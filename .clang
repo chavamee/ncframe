@@ -1,0 +1,1 @@
+flags=-Iinc -DDEBUG -std=c++14

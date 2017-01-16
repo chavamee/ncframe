@@ -120,7 +120,7 @@ class Menu : public Widget {
             return m_handle;
         }
 
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override;
+        void Draw(std::unique_ptr<Window>& window) override;
 
         void OnMouseEvent (int ch) override;
 
@@ -173,8 +173,6 @@ class Menu : public Widget {
         MENU* m_handle = NULL;
         const char* m_itemMark = "*";
 
-        std::unique_ptr<Window> m_mainWindow;
-        std::unique_ptr<Window> m_subWindow;
         bool m_isDrawn = false;
 
         std::vector<MenuItem*> m_items;

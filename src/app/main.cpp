@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     Feedly::User user{
         "0f558b72-8e00-48b4-9f4a-7f97d8621968",
-        "AwrS_rOER9mV3pd9CnGBH5Jckc96fv_yAfhaTWJdKWaXC9fuvGbDh4MW25kEvAiJi90p7yR41gSO8D02D20QLWm9hVF1utpbmcZlxwUgjxTIT-JgxjiIxkhmXnEPqW85VwUqNQO1hMtkAzc96bz8TR9ZulKg5Ci3PhyO7iECLFRZVo0Woz3aQwgq1cMaRKaHLkcTWECnIjbkTHm3pFreEBmoAu7zY_E:feedlydev"
+        "Az8RkrRAn5dR0MpoZUmSaYr55MsrclittquxiHIPiHgOU1hpkzCiH881WYeIMqKzo3fy5ZKzqjgMCjml9OYxTwkRXjAmycKeXoBh4ddQVwAr6Efb5kJy4_iR1q8-0OkOw2ZXiZC1m_x88lmUwp04ByckJq2ErTL0G8AhTlNfmWtvbVjF7Cqju3_x_WJTnsbCzPRSR6zg5kxLhVgzoIxgEtlgSQNmFw:feedlydev"
     };
 
     Feedly server {

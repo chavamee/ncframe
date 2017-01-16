@@ -15,7 +15,7 @@ class TextView : public View {
 
         TextView(int height, int width, int y, int x);
 
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override;
+        void Draw(std::unique_ptr<Window>& mainWindow) override;
 
         void SetContent(const std::string& str)
         {

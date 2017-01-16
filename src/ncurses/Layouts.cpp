@@ -1,6 +1,8 @@
 #include "ncurses/Layouts.hpp"
 #include <cassert>
 
+using namespace std;
+
 LayoutCompositor::LayoutCompositor()
 {
 }
@@ -55,7 +57,7 @@ RowLayout::~RowLayout()
 {
 }
 
-void RowLayout::Draw(std::unique_ptr<Window> mainWindow)
+void RowLayout::Draw(std::unique_ptr<Window>& mainWindow)
 {
     MaxHeight = mainWindow->Height();
     MaxWidth = mainWindow->Width();
@@ -111,7 +113,8 @@ void UniformRowCompositor::Compose()
 
     for (int i = 0; i < numCmps; i++) {
         m_row.Add(composition->Child(i));
-        composition->Child(i)->Draw(std::make_unique<Window>(maxHeight, cmpWidth, 0, currentX));
+        unique_ptr<Window> window = make_unique<Window>(maxHeight, cmpWidth, 0, currentX);
+        composition->Child(i)->Draw(window);
         currentX += cmpWidth;
 
     }
@@ -143,7 +146,7 @@ ColumnLayout::~ColumnLayout()
 {
 }
 
-void ColumnLayout::Draw(std::unique_ptr<Window> mainWindow)
+void ColumnLayout::Draw(std::unique_ptr<Window>& mainWindow)
 {
     MaxHeight = mainWindow->Height();
     MaxWidth = mainWindow->Width();
@@ -195,7 +198,8 @@ void UniformColumnCompositor::Compose()
 
     for (int i = 0; i < numCmps; i++) {
         m_column.Add(composition->Child(i));
-        composition->Child(i)->Draw(std::make_unique<Window>(cmpHeight, maxWidth, currentY, 0));
+        unique_ptr<Window> window = make_unique<Window>(cmpHeight, maxWidth, currentY, 0);
+        composition->Child(i)->Draw(window);
         currentY += cmpHeight;
 
     }

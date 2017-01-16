@@ -45,7 +45,7 @@ class RowLayout : public Layout {
 
         virtual ~RowLayout();
 
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override;
+        void Draw(std::unique_ptr<Window>& mainWindow) override;
 
         void Show() override;
 
@@ -87,7 +87,7 @@ class ColumnLayout : public Layout {
 
         virtual ~ColumnLayout();
 
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override;
+        void Draw(std::unique_ptr<Window>& mainWindow) override;
 
         void Show() override;
 

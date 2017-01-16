@@ -57,17 +57,40 @@ class Widget : public Component {
 
         bool CanFocus = true;
 
+        void SetWindow(std::unique_ptr<Window>& window)
+        {
+            m_window = move(window);
+        }
+
+        void SetSubWindow(std::unique_ptr<Window>& window)
+        {
+            m_subWindow = move(window);
+        }
+
+        Window& GetWindow() const
+        {
+            return *m_window;
+        }
+
+        Window& GetSubWindow() const
+        {
+            return *m_window;
+        }
+
     private:
         int m_width = 0;
         int m_height = 0;
+
+        std::unique_ptr<Window> m_window;
+        std::unique_ptr<Window> m_subWindow;
 };
 
 class Row : public Component {
     public:
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override
+        void Draw(std::unique_ptr<Window>& mainWindow) override
         {
             for (auto& cmp : m_components) {
-                cmp->Draw(move(mainWindow));
+                cmp->Draw(mainWindow);
             }
         }
 
@@ -97,10 +120,10 @@ class Row : public Component {
 
 class Column : public Component {
     public:
-        void Draw(std::unique_ptr<Window> mainWindow = {}) override
+        void Draw(std::unique_ptr<Window>& mainWindow) override
         {
             for (auto& cmp : m_components) {
-                cmp->Draw(move(mainWindow));
+                cmp->Draw(mainWindow);
             }
         }
 

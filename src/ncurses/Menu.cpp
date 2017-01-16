@@ -69,7 +69,6 @@ void MenuItem::set_options (Menu_Options opts) {
 Menu::Menu() :
     m_handle(NULL),
     m_itemMark(nullptr),
-    m_subWindow{},
     m_items()
 {
 }
@@ -77,8 +76,6 @@ Menu::Menu() :
 Menu::Menu(int height, int width, int y, int x) :
     m_handle(NULL),
     m_itemMark(nullptr),
-    m_mainWindow {new Window {height, width, y, x}},
-    m_subWindow{},
     m_items()
 {
 }
@@ -86,8 +83,6 @@ Menu::Menu(int height, int width, int y, int x) :
 Menu::Menu(int height, int width, int y, int x, vector<MenuItem*>& items) :
     m_handle(NULL),
     m_itemMark(nullptr),
-    m_mainWindow {new Window {height, width, y, x}},
-    m_subWindow {},
     m_items(items)
 {
 }
@@ -111,44 +106,45 @@ Menu::~Menu()
 //  item.m_handle = new_item(...)
 //}
 
-void Menu::Draw(std::unique_ptr<Window> mainWindow)
+void Menu::Draw(std::unique_ptr<Window>& window)
 {
-    if (mainWindow.get() != nullptr) {
-        m_mainWindow = std::move(mainWindow);
+    if (window.get() != nullptr) {
+
+        keypad(window->GetHandle(), true);
+        meta(window->GetHandle(), true);
+
+        //TODO: initializeItems()
+
+        m_handle = new_menu(unpackItems(m_items));
+        if (m_handle == NULL) {
+            throw std::runtime_error("menu error");
+        }
+
+        int subRows, subCols;
+        scale_menu(m_handle, &subRows, &subCols);
+        set_menu_win(m_handle, window->GetHandle());
+
+        if (subRows < window->Height() - 2 && subCols < window->Width() - 2) {
+            unique_ptr<Window> subWindow = make_unique<Window>(
+                    *window,
+                    subRows, subCols, 1, 1,
+                    false
+                    );
+            set_menu_sub(m_handle, subWindow->GetHandle());
+            SetSubWindow(subWindow);
+        } else {
+            throw NCException("No room left for menu");
+        }
+
+        set_menu_mark(m_handle, m_itemMark ? m_itemMark : "*");
+
+        post_menu(m_handle);
+        m_isDrawn = true;
+
+        SetWindow(window);
     } else {
         //TODO: Define defaults
     }
-
-    keypad(m_mainWindow->GetHandle(), true);
-    meta(m_mainWindow->GetHandle(), true);
-
-
-    //TODO: initializeItems()
-
-    m_handle = new_menu(unpackItems(m_items));
-    if (m_handle == NULL) {
-        throw std::runtime_error("menu error");
-    }
-
-    int subRows, subCols;
-    scale_menu(m_handle, &subRows, &subCols);
-    set_menu_win(m_handle, m_mainWindow->GetHandle());
-
-    if (subRows < m_mainWindow->Height() - 2 && subCols < m_mainWindow->Width() - 2) {
-        m_subWindow = make_unique<Window>(
-                *m_mainWindow,
-                subRows, subCols, 1, 1,
-                false
-                );
-        set_menu_sub(m_handle, m_subWindow->GetHandle());
-    } else {
-        throw NCException("No room left for menu");
-    }
-
-    set_menu_mark(m_handle, m_itemMark ? m_itemMark : "*");
-
-    post_menu(m_handle);
-    m_isDrawn = true;
 }
 
 void Menu::SetItems(vector<MenuItem*>& items)
@@ -189,10 +185,10 @@ int Menu::OnKeyEvent(int ch)
 
         case CTRL('T')     : return ::menu_driver(m_handle, REQ_TOGGLE_ITEM);
 
-        /*
-         * Depending on the terminal, the Enter/Send key will return one of
-         * the following:
-         */
+                             /*
+                              * Depending on the terminal, the Enter/Send key will return one of
+                              * the following:
+                              */
         case '\r'          :
         case '\n'          :
         case KEY_ENTER     : invokeAction(CurrentItem()); return 1;

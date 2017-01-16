@@ -1,0 +1,5 @@
+-DDEBUG
+-Wall
+-Wextra
+-Iinc
+-std=c++14

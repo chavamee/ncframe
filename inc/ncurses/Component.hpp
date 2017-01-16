@@ -27,7 +27,7 @@ class Component {
 
         virtual ~Component() {}
 
-        virtual void Draw(std::unique_ptr<Window> window = {}) = 0;
+        virtual void Draw(std::unique_ptr<Window>& window) = 0;
 
         virtual void Add(Component* component, unsigned int pos = 0)
         {

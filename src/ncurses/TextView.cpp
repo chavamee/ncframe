@@ -21,7 +21,7 @@ TextView::TextView(int height, int width, int y, int x) :
     (void)x;
 }
 
-void TextView::Draw(std::unique_ptr<Window> mainWindow)
+void TextView::Draw(std::unique_ptr<Window>& mainWindow)
 {
     if (mainWindow.get() != nullptr) {
         m_mainWindow = move(mainWindow);

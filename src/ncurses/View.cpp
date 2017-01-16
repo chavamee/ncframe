@@ -70,3 +70,8 @@ void Pad::SetSubWindow(unique_ptr<Window> sub)
 
     m_viewSub = std::move(sub);
 }
+
+View::View(int height, int width) :
+    Widget{ height, width }
+{
+}

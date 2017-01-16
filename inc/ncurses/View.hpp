@@ -1,10 +1,30 @@
 #ifndef NCURSES_VIEW_HPP_
 #include "ncurses/Widgets.hpp"
 
+class Pad;
+
+// TODO: ScrollableView and View should own the window not Widget
+//       ScrollableView will own a pad
+//       View will own a Window
+
 class View : public Widget {
+    public:
+        View()
+        {
+        }
+        View(int height, int width);
 };
 
 class ScrollableView : public View {
+    public:
+        ScrollableView()
+        {
+        }
+
+        ScrollableView(int height, int width);
+
+    private:
+        std::unique_ptr<Pad> m_pad;
 };
 
 
@@ -40,19 +60,19 @@ class Pad : public Window {
         // The driver translates the keystroke c into an Pad_Request
 
         virtual void OnUnknownOperation(int pad_req) {
-            (void) pad_req;
-            ::beep();
+        (void) pad_req;
+        ::beep();
         }
         // This is called if the driver returns an unknown op-code
 
         virtual void OnNavigationError(int pad_req) {
-            (void) pad_req;
-            ::beep();
+        (void) pad_req;
+        ::beep();
         }
         // This is called if a navigation request couldn't be satisfied
 
         virtual void OnOperation(int pad_req) {
-            (void) pad_req;
+        (void) pad_req;
         };
         // OnOperation is called if a Pad_Operation was executed and just before
         // the refresh() operation is done.*/
@@ -77,8 +97,8 @@ class Pad : public Window {
             m_vertGridsize(rhs.m_vertGridsize),
             m_minRow(rhs.m_minRow),
             m_minCol(rhs.m_minCol)
-        {
-        }
+    {
+    }
 
         virtual ~Pad() {}
 
