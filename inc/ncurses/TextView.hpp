@@ -7,7 +7,7 @@
 #include <string>
 
 //Should probably be widget
-class TextView : public View {
+class TextView : public ScrollableView {
     public:
         TextView();
 
@@ -15,7 +15,16 @@ class TextView : public View {
 
         TextView(int height, int width, int y, int x);
 
+        virtual ~TextView()
+        {
+        }
+
         void Draw(std::unique_ptr<Window>& window) override;
+
+        void SetContent(const std::string& str)
+        {
+            m_content = str;
+        }
 
         int OnKeyEvent(int ch) override;
 

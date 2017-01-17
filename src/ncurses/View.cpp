@@ -2,6 +2,16 @@
 #include "ncurses/NCException.hpp"
 #include <cassert>
 
+//TODO: SubWindow should be manipulated at the View level.
+//      In other words, the content is printed/placed on the SubWindow
+//      On the View instance.
+//      void View::Draw(unique_ptr<Window)
+//      {
+//          ...
+//          subWindow->PrintStr(m_content);
+//          ...
+//      }
+
 using namespace std;
 
 Pad::Pad(int height, int width) :
@@ -42,7 +52,7 @@ int Pad::NoutRefresh()
     return res;
 }
 
-void Pad::SetWindow(unique_ptr<Window> view,
+void Pad::SetWindow(unique_ptr<Window>& view,
         int v_grid,
         int h_grid
         )
@@ -57,7 +67,7 @@ void Pad::SetWindow(unique_ptr<Window> view,
     }
 }
 
-void Pad::SetSubWindow(unique_ptr<Window> sub)
+void Pad::SetSubWindow(unique_ptr<Window>& sub)
 {
     if (!m_viewWin) {
         NCException("Pad has no viewport");
@@ -76,6 +86,15 @@ View::View(int height, int width) :
 {
 }
 
+void View::Draw(unique_ptr<Window>& window)
+{
+}
+
+ScrollableView::ScrollableView(int height, int width) :
+    View{ height, width }
+{
+}
+
 void ScrollableView::Draw(unique_ptr<Window>& window)
 {
     if (window) {
@@ -86,6 +105,10 @@ void ScrollableView::Draw(unique_ptr<Window>& window)
         }
     }
 
-    m_pad = make_unique<Pad>(new Pad(Height(), Width()));
-    m_pad->SetSubWindow(GetSubWindow());
+    std::unique_ptr<Window> subWindow = make_unique<Window>(
+            *window, window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1
+            );
+
+    m_pad = make_unique<Pad>(Height(), Width());
+    m_pad->SetSubWindow(subWindow);
 }

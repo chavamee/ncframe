@@ -21,9 +21,12 @@ class View : public Widget {
 
         View(int height, int width);
 
-        void Draw(std::unique_ptr<Window>& window) override;
+        virtual ~View()
+        {
+        }
 
-        void Content(const std::string& content);
+
+        void Draw(std::unique_ptr<Window>& window) override;
 
     private:
         std::unique_ptr<Window> m_window;
@@ -38,6 +41,10 @@ class ScrollableView : public View {
         }
 
         ScrollableView(int height, int width);
+
+        virtual ~ScrollableView()
+        {
+        }
 
         void Draw(std::unique_ptr<Window>& window) override;
 
@@ -150,10 +157,10 @@ class Pad : public Window {
         }
         // Does the same as refresh() but without calling doupdate().
 
-        virtual void SetWindow(std::unique_ptr<Window> view, int v_grid = 1, int h_grid = 1);
+        void SetWindow(std::unique_ptr<Window>& view, int v_grid = 1, int h_grid = 1);
         // Add the window "view" as viewing window to the pad.
 
-        virtual void SetSubWindow(std::unique_ptr<Window> sub);
+        void SetSubWindow(std::unique_ptr<Window>& sub);
         // Use the subwindow "sub" of the viewport window for the actual viewing.
         // The full viewport window is usually used to provide some decorations
         // like frames, titles etc.
