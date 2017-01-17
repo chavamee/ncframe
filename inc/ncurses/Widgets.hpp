@@ -33,7 +33,7 @@ class Widget : public Component {
 
         bool m_shouldListenForKeyEvents = false;
 
-        int Widgth() const
+        int Width() const
         {
             return m_width;
         }
@@ -67,14 +67,14 @@ class Widget : public Component {
             m_subWindow = move(window);
         }
 
-        Window& GetWindow() const
+        Window *const GetWindow() const
         {
-            return *m_window;
+            return m_window.get();
         }
 
-        Window& GetSubWindow() const
+        Window *const GetSubWindow() const
         {
-            return *m_window;
+            return m_window.get();
         }
 
     private:

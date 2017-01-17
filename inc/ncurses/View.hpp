@@ -7,12 +7,28 @@ class Pad;
 //       ScrollableView will own a pad
 //       View will own a Window
 
+//TODO: Turn into model/view
+
+//TODO: Is the seperate view for scrolling needed or can we merge it?
+//      Pad already inherits window so we could construct a pad when needing
+//      scrolling and a normal window when not.
+
 class View : public Widget {
     public:
         View()
         {
         }
+
         View(int height, int width);
+
+        void Draw(std::unique_ptr<Window>& window) override;
+
+        void Content(const std::string& content);
+
+    private:
+        std::unique_ptr<Window> m_window;
+        std::string m_content;
+        bool isScrollable = true;
 };
 
 class ScrollableView : public View {
@@ -22,6 +38,8 @@ class ScrollableView : public View {
         }
 
         ScrollableView(int height, int width);
+
+        void Draw(std::unique_ptr<Window>& window) override;
 
     private:
         std::unique_ptr<Pad> m_pad;
@@ -78,7 +96,7 @@ class Pad : public Window {
         // the refresh() operation is done.*/
 
     public:
-        Pad(int nlines, int ncols);
+        Pad(int height, int width);
         // create a pad with the given size
 
         Pad& operator=(const Pad& rhs)
@@ -97,8 +115,8 @@ class Pad : public Window {
             m_vertGridsize(rhs.m_vertGridsize),
             m_minRow(rhs.m_minRow),
             m_minCol(rhs.m_minCol)
-    {
-    }
+        {
+        }
 
         virtual ~Pad() {}
 

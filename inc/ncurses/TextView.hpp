@@ -15,22 +15,7 @@ class TextView : public View {
 
         TextView(int height, int width, int y, int x);
 
-        void Draw(std::unique_ptr<Window>& mainWindow) override;
-
-        void SetContent(const std::string& str)
-        {
-            m_content = str;
-            Redraw();
-        }
-
-        void Redraw()
-        {
-            if (m_pad) {
-                m_pad->Clear();
-                m_pad->PrintStr(m_content);
-                m_pad->Refresh();
-            }
-        }
+        void Draw(std::unique_ptr<Window>& window) override;
 
         int OnKeyEvent(int ch) override;
 
@@ -39,10 +24,7 @@ class TextView : public View {
         bool OnEvent(int ch) override;
 
     private:
-        std::unique_ptr<Window> m_mainWindow;
-        std::unique_ptr<Window> m_subWindow;
         std::string m_content;
-        std::unique_ptr<Pad> m_pad;
 };
 
 #endif /* ifndef NCURSES_TEXTVIEW_COMPONENT */

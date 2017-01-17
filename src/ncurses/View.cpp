@@ -4,10 +4,10 @@
 
 using namespace std;
 
-Pad::Pad(int nlines, int ncols) :
+Pad::Pad(int height, int width) :
     Window()
 {
-    m_handle = ::newpad(nlines, ncols);
+    m_handle = ::newpad(height, width);
     if (static_cast<WINDOW*>(0) == m_handle) {
         throw NCException("Cannot construct window");
     }
@@ -74,4 +74,18 @@ void Pad::SetSubWindow(unique_ptr<Window> sub)
 View::View(int height, int width) :
     Widget{ height, width }
 {
+}
+
+void ScrollableView::Draw(unique_ptr<Window>& window)
+{
+    if (window) {
+        if (GetWindow()) {
+            // TODO: Use this window
+        } else {
+            //TODO: Make default window
+        }
+    }
+
+    m_pad = make_unique<Pad>(new Pad(Height(), Width()));
+    m_pad->SetSubWindow(GetSubWindow());
 }

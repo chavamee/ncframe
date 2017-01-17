@@ -2,40 +2,30 @@
 
 using namespace std;
 
-TextView::TextView() :
-    m_mainWindow{},
-    m_subWindow{}
+TextView::TextView()
 {
 }
 
-TextView::TextView(int height, int width)
-    //View(height, width)
+TextView::TextView(int height, int width) :
+    View(height, width)
 {
 }
 
 TextView::TextView(int height, int width, int y, int x) :
-    //Widget(height, width),
-    m_subWindow{}
+    View(height, width)
 {
     (void)y;
     (void)x;
 }
 
-void TextView::Draw(std::unique_ptr<Window>& mainWindow)
+void TextView::Draw(std::unique_ptr<Window>& window)
 {
-    if (mainWindow.get() != nullptr) {
-        m_mainWindow = move(mainWindow);
-    } else {
-        m_mainWindow  = make_unique<Window>(10, 10, 0, 0);
-    }
-
-    m_subWindow = std::make_unique<Window>(
-            m_mainWindow->Height()-2, m_mainWindow->Width()-2, m_mainWindow->OriginY()+1, m_mainWindow->OriginX()+1);
-    m_pad = make_unique<Pad>(m_mainWindow->Height(), m_mainWindow->Width());
-    m_pad->SetWindow(move(m_mainWindow));
-    m_pad->SetSubWindow(move(m_subWindow));
-    m_pad->PrintStr(m_content);
-    m_pad->Refresh();
+    std::unique_ptr<Window> subWindow = std::make_unique<Window>(
+            window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1);
+    window->PrintStr(m_content);
+    SetWindow(window);
+    SetSubWindow(subWindow);
+    View::Draw(window);
 }
 
 int TextView::OnKeyEvent(int ch)
