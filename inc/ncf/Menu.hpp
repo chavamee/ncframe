@@ -1,9 +1,9 @@
 #ifndef NCURSES_MENU_BINDINGS_H_
 #define NCURSES_MENU_BINDINGS_H_
 
-#include "ncurses/Window.hpp"
-#include "ncurses/Component.hpp"
-#include "ncurses/Widgets.hpp"
+#include "ncf/Window.hpp"
+#include "ncf/Component.hpp"
+#include "ncf/Widgets.hpp"
 #include <menu.h>
 #include <vector>
 #include <memory>
@@ -120,7 +120,7 @@ class Menu : public Widget {
             return m_handle;
         }
 
-        void Draw(std::unique_ptr<Window>& window) override;
+        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         void OnMouseEvent (int ch) override;
 

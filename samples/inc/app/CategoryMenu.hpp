@@ -1,7 +1,7 @@
 #ifndef APPLICATION_CTG_MENU_H_
 #define APPLICATION_CTG_MENU_H_
 
-#include "ncurses/Menu.hpp"
+#include "ncf/Menu.hpp"
 #include "app/EntriesMenu.hpp"
 #include "api/Feedly.hpp"
 

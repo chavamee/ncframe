@@ -1,5 +1,5 @@
-#include "ncurses/Application.hpp"
-#include "ncurses/Widgets.hpp"
+#include "ncf/Application.hpp"
+#include "ncf/Widgets.hpp"
 #include <algorithm>
 #include <menu.h>
 #include <panel.h>

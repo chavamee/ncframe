@@ -1,4 +1,4 @@
-#include "ncurses/Layouts.hpp"
+#include "ncf/Layouts.hpp"
 #include <cassert>
 
 using namespace std;
@@ -57,10 +57,10 @@ RowLayout::~RowLayout()
 {
 }
 
-void RowLayout::Draw(std::unique_ptr<Window>& mainWindow)
+void RowLayout::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    MaxHeight = mainWindow->Height();
-    MaxWidth = mainWindow->Width();
+    MaxHeight = window->Height();
+    MaxWidth = window->Width();
     Show();
 }
 
@@ -114,7 +114,7 @@ void UniformRowCompositor::Compose()
     for (int i = 0; i < numCmps; i++) {
         m_row.Add(composition->Child(i));
         unique_ptr<Window> window = make_unique<Window>(maxHeight, cmpWidth, 0, currentX);
-        composition->Child(i)->Draw(window);
+        composition->Child(i)->Draw(std::move(window));
         currentX += cmpWidth;
 
     }
@@ -146,10 +146,10 @@ ColumnLayout::~ColumnLayout()
 {
 }
 
-void ColumnLayout::Draw(std::unique_ptr<Window>& mainWindow)
+void ColumnLayout::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    MaxHeight = mainWindow->Height();
-    MaxWidth = mainWindow->Width();
+    MaxHeight = window->Height();
+    MaxWidth = window->Width();
     Show();
 }
 
@@ -199,7 +199,7 @@ void UniformColumnCompositor::Compose()
     for (int i = 0; i < numCmps; i++) {
         m_column.Add(composition->Child(i));
         unique_ptr<Window> window = make_unique<Window>(cmpHeight, maxWidth, currentY, 0);
-        composition->Child(i)->Draw(window);
+        composition->Child(i)->Draw(std::move(window));
         currentY += cmpHeight;
 
     }

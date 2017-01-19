@@ -1,57 +1,7 @@
-#ifndef NCURSES_VIEW_HPP_
-#include "ncurses/Widgets.hpp"
+#ifndef NCF_NCURSES_PAD_H_
+#define NCF_NCURSES_PAD_H_
 
-class Pad;
-
-// TODO: ScrollableView and View should own the window not Widget
-//       ScrollableView will own a pad
-//       View will own a Window
-
-//TODO: Turn into model/view
-
-//TODO: Is the seperate view for scrolling needed or can we merge it?
-//      Pad already inherits window so we could construct a pad when needing
-//      scrolling and a normal window when not.
-
-class View : public Widget {
-    public:
-        View()
-        {
-        }
-
-        View(int height, int width);
-
-        virtual ~View()
-        {
-        }
-
-
-        void Draw(std::unique_ptr<Window>& window) override;
-
-    private:
-        std::unique_ptr<Window> m_window;
-        std::string m_content;
-        bool isScrollable = true;
-};
-
-class ScrollableView : public View {
-    public:
-        ScrollableView()
-        {
-        }
-
-        ScrollableView(int height, int width);
-
-        virtual ~ScrollableView()
-        {
-        }
-
-        void Draw(std::unique_ptr<Window>& window) override;
-
-    private:
-        std::unique_ptr<Pad> m_pad;
-};
-
+#include "ncf/Window.hpp"
 
 // -------------------------------------------------------------------------
 // Pad Support. We allow an association of a pad with a "real" window
@@ -59,8 +9,9 @@ class ScrollableView : public View {
 // -------------------------------------------------------------------------
 class Pad : public Window {
     private:
-        std::unique_ptr<Window> m_viewWin = {};       // the "viewport" window
-        std::unique_ptr<Window> m_viewSub = {};       // the "viewport" subwindow
+        Window* m_viewWin = nullptr;       // the "viewport" window*/
+        Window* m_viewSub = nullptr;       // the "viewport" subwindow*/
+
         int m_horizGridsize = 0;
         int m_vertGridsize  = 0;
 
@@ -70,15 +21,15 @@ class Pad : public Window {
 
         Window* Win(void) const {
             // Get the window into which the pad should be copied (if any)
-            return m_viewSub ? m_viewSub.get() : (m_viewWin.get() ? m_viewWin.get() : nullptr);
+            return m_viewSub ? m_viewSub : (m_viewWin ? m_viewWin : nullptr);
         }
 
         Window& GetWindow(void) const {
-            return *m_viewWin.get();
+            return *m_viewWin;
         }
 
         Window& GetSubWindow(void) const {
-            return *m_viewSub.get();
+            return *m_viewSub;
         }
 
         /*TODO: virtual int driver (int key);      // Virtualize keystroke key
@@ -157,10 +108,10 @@ class Pad : public Window {
         }
         // Does the same as refresh() but without calling doupdate().
 
-        void SetWindow(std::unique_ptr<Window>& view, int v_grid = 1, int h_grid = 1);
+        void SetWindow(Window* view, int v_grid = 1, int h_grid = 1);
         // Add the window "view" as viewing window to the pad.
 
-        void SetSubWindow(std::unique_ptr<Window>& sub);
+        void SetSubWindow(Window* sub);
         // Use the subwindow "sub" of the viewport window for the actual viewing.
         // The full viewport window is usually used to provide some decorations
         // like frames, titles etc.

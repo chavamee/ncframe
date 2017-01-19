@@ -1,9 +1,9 @@
 #ifndef NCURSES_APPLICATION_BINDINGS_H_
 #define NCURSES_APPLICATION_BINDINGS_H_
 
-#include "ncurses/Window.hpp"
-#include "ncurses/Widgets.hpp"
-#include "ncurses/Component.hpp"
+#include "ncf/Window.hpp"
+#include "ncf/Widgets.hpp"
+#include "ncf/Component.hpp"
 #include <curses.h>
 #include <cassert>
 #include <vector>

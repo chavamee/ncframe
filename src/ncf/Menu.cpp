@@ -1,5 +1,5 @@
-#include "ncurses/Menu.hpp"
-#include "ncurses/NCException.hpp"
+#include "ncf/Menu.hpp"
+#include "ncf/NCException.hpp"
 
 #include <menu.h>
 #include <cassert>
@@ -106,7 +106,7 @@ Menu::~Menu()
 //  item.m_handle = new_item(...)
 //}
 
-void Menu::Draw(std::unique_ptr<Window>& window)
+void Menu::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     if (window.get() != nullptr) {
 
@@ -131,7 +131,7 @@ void Menu::Draw(std::unique_ptr<Window>& window)
                     false
                     );
             set_menu_sub(m_handle, subWindow->GetHandle());
-            SetSubWindow(subWindow);
+            SetSubWindow(std::move(subWindow));
         } else {
             throw NCException("No room left for menu");
         }
@@ -141,7 +141,7 @@ void Menu::Draw(std::unique_ptr<Window>& window)
         post_menu(m_handle);
         m_isDrawn = true;
 
-        SetWindow(window);
+        SetWindow(std::move(window));
     } else {
         //TODO: Define defaults
     }

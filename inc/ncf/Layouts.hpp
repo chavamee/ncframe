@@ -1,8 +1,8 @@
 #ifndef NCURSES_LAYOUTS_H_
 #define NCURSES_LAYOUTS_H_ value
 
-#include "ncurses/Composition.hpp"
-#include "ncurses/Widgets.hpp"
+#include "ncf/Composition.hpp"
+#include "ncf/Widgets.hpp"
 #include <algorithm>
 
 class LayoutCompositor : public Compositor {
@@ -45,7 +45,7 @@ class RowLayout : public Layout {
 
         virtual ~RowLayout();
 
-        void Draw(std::unique_ptr<Window>& mainWindow) override;
+        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         void Show() override;
 
@@ -87,7 +87,7 @@ class ColumnLayout : public Layout {
 
         virtual ~ColumnLayout();
 
-        void Draw(std::unique_ptr<Window>& mainWindow) override;
+        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         void Show() override;
 

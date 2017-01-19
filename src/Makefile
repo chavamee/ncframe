@@ -1,16 +1,6 @@
 all:
-	make -C ./api all
-	make -C ./ncurses all
-	make -C ./app all
+	make -C ./ncf all
 dev:
-	make -C ./api dev
-	make -C ./ncurses dev
-	make -C ./app dev
-install:
-	make -C ./app install
-uninstall:
-	make -C ./api remove
+	make -C ./ncf dev
 clean:
-	make -C ./api clean
-	make -C ./app clean
-	make -C ./ncurses clean
+	make -C ./ncf clean

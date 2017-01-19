@@ -1,7 +1,8 @@
 #ifndef NCURSES_COMPONENT_BINDIGNS_H_
 #define NCURSES_COMPONENT_BINDIGNS_H_
 
-#include "ncurses/Window.hpp"
+#include "common/platform.h"
+#include "ncf/Window.hpp"
 #include <vector>
 #include <memory>
 
@@ -20,30 +21,30 @@ class Component {
 
         virtual void Bounds(Rect& bounds)
         {
-            (void)bounds;
+            NCF_UNUSED(bounds);
         }
 
-        //virtual void Intersects(const Points&);
+        //TODO?: virtual void Intersects(const Points&);
 
         virtual ~Component() {}
 
-        virtual void Draw(std::unique_ptr<Window>& window) = 0;
+        virtual void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) = 0;
 
         virtual void Add(Component* component, unsigned int pos = 0)
         {
-            (void)component;
-            (void)pos;
+            NCF_UNUSED(component);
+            NCF_UNUSED(pos);
         }
 
         virtual void Remove(Component* component)
         {
-            (void)component;
+            NCF_UNUSED(component);
         }
 
 
         virtual Component* Child(int pos)
         {
-            (void)pos;
+            NCF_UNUSED(pos);
             return nullptr;
         }
 

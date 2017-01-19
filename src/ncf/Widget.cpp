@@ -1,3 +1,3 @@
-#include "ncurses/Widgets.hpp"
+#include "ncf/Widgets.hpp"
 
 std::vector<Widget*> Widget::WidgetList = {};

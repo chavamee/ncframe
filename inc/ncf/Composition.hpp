@@ -1,7 +1,7 @@
 #ifndef NCURSES_COMPOSITIONS_H_
 #define NCURSES_COMPOSITIONS_H_ value
 
-#include "ncurses/Component.hpp"
+#include "ncf/Component.hpp"
 
 class Composition;
 

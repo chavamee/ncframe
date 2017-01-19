@@ -1,8 +1,8 @@
 #ifndef APPLICATION_ENTRIES_MENU_H_
 #define APPLICATION_ENTRIES_MENU_H_
 
-#include "ncurses/Menu.hpp"
-#include "ncurses/TextView.hpp"
+#include "ncf/Menu.hpp"
+#include "ncf/TextView.hpp"
 #include "api/Feedly.hpp"
 
 

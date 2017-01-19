@@ -2,17 +2,17 @@ CC        := clang++
 LD    	  := clang++
 
 BUILD_DIR := ../../build
-#BIN_DIR    = $(BUILD_DIR)/bin
+BIN_DIR    = $(BUILD_DIR)/bin
 LIB_DIR   := $(BUILD_DIR)/lib
 OBJS_DIR  := $(BUILD_DIR)/objs
 INC_DIR    = ../../inc
 
-TARGET    := $(LIB_DIR)/libfeedly.a
-CFLAGS    := -std=c++14 -Wall -Wextra -pg -g -c -O0
-LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp
+TARGET    := $(BIN_DIR)/feedlr
+CFLAGS    := -std=c++14 -Wall -Wextra -pg -g -O0
+LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp -lncframe
 
-INCLUDES  := -I$(INC_DIR)
-LDFLAGS    := -L$(BUILD_DIR)
+INCLUDES  := -I$(INC_DIR) -I../inc
+LDFLAGS   := -L$(LIB_DIR)
 
 SOURCES   := $(wildcard *.cpp)
 OBJECTS   := $(SOURCES:%.cpp=$(OBJS_DIR)/%.o)
@@ -25,7 +25,7 @@ dev: CFLAGS+=-g
 dev: all
 
 $(TARGET): $(OBJECTS)
-	ar -cvq $@ $^
+	$(LD) $^ $(LDFLAGS) $(LIBS) -o $@
 
 $(OBJECTS): $(OBJS_DIR)/%.o : %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

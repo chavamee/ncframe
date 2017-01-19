@@ -1,10 +1,13 @@
 #include "api/Feedly.hpp"
-#include "ncurses/Decorators.hpp"
-#include "ncurses/TextView.hpp"
-#include "ncurses/Application.hpp"
+
+#include "ncf/Decorators.hpp"
+#include "ncf/TextView.hpp"
+#include "ncf/Application.hpp"
+#include "ncf/Layouts.hpp"
+
 #include "app/CategoryMenu.hpp"
 #include "app/EntriesMenu.hpp"
-#include "ncurses/Layouts.hpp"
+
 #include <string>
 #include <iostream>
 #include <map>

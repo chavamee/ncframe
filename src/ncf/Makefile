@@ -7,13 +7,12 @@ LIB_DIR   := $(BUILD_DIR)/lib
 OBJS_DIR  := $(BUILD_DIR)/objs
 INC_DIR    = ../../inc
 
-TARGET    := $(BIN_DIR)/feedlr
-CFLAGS    := -std=c++14 -Wall -Wextra -pg -g -c -O0
-ARCHIVES  := $(wildcard $(LIB_DIR)/*.a)
-LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp $(ARCHIVES)
+TARGET    := $(LIB_DIR)/libncframe.so
+CFLAGS    := -std=c++14 -Wall -Wextra -pg -O0 -fPIC
+LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp
 
 INCLUDES  := -I$(INC_DIR)
-LDFLAGS   := -L$(LIB_DIR)
+LDFLAGS   := -L$(BUILD_DIR) -shared
 
 SOURCES   := $(wildcard *.cpp)
 OBJECTS   := $(SOURCES:%.cpp=$(OBJS_DIR)/%.o)
@@ -26,7 +25,7 @@ dev: CFLAGS+=-g
 dev: all
 
 $(TARGET): $(OBJECTS)
-	$(LD) $^ $(LDLAGS) $(LIBS) -o $@
+	$(LD) $^ $(LDFLAGS) $(LIBS) -o $@
 
 $(OBJECTS): $(OBJS_DIR)/%.o : %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@

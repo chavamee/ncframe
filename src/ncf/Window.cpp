@@ -1,6 +1,6 @@
-#include "ncurses/Menu.hpp"
+#include "ncf/Menu.hpp"
 #include <stdexcept>
-#include "ncurses/NCException.hpp"
+#include "ncf/NCException.hpp"
 
 //TODO: Destructors
 

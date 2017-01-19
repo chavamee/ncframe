@@ -778,7 +778,7 @@ class Window {
         /**
          * Window destructor
          */
-        ~Window();
+        virtual ~Window();
 
 
 
@@ -896,7 +896,7 @@ class Window {
         // Move cursor to the requested position and then put attributed character
         // to the window.
 
-        int EchoChar(const chtype ch) { return ::wechochar(m_handle, ch); }
+        virtual int EchoChar(const chtype ch) { return ::wechochar(m_handle, ch); }
         // Put attributed character to the window and refresh it immediately.
 
         int WriteString(const std::string& str, int n=-1) {
@@ -1183,11 +1183,11 @@ class Window {
         //
         int EnableStandout(bool bf) { return bf ? wstandout(m_handle) : wstandend(m_handle); }
 
-        int  Refresh() { return ::wrefresh(m_handle); }
+        virtual int  Refresh() { return ::wrefresh(m_handle); }
         // Propagate the changes in this window to the virtual screen and call
         // doupdate(). This is redefined in NCursesPanel.
 
-        int  NoutRefresh() { return ::wnoutrefresh(m_handle); }
+        virtual int  NoutRefresh() { return ::wnoutrefresh(m_handle); }
         // Propagate the changes in this window to the virtual screen. This is
         // redefined in NCursesPanel.
 

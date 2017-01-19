@@ -1,13 +1,13 @@
 #ifndef NCURSES_TEXTVIEW_COMPONENT
 #define NCURSES_TEXTVIEW_COMPONENT value
 
-#include "ncurses/Component.hpp"
-#include "ncurses/Window.hpp"
-#include "ncurses/View.hpp"
+#include "ncf/Component.hpp"
+#include "ncf/Window.hpp"
+#include "ncf/View.hpp"
 #include <string>
 
 //Should probably be widget
-class TextView : public ScrollableView {
+class TextView : public View {
     public:
         TextView();
 
@@ -19,12 +19,7 @@ class TextView : public ScrollableView {
         {
         }
 
-        void Draw(std::unique_ptr<Window>& window) override;
-
-        void SetContent(const std::string& str)
-        {
-            m_content = str;
-        }
+        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         int OnKeyEvent(int ch) override;
 

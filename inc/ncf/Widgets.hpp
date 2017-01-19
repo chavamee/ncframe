@@ -1,7 +1,7 @@
 #ifndef NCURSES_WIDGETS_H_
 #define NCURSES_WIDGETS_H_
 
-#include "ncurses/Component.hpp"
+#include "ncf/Component.hpp"
 #include <algorithm>
 
 class Widget : public Component {
@@ -57,24 +57,24 @@ class Widget : public Component {
 
         bool CanFocus = true;
 
-        void SetWindow(std::unique_ptr<Window>& window)
+        void SetWindow(std::unique_ptr<Window> window)
         {
-            m_window = move(window);
+            m_window = std::move(window);
         }
 
-        void SetSubWindow(std::unique_ptr<Window>& window)
+        void SetSubWindow(std::unique_ptr<Window> window)
         {
-            m_subWindow = move(window);
+            m_subWindow = std::move(window);
         }
 
-        Window *const GetWindow() const
+        Window* GetWindow() const
         {
             return m_window.get();
         }
 
-        Window *const GetSubWindow() const
+        Window* GetSubWindow() const
         {
-            return m_window.get();
+            return m_subWindow.get();
         }
 
     private:
@@ -87,10 +87,10 @@ class Widget : public Component {
 
 class Row : public Component {
     public:
-        void Draw(std::unique_ptr<Window>& mainWindow) override
+        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
         {
             for (auto& cmp : m_components) {
-                cmp->Draw(mainWindow);
+                cmp->Draw(std::move(window), std::move(subWindow));
             }
         }
 
@@ -120,10 +120,10 @@ class Row : public Component {
 
 class Column : public Component {
     public:
-        void Draw(std::unique_ptr<Window>& mainWindow) override
+        void Draw(std::unique_ptr<Window> window, std::unique_ptr<Window> subWindow = {}) override
         {
             for (auto& cmp : m_components) {
-                cmp->Draw(mainWindow);
+                cmp->Draw(std::move(window), std::move(subWindow));
             }
         }
 

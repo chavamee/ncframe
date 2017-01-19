@@ -1,16 +1,6 @@
-#include "ncurses/View.hpp"
-#include "ncurses/NCException.hpp"
+#include "ncf/Pad.hpp"
+#include "ncf/NCException.hpp"
 #include <cassert>
-
-//TODO: SubWindow should be manipulated at the View level.
-//      In other words, the content is printed/placed on the SubWindow
-//      On the View instance.
-//      void View::Draw(unique_ptr<Window)
-//      {
-//          ...
-//          subWindow->PrintStr(m_content);
-//          ...
-//      }
 
 using namespace std;
 
@@ -52,12 +42,12 @@ int Pad::NoutRefresh()
     return res;
 }
 
-void Pad::SetWindow(unique_ptr<Window>& view,
+void Pad::SetWindow(Window* view,
         int v_grid,
         int h_grid
         )
 {
-    m_viewWin = std::move(view);
+    m_viewWin = view;
     m_minRow = m_minCol = 0;
     if (h_grid <=0 || v_grid <= 0) {
         NCException("Illegal Gridsize");
@@ -67,7 +57,7 @@ void Pad::SetWindow(unique_ptr<Window>& view,
     }
 }
 
-void Pad::SetSubWindow(unique_ptr<Window>& sub)
+void Pad::SetSubWindow(Window* sub)
 {
     if (!m_viewWin) {
         NCException("Pad has no viewport");
@@ -78,37 +68,5 @@ void Pad::SetSubWindow(unique_ptr<Window>& sub)
         NCException("NCursesFramePad"/*, E_SYSTEM_ERROR*/);
     }
 
-    m_viewSub = std::move(sub);
-}
-
-View::View(int height, int width) :
-    Widget{ height, width }
-{
-}
-
-void View::Draw(unique_ptr<Window>& window)
-{
-}
-
-ScrollableView::ScrollableView(int height, int width) :
-    View{ height, width }
-{
-}
-
-void ScrollableView::Draw(unique_ptr<Window>& window)
-{
-    if (window) {
-        if (GetWindow()) {
-            // TODO: Use this window
-        } else {
-            //TODO: Make default window
-        }
-    }
-
-    std::unique_ptr<Window> subWindow = make_unique<Window>(
-            *window, window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1
-            );
-
-    m_pad = make_unique<Pad>(Height(), Width());
-    m_pad->SetSubWindow(subWindow);
+    m_viewSub = sub;
 }

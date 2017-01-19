@@ -1,4 +1,4 @@
-#include "ncurses/TextView.hpp"
+#include "ncf/TextView.hpp"
 
 using namespace std;
 
@@ -7,23 +7,22 @@ TextView::TextView()
 }
 
 TextView::TextView(int height, int width) :
-    ScrollableView(height, width)
+    View(height, width)
 {
 }
 
 TextView::TextView(int height, int width, int y, int x) :
-    ScrollableView(height, width)
+    View(height, width)
 {
     (void)y;
     (void)x;
 }
 
-void TextView::Draw(std::unique_ptr<Window>& window)
+void TextView::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    std::unique_ptr<Window> subWindow = std::make_unique<Window>(
-            window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1);
-    window->PrintStr(m_content);
-    View::Draw(window);
+    //std::unique_ptr<Window> subWindow = std::make_unique<Window>(
+            //window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1);
+    View::Draw(std::move(window), std::move(subWindow));
 }
 
 int TextView::OnKeyEvent(int ch)
