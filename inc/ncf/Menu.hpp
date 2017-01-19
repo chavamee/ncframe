@@ -168,14 +168,15 @@ class Menu : public Widget {
             (void)item;
         }
 
-        inline void Scale(int& height, int& width)
+        //TODO: This shoudl return
+        inline void Scale(int& height, int& width) const
         {
-            ::scale_menu(m_handle, &height, &width);
+            OnError (::scale_menu (m_handle, &height, &width));
         }
 
         inline void OnError (int err) const {
             if (err != E_OK)
-                throw NCException("Menu error" /*err*/);
+                throw NCException("Menu error", err);
         }
 
         // Remove the menu from the screen
@@ -184,22 +185,17 @@ class Menu : public Widget {
         }
 
         // Post the menu to the screen if flag is true, unpost it otherwise
-        inline void post(bool flag = TRUE) {
-            flag ? OnError (::post_menu(m_handle)) : OnError (::unpost_menu (m_handle));
-        }
-
-        // Get the numer of rows and columns for this menu
-        inline void scale (int& mrows, int& mcols) const  {
-            OnError (::scale_menu (m_handle, &mrows, &mcols));
+        inline void Post() {
+            OnError (::post_menu(m_handle));
         }
 
         // Set the format of this menu
-        inline void set_format(int mrows, int mcols) {
+        inline void SetFormat(int mrows, int mcols) {
             OnError (::set_menu_format(m_handle, mrows, mcols));
         }
 
         // Get the format of this menu
-        inline void menu_format(int& rows,int& ncols) {
+        inline void Format(int& rows,int& ncols) {
             ::menu_format(m_handle,&rows,&ncols);
         }
 

@@ -29,9 +29,13 @@ struct Attributes {
 class Application {
     public:
         Application();
+
         Application(bool enableColors);
+
         Application(int argc, char *argv[], bool enableColors = true);
+
         virtual ~Application();
+
         virtual void Start();
 
         void initializeNCurses();

@@ -719,6 +719,7 @@ class Window;
 //      exposed in Window class
 //
 //TODO: Make int y, int x pairs to Point structs
+//TODO: Complete panel implementation
 
 struct Point {
     int x;

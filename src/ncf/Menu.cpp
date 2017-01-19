@@ -90,12 +90,12 @@ Menu::Menu(int height, int width, int y, int x, vector<MenuItem*>& items) :
 Menu::~Menu()
 {
     // Free all items before freeing the menu
-    m_items.clear();
+    if (m_handle) {
+        ::free_menu(m_handle);
+        m_items.clear();
+        m_handle = NULL;
+    }
 
-    ITEM** items = menu_items(m_handle);
-    free_menu(m_handle);
-    m_handle = NULL;
-    delete[] items;
 }
 
 
@@ -123,30 +123,35 @@ void Menu::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         int subRows = 0;
         int subCols = 0;
         Scale(subRows, subCols);
+
         set_menu_win(m_handle, window->GetHandle());
 
         if (subRows < window->Height() - 2 && subCols < window->Width() - 2) {
-            unique_ptr<Window> derSubWindow = make_unique<Window>(
+            subWindow = make_unique<Window>(
                     *window,
                     subRows, subCols, 1, 1,
                     false
                     );
 
-            SetSubWindow(std::move(derSubWindow));
-            set_menu_sub(m_handle, GetSubWindow()->GetHandle());
+            set_menu_sub(m_handle, subWindow->GetHandle());
+            set_menu_mark(m_handle, m_itemMark ? m_itemMark : "*");
+
+            Post();
+            window->Show();
+            window->Refresh();
+            window->Refresh();
+
+            SetWindow(std::move(window));
+            SetSubWindow(std::move(subWindow));
         } else {
             throw NCException("No room left for menu");
         }
 
-        set_menu_mark(m_handle, m_itemMark ? m_itemMark : "*");
-
-        post_menu(m_handle);
-        m_isDrawn = true;
-
-        SetWindow(std::move(window));
     } else {
         //TODO: Define defaults
     }
+
+    m_isDrawn = true;
 }
 
 void Menu::SetItems(vector<MenuItem*>& items)
@@ -160,13 +165,11 @@ void Menu::SetItems(vector<MenuItem*>& items)
     if (m_isDrawn) {
         ITEM** oldItems = menu_items(m_handle);
 
-        unpost_menu(m_handle);
         if (m_items.empty()) {
             set_menu_items(m_handle, NULL);
         } else {
             set_menu_items(m_handle, unpackItems(m_items));
         }
-        post_menu(m_handle);
 
         delete[] oldItems;
     }
