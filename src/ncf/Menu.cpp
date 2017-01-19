@@ -1,5 +1,5 @@
 #include "ncf/Menu.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/Application.hpp"
 
 #include <menu.h>
 #include <cassert>
@@ -237,4 +237,14 @@ ITEM** Menu::unpackItems(vector<MenuItem*>& items)
     rawItems[i] = (ITEM*)NULL;
 
     return rawItems;
+}
+
+void Menu::SetDefaultAttributes()
+{
+  Application* app = Application::GetApplication();
+  if (app) {
+    ::set_menu_fore(m_handle, app->Foregrounds());
+    ::set_menu_back(m_handle, app->Backgrounds());
+    ::set_menu_grey(m_handle, app->Inactives());
+  }
 }

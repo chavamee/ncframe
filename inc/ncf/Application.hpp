@@ -8,6 +8,8 @@
 #include <cassert>
 #include <vector>
 
+//TODO: Should probably be a singleton
+
 using ColorPair = std::pair<int, int>;
 
 struct Colors {
@@ -51,10 +53,50 @@ class Application {
             return m_killKey;
         }
 
+        // Attributes to use for menu and forms foregrounds
+        virtual chtype Foregrounds() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(1)) : A_BOLD;
+        }
+
+        // Attributes to use for menu and forms backgrounds
+        virtual chtype Backgrounds() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(2)) : A_NORMAL;
+        }
+
+        // Attributes to use for inactive (menu) elements
+        virtual chtype Inactives() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(3)|A_DIM) : A_DIM;
+        }
+
+        // Attributes to use for (form) labels and SLKs
+        virtual chtype Labels() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(4)) : A_NORMAL;
+        }
+
+        // Attributes to use for form backgrounds
+        virtual chtype DialogBackgrounds() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(4)) : A_NORMAL;
+        }
+
+        // Attributes to use as default for (form) window backgrounds
+        virtual chtype window_backgrounds() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(5)) : A_NORMAL;
+        }
+
+        // Attributes to use for the title window
+        virtual chtype screen_titles() const {
+            return m_hasColors ? static_cast<chtype>(COLOR_PAIR(6)) : A_BOLD;
+        }
+
+
+        static Application* GetApplication();
+
+        static Application* m_instance;
+
     private:
         Window* m_rootWindow = new Window(::stdscr);
         Widget* m_currWdgtWithFocus = nullptr;
-        bool m_enableColors = true;
+        bool m_hasColors = true;
         char m_killKey = 'q';
 };
 

@@ -6,6 +6,13 @@
 
 using namespace std;
 
+Application* Application::m_instance = nullptr;
+
+Application* Application::GetApplication()
+{
+    return m_instance;
+}
+
 Application::Application()
 {
     setlocale(LC_ALL, "");
@@ -32,17 +39,20 @@ Application::Application()
     m_rootWindow->SetPalette(COLOR_BLUE,COLOR_YELLOW);
     m_rootWindow->SetColor(6);
     m_rootWindow->SetPalette(COLOR_BLACK,COLOR_GREEN);
+
+    m_instance = this;
 }
 
 Application::Application(bool enableColors) :
-    m_enableColors(enableColors)
+    m_hasColors(enableColors)
 {
 }
 
+//TODO: Refactor construction
 Application::Application(int argc, char *argv[], bool enableColors) :
     Application()
 {
-    m_enableColors = enableColors;
+    m_hasColors = enableColors;
     //TODO:Parse command line options
     (void)argc;
     (void)argv;

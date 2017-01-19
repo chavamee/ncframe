@@ -801,9 +801,6 @@ class Window {
          */
         virtual ~Window();
 
-
-
-
         //int            tabsize() const { initialize(); return TABSIZE; }
         // Size of a tab on terminal, *not* window
 

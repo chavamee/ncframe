@@ -4,6 +4,7 @@
 #include "ncf/Window.hpp"
 #include "ncf/Component.hpp"
 #include "ncf/Widgets.hpp"
+#include "ncf/NCException.hpp"
 #include <menu.h>
 #include <vector>
 #include <memory>
@@ -12,6 +13,7 @@
 #define CTRL(x) ((x) & 0x1f)
 
 //TODO: Set items should have a limit
+//TODO: Place all calls to ncurses api on the OnError callback
 
 class Menu;
 
@@ -170,6 +172,183 @@ class Menu : public Widget {
         {
             ::scale_menu(m_handle, &height, &width);
         }
+
+        inline void OnError (int err) const {
+            if (err != E_OK)
+                throw NCException("Menu error" /*err*/);
+        }
+
+        // Remove the menu from the screen
+        inline void Unpost (void) {
+            OnError (::unpost_menu (m_handle));
+        }
+
+        // Post the menu to the screen if flag is true, unpost it otherwise
+        inline void post(bool flag = TRUE) {
+            flag ? OnError (::post_menu(m_handle)) : OnError (::unpost_menu (m_handle));
+        }
+
+        // Get the numer of rows and columns for this menu
+        inline void scale (int& mrows, int& mcols) const  {
+            OnError (::scale_menu (m_handle, &mrows, &mcols));
+        }
+
+        // Set the format of this menu
+        inline void set_format(int mrows, int mcols) {
+            OnError (::set_menu_format(m_handle, mrows, mcols));
+        }
+
+        // Get the format of this menu
+        inline void menu_format(int& rows,int& ncols) {
+            ::menu_format(m_handle,&rows,&ncols);
+        }
+
+        // Items of the menu
+        inline std::vector<MenuItem*> Items() const {
+            return m_items;
+        }
+
+        // Get the number of items in this menu
+        inline int Count() const {
+            return ::item_count(m_handle);
+        }
+
+        // Get the marker string
+        inline const char* Mark() const {
+            return ::menu_mark(m_handle);
+        }
+
+        // Set the marker string
+        inline void SetMark(const char *marker) {
+            OnError (::set_menu_mark (m_handle, marker));
+        }
+
+        // Get the name of the request code c
+        /*inline static const char* request_name(int c) {
+            return ::menu_request_name(c);
+        }*/
+
+        // Get the current pattern
+        inline char* Pattern() const {
+            return ::menu_pattern(m_handle);
+        }
+
+        // true if there is a pattern match, false otherwise.
+        bool SetPattern (const char *pat);
+
+        // set the default attributes for the menu
+        // i.e. set fore, back and grey attribute
+        virtual void SetDefaultAttributes();
+
+        //TODO: Should return more concrete type
+        // Get the menus background attributes
+        inline chtype Background() const {
+            return ::menu_back(m_handle);
+        }
+
+        // Get the menus foreground attributes
+        inline chtype Foreground() const {
+            return ::menu_fore(m_handle);
+        }
+
+        // Get the menus grey attributes (used for unselectable items)
+        inline chtype Grey() const {
+            return ::menu_grey(m_handle);
+        }
+
+        // Set the menus background attributes
+        inline chtype SetBackground(chtype a) {
+            return ::set_menu_back(m_handle,a);
+        }
+
+        // Set the menus foreground attributes
+        inline chtype SetForeground(chtype a) {
+            return ::set_menu_fore(m_handle,a);
+        }
+
+        // Set the menus grey attributes (used for unselectable items)
+        inline chtype SetGrey(chtype a) {
+            return ::set_menu_grey(m_handle,a);
+        }
+
+        inline Menu_Options options() const {
+            return ::menu_opts(m_handle);
+        }
+
+        inline void SetOptions (Menu_Options opts) {
+            OnError (::set_menu_opts (m_handle,opts));
+        }
+
+        inline int Padding() const {
+            return ::menu_pad(m_handle);
+        }
+
+        inline void SetPadding (int padch) {
+            OnError (::set_menu_pad (m_handle, padch));
+        }
+
+        // Position the cursor to the current item
+        inline void PositionCursor () const {
+            OnError (::pos_menu_cursor (m_handle));
+        }
+
+        // Set the current item
+        inline void SetCurrentItem(MenuItem& I) {
+            OnError (::set_current_item(m_handle, I.m_handle));
+        }
+
+        // Get the current top row of the menu
+        inline int TopRow (void) const {
+            return ::top_row (m_handle);
+        }
+
+        // Set the current top row of the menu
+        inline void SetTopRow (int row) {
+            OnError (::set_top_row (m_handle, row));
+        }
+
+        // spacing control
+        // Set the spacing for the menu
+        inline void SetSpacing(int spc_description,
+                int spc_rows,
+                int spc_columns) {
+            OnError(::set_menu_spacing(m_handle,
+                        spc_description,
+                        spc_rows,
+                        spc_columns));
+        }
+
+        // Get the spacing info for the menu
+        inline void Spacing(int& spc_description,
+                int& spc_rows,
+                int& spc_columns) const {
+            OnError(::menu_spacing(m_handle,
+                        &spc_description,
+                        &spc_rows,
+                        &spc_columns));
+        }
+
+        // Decorations
+        /*inline void frame(const char *title=NULL, const char* btitle=NULL) {
+            if (b_framed)
+                NCursesPanel::frame(title,btitle);
+            else
+                OnError(E_SYSTEM_ERROR);
+        }
+
+        inline void boldframe(const char *title=NULL, const char* btitle=NULL) {
+            if (b_framed)
+                NCursesPanel::boldframe(title,btitle);
+            else
+                OnError(E_SYSTEM_ERROR);
+        }
+
+        inline void label(const char *topLabel, const char *bottomLabel) {
+            if (b_framed)
+                NCursesPanel::label(topLabel,bottomLabel);
+            else
+                OnError(E_SYSTEM_ERROR);
+        }*/
 
     private:
         ITEM** unpackItems(std::vector<MenuItem*>& items);

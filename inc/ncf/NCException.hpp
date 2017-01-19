@@ -1,4 +1,5 @@
-#ifndef NCURSES_FRAME_EXCEPTION_H_
+#ifndef NCFRAME_NCURSES_EXCEPTION_H_
+#define NCFRAME_NCURSES_EXCEPTION_H_
 
 extern "C" {
 #include <curses.h>
