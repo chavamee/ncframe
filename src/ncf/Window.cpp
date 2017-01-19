@@ -56,9 +56,9 @@ void Window::PrintStr(const std::string& str)
 
 Window::~Window()
 {
-    //killSubwindows();
+    killSubwindows();
 
-    /*if (m_parent) {
+    if (m_parent) {
         // Remove this window from the parent's list of subwindows.
         Window* next = m_parent->m_subWins;
         Window* prev = 0;
@@ -74,10 +74,10 @@ Window::~Window()
             prev = next;
             next = next->m_sib;
         }
-    }*/
+    }
 
     if (/*alloced &&*/ m_handle != NULL) {
-        //::delwin(m_handle);
+        ::delwin(m_handle);
     }
 
 }

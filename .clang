@@ -1,1 +1,1 @@
-flags=-Iinc -DDEBUG -std=c++14 -Lbuild/lib
+flags=-Iinc -DDEBUG -std=c++14 -Lbuild/lib -Isamples/inc

@@ -120,18 +120,20 @@ void Menu::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
             throw std::runtime_error("menu error");
         }
 
-        int subRows, subCols;
-        scale_menu(m_handle, &subRows, &subCols);
+        int subRows = 0;
+        int subCols = 0;
+        Scale(subRows, subCols);
         set_menu_win(m_handle, window->GetHandle());
 
         if (subRows < window->Height() - 2 && subCols < window->Width() - 2) {
-            unique_ptr<Window> subWindow = make_unique<Window>(
+            unique_ptr<Window> derSubWindow = make_unique<Window>(
                     *window,
                     subRows, subCols, 1, 1,
                     false
                     );
-            set_menu_sub(m_handle, subWindow->GetHandle());
-            SetSubWindow(std::move(subWindow));
+
+            SetSubWindow(std::move(derSubWindow));
+            set_menu_sub(m_handle, GetSubWindow()->GetHandle());
         } else {
             throw NCException("No room left for menu");
         }

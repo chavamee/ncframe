@@ -28,6 +28,8 @@ class Component {
 
         virtual ~Component() {}
 
+        //TODO: Should we add a non-owning variant of Draw?
+
         virtual void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) = 0;
 
         virtual void Add(Component* component, unsigned int pos = 0)

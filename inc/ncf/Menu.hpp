@@ -166,6 +166,11 @@ class Menu : public Widget {
             (void)item;
         }
 
+        inline void Scale(int& height, int& width)
+        {
+            ::scale_menu(m_handle, &height, &width);
+        }
+
     private:
         ITEM** unpackItems(std::vector<MenuItem*>& items);
         bool invokeAction(MenuItem& item);

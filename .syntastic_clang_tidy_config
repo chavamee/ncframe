@@ -1,3 +1,7 @@
 -DDEBUG
--std=c++14
+-Wall
+-Wextra
 -Iinc
+-Isamples/inc
+-std=c++14
+-Lbuild/lib

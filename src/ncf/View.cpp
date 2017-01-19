@@ -1,16 +1,6 @@
 #include "ncf/View.hpp"
 #include "ncf/NCException.hpp"
 
-//TODO: SubWindow should be manipulated at the View level.
-//      In other words, the content is printed/placed on the SubWindow
-//      On the View instance.
-//      void View::Draw(unique_ptr<Window)
-//      {
-//          ...
-//          subWindow->PrintStr(m_content);
-//          ...
-//      }
-
 using namespace std;
 
 View::View(int height, int width) :
@@ -43,5 +33,7 @@ void View::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
     m_pad->SetWindow(GetWindow());
     m_pad->SetSubWindow(GetSubWindow());
 
-    GetSubWindow()->PrintStr(m_content);
+    if (!m_content.empty()) {
+        GetSubWindow()->PrintStr(m_content);
+    }
 }

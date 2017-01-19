@@ -8,6 +8,7 @@ extern "C" {
 
 #include <functional>
 #include <memory>
+#include <iostream>
 
 /* SCO 3.2v4 curses.h includes term.h, which defines lines as a macro.
    Undefine it here, because NCursesWindow uses lines as a method.  */
@@ -772,6 +773,26 @@ class Window {
                 bool derived = false
               );
 
+
+        Window(const Window& rhs) :
+            m_handle(rhs.m_handle),
+            m_parent(rhs.m_parent),
+            m_subWins(rhs.m_subWins),
+            m_sib(rhs.m_sib),
+            m_isOwner(rhs.m_isOwner)
+        {
+        }
+
+        Window(Window&& rhs) :
+            m_handle(rhs.m_handle),
+            m_parent(rhs.m_parent),
+            m_subWins(rhs.m_subWins),
+            m_sib(rhs.m_sib),
+            m_isOwner(rhs.m_isOwner)
+        {
+            rhs.m_handle = NULL;
+        }
+
         //TODO; If we used the ncurses window handle constructor
         //      and we do not take ownership we should not delete
         //      the handle
@@ -1337,6 +1358,7 @@ class Window {
 
     private:
         void killSubwindows();
+        bool m_isOwner = true;
 
 };
 

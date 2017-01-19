@@ -4,6 +4,8 @@
 #include "ncf/Menu.hpp"
 #include "ncf/TextView.hpp"
 #include "api/Feedly.hpp"
+#include <iostream>
+#include <fstream>
 
 
 class EntriesMenu : public Menu {
@@ -29,7 +31,30 @@ class EntriesMenu : public Menu {
 
         void ShowPreview(const std::string& preview)
         {
-            m_previewTextView->SetContent(preview);
+            std::ofstream sample("/home/chavamee/workspace/projects/active/ncframe/sample.html");
+
+            sample << preview;
+
+            sample.close();
+
+            FILE* stream = popen(std::string("w3m -dump -cols " + std::to_string(COLS - 2) + " " + "/home/chavamee/workspace/projects/active/ncframe/sample.html").c_str(), "r");
+
+            std::string content;
+
+            if (stream)
+            {
+                char buffer[256];
+                while (not feof(stream))
+                {
+                    if (fgets(buffer, 256, stream) not_eq NULL)
+                    {
+                        content.append(buffer);
+                    }
+
+                }
+                pclose(stream);
+            }
+            m_previewTextView->SetContent(content);
         }
 
     private:
