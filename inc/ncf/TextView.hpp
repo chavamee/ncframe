@@ -11,21 +11,19 @@ class TextView : public View {
     public:
         TextView();
 
-        TextView(int height, int width);
-
-        TextView(int height, int width, int y, int x);
+        TextView(const Rect& rect);
 
         virtual ~TextView()
         {
         }
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
-        int OnKeyEvent(int ch) override;
+        int onKeyEvent(int ch) override;
 
-        void OnMouseEvent(int ch) override;
+        void onMouseEvent(int ch) override;
 
-        bool OnEvent(int ch) override;
+        bool onEvent(int ch) override;
 
     private:
         std::string m_content;

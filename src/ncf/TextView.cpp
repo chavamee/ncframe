@@ -6,26 +6,17 @@ TextView::TextView()
 {
 }
 
-TextView::TextView(int height, int width) :
-    View(height, width)
+TextView::TextView(const Rect& rect) :
+    View { rect }
 {
 }
 
-TextView::TextView(int height, int width, int y, int x) :
-    View(height, width)
+void TextView::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    (void)y;
-    (void)x;
+    View::draw(std::move(window), std::move(subWindow));
 }
 
-void TextView::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
-{
-    //std::unique_ptr<Window> subWindow = std::make_unique<Window>(
-            //window->Height()-2, window->Width()-2, window->OriginY()+1, window->OriginX()+1);
-    View::Draw(std::move(window), std::move(subWindow));
-}
-
-int TextView::OnKeyEvent(int ch)
+int TextView::onKeyEvent(int ch)
 {
     switch (ch) {
         case KEY_UP:break;
@@ -33,12 +24,12 @@ int TextView::OnKeyEvent(int ch)
     return 0;
 }
 
-void TextView::OnMouseEvent(int ch)
+void TextView::onMouseEvent(int ch)
 {
     (void)ch;
 }
 
-bool TextView::OnEvent(int ch)
+bool TextView::onEvent(int ch)
 {
     (void)ch;
     return false;

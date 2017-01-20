@@ -57,34 +57,34 @@ RowLayout::~RowLayout()
 {
 }
 
-void RowLayout::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void RowLayout::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    MaxHeight = window->Height();
-    MaxWidth = window->Width();
-    Show();
+    MaxHeight = window->height();
+    MaxWidth = window->width();
+    show();
 }
 
-void RowLayout::Show()
+void RowLayout::show()
 {
-    Compositor->Compose();
+    Compositor->compose();
 }
 
-void RowLayout::Add(Component* component, unsigned int pos)
+void RowLayout::add(Component* component, unsigned int pos)
 {
     m_components.insert(m_components.begin()+pos, component);
 }
 
-void RowLayout::Remove(Component* component)
+void RowLayout::remove(Component* component)
 {
     m_components.erase(std::find(m_components.begin(), m_components.end(), component));
 }
 
-Component* RowLayout::Child(int pos)
+Component* RowLayout::child(unsigned int pos)
 {
     return m_components.at(pos);
 }
 
-int RowLayout::ChildCount()
+unsigned int RowLayout::childCount()
 {
     return m_components.size();
 }
@@ -97,7 +97,7 @@ UniformRowCompositor::~UniformRowCompositor()
 {
 }
 
-void UniformRowCompositor::Compose()
+void UniformRowCompositor::compose()
 {
     RowLayout* composition = static_cast<RowLayout*>(Composition);
     if (composition == nullptr) {
@@ -107,14 +107,14 @@ void UniformRowCompositor::Compose()
     unsigned int maxHeight = composition->MaxHeight;
     unsigned int maxWidth = composition->MaxWidth;
 
-    int numCmps = composition->ChildCount();
+    unsigned int numCmps = composition->childCount();
     int cmpWidth = maxWidth / numCmps;
     int currentX = 0;
 
-    for (int i = 0; i < numCmps; i++) {
-        m_row.Add(composition->Child(i));
+    for (unsigned int i = 0; i < numCmps; i++) {
+        m_row.add(composition->child(i));
         unique_ptr<Window> window = make_unique<Window>(maxHeight, cmpWidth, 0, currentX);
-        composition->Child(i)->Draw(std::move(window));
+        composition->child(i)->draw(std::move(window));
         currentX += cmpWidth;
 
     }
@@ -146,34 +146,34 @@ ColumnLayout::~ColumnLayout()
 {
 }
 
-void ColumnLayout::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void ColumnLayout::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    MaxHeight = window->Height();
-    MaxWidth = window->Width();
-    Show();
+    MaxHeight = window->height();
+    MaxWidth = window->width();
+    show();
 }
 
-void ColumnLayout::Show()
+void ColumnLayout::show()
 {
-    Compositor->Compose();
+    Compositor->compose();
 }
 
-void ColumnLayout::Add(Component* component, unsigned int pos)
+void ColumnLayout::add(Component* component, unsigned int pos)
 {
     m_components.insert(m_components.begin()+pos, component);
 }
 
-void ColumnLayout::Remove(Component* component)
+void ColumnLayout::remove(Component* component)
 {
     m_components.erase(std::find(m_components.begin(), m_components.end(), component));
 }
 
-Component* ColumnLayout::Child(int pos)
+Component* ColumnLayout::child(unsigned int pos)
 {
     return m_components.at(pos);
 }
 
-int ColumnLayout::ChildCount()
+unsigned int ColumnLayout::childCount()
 {
     return m_components.size();
 }
@@ -186,20 +186,20 @@ UniformColumnCompositor::~UniformColumnCompositor()
 {
 }
 
-void UniformColumnCompositor::Compose()
+void UniformColumnCompositor::compose()
 {
     ColumnLayout* composition = static_cast<ColumnLayout*>(Composition);
 
     unsigned int maxHeight = composition->MaxHeight;
     unsigned int maxWidth = composition->MaxWidth;
-    int numCmps = composition->ChildCount();
+    unsigned int numCmps = composition->childCount();
     int cmpHeight = maxHeight / numCmps;
     int currentY = 0;
 
-    for (int i = 0; i < numCmps; i++) {
-        m_column.Add(composition->Child(i));
+    for (unsigned int i = 0; i < numCmps; i++) {
+        m_column.add(composition->child(i));
         unique_ptr<Window> window = make_unique<Window>(cmpHeight, maxWidth, currentY, 0);
-        composition->Child(i)->Draw(std::move(window));
+        composition->child(i)->draw(std::move(window));
         currentY += cmpHeight;
 
     }

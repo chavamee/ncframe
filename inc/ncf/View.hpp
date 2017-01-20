@@ -1,6 +1,6 @@
 #ifndef NCURSES_VIEW_HPP_
 
-#include "ncf/Widgets.hpp"
+#include "ncf/Widget.hpp"
 #include "ncf/Pad.hpp"
 
 // TODO: ScrollableView and View should own the window not Widget
@@ -15,14 +15,14 @@ class View : public Widget {
         {
         }
 
-        View(int height, int width);
+        View(const Rect& rect);
 
-        void SetContent(const std::string& content)
+        void setContent(const std::string& content)
         {
             m_content = content;
-            if (GetSubWindow()) {
-                GetSubWindow()->Clear();
-                GetSubWindow()->PrintStr(m_content);
+            if (getSubWindow()) {
+                getSubWindow()->clear();
+                getSubWindow()->printStr(m_content);
             }
         }
 
@@ -31,12 +31,11 @@ class View : public Widget {
         }
 
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
     private:
         std::unique_ptr<Pad> m_pad;
         std::string m_content;
-        bool isScrollable = true;
 };
 
 #endif

@@ -10,9 +10,9 @@ class Decorator : public Component {
         {
         }
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
         {
-            m_component->Draw(std::move(window), std::move(subWindow));
+            m_component->draw(std::move(window), std::move(subWindow));
         }
 
     private:
@@ -25,10 +25,10 @@ class Border : public Decorator {
             Decorator(component)
         {
         }
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
         {
-            window->Frame();
-            Decorator::Draw(std::move(window), std::move(subWindow));
+            window->frame();
+            Decorator::draw(std::move(window), std::move(subWindow));
         }
 };
 

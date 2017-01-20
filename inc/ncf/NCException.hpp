@@ -16,20 +16,15 @@ extern "C" {
 
 class NCException : public std::exception {
     public:
-        explicit NCException(const std::string& what_arg) :
-            m_what{ what_arg }
-        {
-            def_prog_mode();
-        }
-        const char *message;
+        std::string message;
         int errorno;
 
         NCException (const char* msg, int err)
-            : m_what(msg), m_errorno (err)
+            : message(msg), errorno (err)
         {};
 
         NCException (const char* msg)
-            : m_what(msg), m_errorno (E_SYSTEM_ERROR)
+            : message(msg), errorno (E_SYSTEM_ERROR)
         {};
 
         NCException& operator=(const NCException& rhs)
@@ -43,23 +38,14 @@ class NCException : public std::exception {
         {
         }
 
-        virtual const char* classname() const {
-            return "NCursesWindow";
-        }
-
-        ~NCException()
+        virtual ~NCException()
         {
-            reset_prog_mode();
         }
 
-        const char* what() const throw() override
+        const char* what() const noexcept override
         {
-            return m_what.c_str();
+            return (message + ": " + std::to_string(errorno)).c_str();
         }
-
-    private:
-        std::string m_what;
-        int m_errorno;
 };
 
 #endif

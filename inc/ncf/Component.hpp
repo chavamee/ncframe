@@ -3,59 +3,61 @@
 
 #include "common/platform.h"
 #include "ncf/Window.hpp"
+#include "ncf/Geometry.hpp"
 #include <vector>
 #include <memory>
 
-struct Rect
-{
-};
+//TODO: Should we add a non-owning variant of Draw?
 
 class Component {
     public:
         Component() = default;
 
         Component(Component* parent) :
-            Parent(parent)
+            parent(parent)
         {
         }
 
-        virtual void Bounds(Rect& bounds)
+        virtual ~Component()
+        {
+        }
+
+        virtual void bounds(Rect& bounds)
         {
             NCF_UNUSED(bounds);
         }
 
-        //TODO?: virtual void Intersects(const Points&);
+        virtual void intersects(const Point& point)
+        {
+            NCF_UNUSED(point);
+        }
 
-        virtual ~Component() {}
+        virtual void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) = 0;
 
-        //TODO: Should we add a non-owning variant of Draw?
-
-        virtual void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) = 0;
-
-        virtual void Add(Component* component, unsigned int pos = 0)
+        virtual void add(Component* component, unsigned int pos = 0)
         {
             NCF_UNUSED(component);
             NCF_UNUSED(pos);
         }
 
-        virtual void Remove(Component* component)
+        virtual void remove(Component* component)
         {
             NCF_UNUSED(component);
         }
 
 
-        virtual Component* Child(int pos)
+        virtual Component* child(unsigned int pos)
         {
             NCF_UNUSED(pos);
             return nullptr;
         }
 
-        virtual int ChildCount()
+        virtual unsigned int childCount()
         {
             return 0;
         }
 
-        Component* Parent = nullptr;
+        Component* parent = nullptr;
 };
 
 #endif

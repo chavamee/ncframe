@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
     EntriesMenu  entriesMenu {&prev};
     CategoryMenu ctgMenu     {&server, &entriesMenu};
 
-    ctgMenu.OptionsOff(O_SHOWDESC);
-    entriesMenu.OptionsOff(O_SHOWDESC);
+    ctgMenu.optionsOff(O_SHOWDESC);
+    entriesMenu.optionsOff(O_SHOWDESC);
 
-    prev.CanFocus = false;
+    prev.canFocus = false;
 
     vector<MenuItem*> ctgItems;
     map<string, string> ctgs = server.Categories();
@@ -52,22 +52,22 @@ int main(int argc, char *argv[])
         entryItems.push_back(new EntryItem(entry));
     }
 
-    ctgMenu.SetItems(ctgItems);
-    entriesMenu.SetItems(entryItems);
+    ctgMenu.setItems(ctgItems);
+    entriesMenu.setItems(entryItems);
 
-    top.Add(new Border(&entriesMenu));
-    top.Add(new Border(&ctgMenu));
+    top.add(new Border(&entriesMenu));
+    top.add(new Border(&ctgMenu));
 
-    body.Add(new Border(&prev));
-    body.Add(&top);
+    body.add(new Border(&prev));
+    body.add(&top);
 
-    prev.SetContent("Hello, World!");
+    prev.setContent("Hello, World!");
 
-    body.Show();
+    body.show();
 
-    app.SetInitialContext(&ctgMenu);
+    app.setInitialContext(&ctgMenu);
 
-    app.Start();
+    app.start();
 
     return 0;
 }

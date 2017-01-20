@@ -2,7 +2,7 @@
 #define NCURSES_APPLICATION_BINDINGS_H_
 
 #include "ncf/Window.hpp"
-#include "ncf/Widgets.hpp"
+#include "ncf/Widget.hpp"
 #include "ncf/Component.hpp"
 #include <curses.h>
 #include <cassert>
@@ -36,54 +36,54 @@ class Application {
 
         virtual ~Application();
 
-        virtual void Start();
+        virtual void start();
 
         void initializeNCurses();
 
-        inline void SetInitialContext(Widget* widget)
+        inline void setInitialContext(Widget* widget)
         {
             assert(widget != NULL);
             m_currWdgtWithFocus = widget;
         }
 
-        void SetKillKey(char key)
+        void setKillKey(char key)
         {
             //TODO: Check for key binding conflicts
             m_killKey = key;
         }
 
-        char KillKey()
+        char killKey()
         {
             return m_killKey;
         }
 
         // Attributes to use for menu and forms foregrounds
-        virtual chtype Foregrounds() const {
+        virtual chtype foregrounds() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(1)) : A_BOLD;
         }
 
         // Attributes to use for menu and forms backgrounds
-        virtual chtype Backgrounds() const {
+        virtual chtype backgrounds() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(2)) : A_NORMAL;
         }
 
         // Attributes to use for inactive (menu) elements
-        virtual chtype Inactives() const {
+        virtual chtype inactives() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(3)|A_DIM) : A_DIM;
         }
 
         // Attributes to use for (form) labels and SLKs
-        virtual chtype Labels() const {
+        virtual chtype labels() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         // Attributes to use for form backgrounds
-        virtual chtype DialogBackgrounds() const {
+        virtual chtype dialogBackgrounds() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         // Attributes to use as default for (form) window backgrounds
-        virtual chtype window_backgrounds() const {
+        virtual chtype windowBackgrounds() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(5)) : A_NORMAL;
         }
 
@@ -93,7 +93,7 @@ class Application {
         }
 
 
-        static Application* GetApplication();
+        static Application* getApplication();
 
         static Application* m_instance;
 

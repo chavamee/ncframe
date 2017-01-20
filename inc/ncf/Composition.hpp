@@ -11,7 +11,7 @@ class Compositor {
 
         virtual ~Compositor() = default;
 
-        virtual void Compose() = 0;
+        virtual void compose() = 0;
 
         Composition* Composition = nullptr;
 };
@@ -29,7 +29,7 @@ class Composition : public Component {
         {
         }
 
-        virtual void Show() = 0;
+        virtual void show() = 0;
 
         Compositor* Compositor = nullptr;
 };

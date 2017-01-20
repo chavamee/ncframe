@@ -3,220 +3,143 @@
 
 #include "ncf/Window.hpp"
 #include "ncf/Component.hpp"
-#include "ncf/Widgets.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/Widget.hpp"
+#include "ncf/NCMenuException.hpp"
+#include "ncf/MenuItem.hpp"
+
 #include <menu.h>
+
+#include <cstring>
+
 #include <vector>
 #include <memory>
-#include <string.h>
 
 #define CTRL(x) ((x) & 0x1f)
 
 //TODO: Set items should have a limit
-//TODO: Place all calls to ncurses api on the OnError callback
+//TODO: Replace Menu_Options with concrete struct
 
-class Menu;
-
-class MenuItem {
-    friend Menu;
-
-    public:
-        MenuItem();
-
-        MenuItem(
-            std::string name,
-            std::string description
-                );
-
-        /**
-         * Copy Constructor
-         */
-        MenuItem(const MenuItem& item);
-
-        virtual ~MenuItem();
-
-        MenuItem& operator=(const MenuItem& other);
-
-        inline std::string Name() const {
-            return m_name;
-        }
-
-        inline std::string Description () const {
-            return m_description;
-        }
-
-        inline int Index() const {
-            return item_index(m_handle);
-        }
-
-        inline void SetValue (bool f) {
-            set_item_value(m_handle, f);
-        }
-
-        inline bool Value () const {
-            return item_value(m_handle);
-        }
-
-        inline bool Visible () const {
-            return item_visible(m_handle);
-        }
-
-        inline Menu* Menu() const
-        {
-            return m_menu;
-        }
-
-        inline bool HasMenu() const
-        {
-            return m_menu ? true : false;
-        }
-
-        virtual bool Action()
-        {
-            return false;
-        }
-
-        inline Menu_Options options();
-
-        inline void set_options (Menu_Options opts);
-
-    private:
-        ITEM* m_handle = NULL;
-
-        /*
-         * ncurses does not copy the name or description buffers and only
-         * keeps pointers to them. The strings are managed internally to
-         * avoid invalid memory derefrence by ncurses and managing their lifetime.
-         */
-        std::string m_name = "";
-        std::string m_description = "";
-
-        class Menu* m_menu = nullptr;
-};
+class MenuItem;
 
 class Menu : public Widget {
     public:
         Menu();
 
-        Menu(
-            int rows,
-            int cols,
-            int y,
-            int x
-            );
+        Menu(const Rect& rect);
 
-        Menu(
-            int rows,
-            int cols,
-            int y,
-            int x,
-            std::vector<MenuItem*>& items
-            );
+        Menu(const Rect& rect, std::vector<MenuItem*>& items);
 
         virtual ~Menu();
 
-        void SetItems(std::vector<MenuItem*>& items);
+        void setItems(std::vector<MenuItem*>& items);
 
-        inline MENU* GetHandle() const
+        inline MENU* getHandle() const
         {
             return m_handle;
         }
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
-        void OnMouseEvent (int ch) override;
+        void onMouseEvent (int ch) override;
 
-        int OnKeyEvent(int ch) override;
+        int onKeyEvent(int ch) override;
 
-        bool OnEvent(int ch) override;
+        bool onEvent(int ch) override;
 
-        void OptionsOff(Menu_Options opts)
+        void optionsOff(Menu_Options opts)
         {
-            ::menu_opts_off(m_handle, opts);
+            onError( ::menu_opts_off(m_handle, opts) );
         }
 
-        void OptionsOn(Menu_Options opts)
+        void optionsOn(Menu_Options opts)
         {
-            ::menu_opts_on(m_handle, opts);
+            onError ( ::menu_opts_on(m_handle, opts) );
         }
 
-        MenuItem& CurrentItem()
+        MenuItem& currentItem()
         {
             return *(m_items.at( item_index(current_item(m_handle)) ));
         }
 
-        virtual void OnMenuPosted()
+        virtual void onMenuPosted()
         {
         }
 
-        virtual void OnMenuUnposted()
+        virtual void onMenuUnposted()
         {
         }
 
-        virtual void OnItemSelected(MenuItem* item)
+        virtual void onItemSelected(MenuItem* item)
         {
-            (void)item;
+            NCF_UNUSED(item);
         }
 
-        virtual void OnItemDeselected(MenuItem* item)
+        virtual void onItemDeselected(MenuItem* item)
         {
-            (void)item;
+            NCF_UNUSED(item);
         }
 
-        virtual void OnItemAction(MenuItem* item)
+        virtual void onItemAction(MenuItem* item)
         {
-            (void)item;
+            NCF_UNUSED(item);
         }
 
-        //TODO: This shoudl return
-        inline void Scale(int& height, int& width) const
+        Size scale() const
         {
-            OnError (::scale_menu (m_handle, &height, &width));
+            int height = 0;
+            int width = 0;
+            onError (::scale_menu (m_handle, &height, &width));
+            return {.height = height, .width = width};
         }
 
-        inline void OnError (int err) const {
+        inline void onError (int err) const {
             if (err != E_OK)
-                throw NCException("Menu error", err);
+                throw NCMenuException("Menu error", err);
         }
 
         // Remove the menu from the screen
-        inline void Unpost (void) {
-            OnError (::unpost_menu (m_handle));
+        inline void unpost (void) {
+            onError (::unpost_menu (m_handle));
+            m_isPosted = false;
         }
 
         // Post the menu to the screen if flag is true, unpost it otherwise
-        inline void Post() {
-            OnError (::post_menu(m_handle));
+        inline void post() {
+            onError (::post_menu(m_handle));
+            m_isPosted = true;
         }
 
         // Set the format of this menu
-        inline void SetFormat(int mrows, int mcols) {
-            OnError (::set_menu_format(m_handle, mrows, mcols));
+        inline void setFormat(const Size& size) {
+            onError (::set_menu_format(m_handle, size.height, size.width));
         }
 
         // Get the format of this menu
-        inline void Format(int& rows,int& ncols) {
-            ::menu_format(m_handle,&rows,&ncols);
+        Size format() {
+            int height = 0;
+            int width = 0;
+            ::menu_format(m_handle, &height, &width);
+            return {.height = height, .width = width};
         }
 
         // Items of the menu
-        inline std::vector<MenuItem*> Items() const {
+        std::vector<MenuItem*> items() const {
             return m_items;
         }
 
         // Get the number of items in this menu
-        inline int Count() const {
+        inline int count() const {
             return ::item_count(m_handle);
         }
 
         // Get the marker string
-        inline const char* Mark() const {
+        inline const char* mark() const {
             return ::menu_mark(m_handle);
         }
 
         // Set the marker string
-        inline void SetMark(const char *marker) {
-            OnError (::set_menu_mark (m_handle, marker));
+        inline void setMark(const char* marker) {
+            onError (::set_menu_mark (m_handle, marker));
         }
 
         // Get the name of the request code c
@@ -225,45 +148,45 @@ class Menu : public Widget {
         }*/
 
         // Get the current pattern
-        inline char* Pattern() const {
+        inline char* pattern() const {
             return ::menu_pattern(m_handle);
         }
 
         // true if there is a pattern match, false otherwise.
-        bool SetPattern (const char *pat);
+        bool setPattern (const char *pattern);
 
         // set the default attributes for the menu
         // i.e. set fore, back and grey attribute
-        virtual void SetDefaultAttributes();
+        virtual void setDefaultAttributes();
 
         //TODO: Should return more concrete type
         // Get the menus background attributes
-        inline chtype Background() const {
+        inline chtype background() const {
             return ::menu_back(m_handle);
         }
 
         // Get the menus foreground attributes
-        inline chtype Foreground() const {
+        inline chtype foreground() const {
             return ::menu_fore(m_handle);
         }
 
         // Get the menus grey attributes (used for unselectable items)
-        inline chtype Grey() const {
+        inline chtype grey() const {
             return ::menu_grey(m_handle);
         }
 
         // Set the menus background attributes
-        inline chtype SetBackground(chtype a) {
+        inline chtype setBackground(chtype a) {
             return ::set_menu_back(m_handle,a);
         }
 
         // Set the menus foreground attributes
-        inline chtype SetForeground(chtype a) {
+        inline chtype setForeground(chtype a) {
             return ::set_menu_fore(m_handle,a);
         }
 
         // Set the menus grey attributes (used for unselectable items)
-        inline chtype SetGrey(chtype a) {
+        inline chtype setGrey(chtype a) {
             return ::set_menu_grey(m_handle,a);
         }
 
@@ -271,54 +194,51 @@ class Menu : public Widget {
             return ::menu_opts(m_handle);
         }
 
-        inline void SetOptions (Menu_Options opts) {
-            OnError (::set_menu_opts (m_handle,opts));
+        inline void setOptions (Menu_Options opts) {
+            onError (::set_menu_opts (m_handle,opts));
         }
 
-        inline int Padding() const {
+        inline int padding() const {
             return ::menu_pad(m_handle);
         }
 
-        inline void SetPadding (int padch) {
-            OnError (::set_menu_pad (m_handle, padch));
+        inline void setPadding (int padch) {
+            onError (::set_menu_pad (m_handle, padch));
         }
 
         // Position the cursor to the current item
-        inline void PositionCursor () const {
-            OnError (::pos_menu_cursor (m_handle));
+        inline void positionCursor () const {
+            onError (::pos_menu_cursor (m_handle));
         }
 
-        // Set the current item
-        inline void SetCurrentItem(MenuItem& I) {
-            OnError (::set_current_item(m_handle, I.m_handle));
-        }
+        inline void setCurrentItem(MenuItem& item);
 
         // Get the current top row of the menu
-        inline int TopRow (void) const {
+        inline int topRow (void) const {
             return ::top_row (m_handle);
         }
 
         // Set the current top row of the menu
-        inline void SetTopRow (int row) {
-            OnError (::set_top_row (m_handle, row));
+        inline void setTopRow (int row) {
+            onError (::set_top_row (m_handle, row));
         }
 
         // spacing control
         // Set the spacing for the menu
-        inline void SetSpacing(int spc_description,
+        inline void setSpacing(int spc_description,
                 int spc_rows,
                 int spc_columns) {
-            OnError(::set_menu_spacing(m_handle,
+            onError(::set_menu_spacing(m_handle,
                         spc_description,
                         spc_rows,
                         spc_columns));
         }
 
         // Get the spacing info for the menu
-        inline void Spacing(int& spc_description,
+        inline void spacing(int& spc_description,
                 int& spc_rows,
                 int& spc_columns) const {
-            OnError(::menu_spacing(m_handle,
+            onError(::menu_spacing(m_handle,
                         &spc_description,
                         &spc_rows,
                         &spc_columns));
@@ -346,17 +266,24 @@ class Menu : public Widget {
                 OnError(E_SYSTEM_ERROR);
         }*/
 
-    private:
-        ITEM** unpackItems(std::vector<MenuItem*>& items);
-        bool invokeAction(MenuItem& item);
+        inline bool isPosted()
+        {
+            return m_isPosted;
+        }
 
+    private:
         MENU* m_handle = NULL;
+
         const char* m_itemMark = "*";
 
         bool m_isDrawn = false;
+        bool m_hasFocus = false;
+        bool m_isPosted = false;
 
         std::vector<MenuItem*> m_items;
-        bool m_hasFocus = false;
+
+        ITEM** _unpackItems(std::vector<MenuItem*>& items);
+        bool _invokeAction(MenuItem& item);
 };
 
 #endif

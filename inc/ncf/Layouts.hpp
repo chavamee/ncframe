@@ -2,7 +2,9 @@
 #define NCURSES_LAYOUTS_H_ value
 
 #include "ncf/Composition.hpp"
-#include "ncf/Widgets.hpp"
+#include "ncf/Widget.hpp"
+#include "ncf/Row.hpp"
+#include "ncf/Column.hpp"
 #include <algorithm>
 
 class LayoutCompositor : public Compositor {
@@ -11,7 +13,7 @@ class LayoutCompositor : public Compositor {
 
         virtual ~LayoutCompositor();
 
-        virtual void Compose() override = 0;
+        virtual void compose() override = 0;
 };
 
 class Layout : public Composition {
@@ -22,7 +24,7 @@ class Layout : public Composition {
 
         virtual ~Layout();
 
-        virtual void Show() = 0;
+        virtual void show() = 0;
 
         int MaxHeight = LINES-1;
         int MaxWidth  = COLS-1;
@@ -45,17 +47,17 @@ class RowLayout : public Layout {
 
         virtual ~RowLayout();
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
-        void Show() override;
+        void show() override;
 
-        void Add(Component* component, unsigned int pos = 0) override;
+        void add(Component* component, unsigned int pos = 0) override;
 
-        void Remove(Component* component) override;
+        void remove(Component* component) override;
 
-        Component* Child(int pos) override;
+        Component* child(unsigned int pos) override;
 
-        int ChildCount() override;
+        unsigned int childCount() override;
 
     private:
         std::vector<Component*> m_components;
@@ -67,7 +69,7 @@ class UniformRowCompositor : public LayoutCompositor {
 
         virtual ~UniformRowCompositor();
 
-        void Compose() override;
+        void compose() override;
 
     private:
         Row m_row;
@@ -87,17 +89,17 @@ class ColumnLayout : public Layout {
 
         virtual ~ColumnLayout();
 
-        void Draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
-        void Show() override;
+        void show() override;
 
-        void Add(Component* component, unsigned int pos = 0) override;
+        void add(Component* component, unsigned int pos = 0) override;
 
-        void Remove(Component* component) override;
+        void remove(Component* component) override;
 
-        Component* Child(int pos) override;
+        Component* child(unsigned int pos) override;
 
-        int ChildCount() override;
+        unsigned int childCount() override;
 
     private:
         std::vector<Component*> m_components;
@@ -110,7 +112,7 @@ class UniformColumnCompositor : public LayoutCompositor {
 
         virtual ~UniformColumnCompositor();
 
-        void Compose() override;
+        void compose() override;
 
     private:
         Column m_column;

@@ -13,36 +13,36 @@ Pad::Pad(int height, int width) :
     }
 }
 
-int Pad::Refresh()
+int Pad::refresh()
 {
-    int res = NoutRefresh();
+    int res = noutrefresh();
     if (res==OK && (m_viewWin)) {
-        res = (m_viewWin->Refresh());
+        res = (m_viewWin->refresh());
     }
 
     return res;
 }
 
-int Pad::NoutRefresh()
+int Pad::noutrefresh()
 {
     int res = OK;
-    Window* win = Win();
-    if (win) {
-        int high = win->MaxY();
-        int wide = win->MaxX();
-        res = Copy(*win, m_minRow, m_minCol,
+    Window* window = win();
+    if (window) {
+        int high = window->maxY();
+        int wide = window->maxX();
+        res = copy(*window, m_minRow, m_minCol,
                 0, 0, high, wide,
                 FALSE);
         if (res==OK) {
-            win->SyncUp();
-            res = m_viewWin->NoutRefresh();
+            window->syncUp();
+            res = m_viewWin->noutrefresh();
         }
     }
 
     return res;
 }
 
-void Pad::SetWindow(Window* view,
+void Pad::setWindow(Window* view,
         int v_grid,
         int h_grid
         )
@@ -57,7 +57,7 @@ void Pad::SetWindow(Window* view,
     }
 }
 
-void Pad::SetSubWindow(Window* sub)
+void Pad::setSubWindow(Window* sub)
 {
     if (!m_viewWin) {
         NCException("Pad has no viewport");

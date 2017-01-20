@@ -17,8 +17,8 @@ class CategoryMenu : public Menu {
         {
         }
 
-        CategoryMenu(int rows, int cols, int y, int x) :
-            Menu(rows, cols, y, x)
+        CategoryMenu(const Rect& rect) :
+            Menu(rect)
         {
         }
 
@@ -26,9 +26,9 @@ class CategoryMenu : public Menu {
         {
         }
 
-        void OnItemAction(MenuItem* item) override
+        void onItemAction(MenuItem* item) override
         {
-            std::vector<Feedly::Entry> entries = m_server->Entries(item->Description(), false, 100);
+            std::vector<Feedly::Entry> entries = m_server->Entries(item->description(), false, 100);
             if (not entries.empty()) {
                 lastReadEntryId = entries.front().id;
             }
@@ -37,25 +37,25 @@ class CategoryMenu : public Menu {
             for (auto& entry : entries) {
                 items.push_back(new EntryItem(entry));
             }
-            m_entriesMenu->SetItems(items);
+            m_entriesMenu->setItems(items);
         }
 
         void markCategoryRead()
         {
-            m_server->MarkCategoryWithAction(CurrentItem().Description(), READ, lastReadEntryId);
-            std::vector<Feedly::Entry> entries = m_server->Entries(CurrentItem().Description());
+            m_server->MarkCategoryWithAction(currentItem().description(), READ, lastReadEntryId);
+            std::vector<Feedly::Entry> entries = m_server->Entries(currentItem().description());
             std::vector<MenuItem*> items;
             for (auto& entry : entries) {
                 items.push_back(new EntryItem{entry});
             }
-            m_entriesMenu->SetItems(items);
+            m_entriesMenu->setItems(items);
         }
 
-        int OnKeyEvent(int ch) override
+        int onKeyEvent(int ch) override
         {
             switch(ch) {
                 case 'r': markCategoryRead(); break;
-                default: Menu::OnKeyEvent(ch); break;
+                default: Menu::onKeyEvent(ch); break;
             }
             return 0;
         }

@@ -1,7 +1,5 @@
-#include "ncf/Menu.hpp"
-#include <stdexcept>
+#include "ncf/Window.hpp"
 #include "ncf/NCException.hpp"
-
 //TODO: Destructors
 
 Window::Window()
@@ -28,16 +26,21 @@ Window::Window(int height, int width, int y, int x)
     }
 }
 
+Window::Window(const Rect& rect) :
+    Window(rect.size.height, rect.size.width, rect.origin.y, rect.origin.x)
+{
+}
+
 Window::Window(Window& parent, int height, int width, int y, int x, bool derived) :
     m_parent(&parent),
     m_sib(parent.m_subWins)
 {
     if (derived) {
-        y -= parent.OriginY();
-        x -= parent.OriginX();
+        y -= parent.originY();
+        x -= parent.originX();
     }
 
-    m_handle = derwin(parent.GetHandle(), height, width, y, x);
+    m_handle = derwin(parent.getHandle(), height, width, y, x);
     if (m_handle == NULL) {
         throw NCException("window error");
     }
@@ -49,14 +52,14 @@ Window::Window(Window& parent, int height, int width, int y, int x, bool derived
     parent.m_subWins = this;
 }
 
-void Window::PrintStr(const std::string& str)
+void Window::printStr(const std::string& str)
 {
     waddnstr(m_handle, str.c_str(), str.size());
 }
 
 Window::~Window()
 {
-    killSubwindows();
+    _killSubwindows();
 
     if (m_parent) {
         // Remove this window from the parent's list of subwindows.
@@ -82,21 +85,21 @@ Window::~Window()
 
 }
 
-Point Window::GetCursorPosition() const
+Point Window::getCursorPosition() const
 {
     Point pt;
     getyx(m_handle, pt.y, pt.x);
     return pt;
 }
 
-Point Window::GetOriginPoint() const
+Point Window::getOriginPoint() const
 {
     Point pt;
     getbegyx(m_handle, pt.y, pt.x);
     return pt;
 }
 
-int Window::Size() const
+int Window::size() const
 {
     int x = 0;
     int y = 0;
@@ -104,7 +107,7 @@ int Window::Size() const
     return x * y;
 }
 
-int Window::Getline(std::string& str, int n)
+int Window::getline(std::string& str, int n)
 {
     char* cstr = nullptr;
     int count = wgetnstr(m_handle, cstr, n);
@@ -112,7 +115,7 @@ int Window::Getline(std::string& str, int n)
     return count;
 }
 
-int Window::GetlineFromPos(int y, int x, std::string& str, int n)
+int Window::getlineFromPos(int y, int x, std::string& str, int n)
 {
     char* cstr = nullptr;
     int count = mvwgetnstr(m_handle, y, x, cstr, n);
@@ -120,7 +123,7 @@ int Window::GetlineFromPos(int y, int x, std::string& str, int n)
     return count;
 }
 
-int Window::ExtractString(std::string& str, int n)
+int Window::extractString(std::string& str, int n)
 {
     char* cstr = nullptr;
     int count = winnstr(m_handle, cstr, n);
@@ -128,7 +131,7 @@ int Window::ExtractString(std::string& str, int n)
     return count;
 }
 
-int Window::ExtractStringFromPos(int y, int x, std::string& str, int n)
+int Window::extractStringFromPos(int y, int x, std::string& str, int n)
 {
     char* cstr = nullptr;
     int count = mvwinnstr(m_handle, y, x, cstr, n);
@@ -136,7 +139,7 @@ int Window::ExtractStringFromPos(int y, int x, std::string& str, int n)
     return count;
 }
 
-int Window::GetStrAtPos(int y, int x, chtype* str, int n)
+int Window::getStrAtPos(int y, int x, chtype* str, int n)
 {
     chtype* cstr = nullptr;
     int count = mvwinchnstr(m_handle, y, x, cstr, n);
@@ -144,42 +147,42 @@ int Window::GetStrAtPos(int y, int x, chtype* str, int n)
     return count;
 }
 
-short Window::GetPair() const
+short Window::getPair() const
 {
     return static_cast<short>(PAIR_NUMBER(getattrs(m_handle)));
 }
 
-void Window::Top()
+void Window::top()
 {
     ::top_panel(m_panel);
 }
 
-void Window::Hide()
+void Window::hide()
 {
     ::hide_panel(m_panel);
 }
 
-void Window::Show()
+void Window::show()
 {
     ::show_panel(m_panel);
 }
 
-void Window::Move(int x, int y)
+void Window::move(int x, int y)
 {
     ::move_panel(m_panel, x, y);
 }
 
-int Window::SetPalette(short fore, short back, short pair)
+int Window::setPalette(short fore, short back, short pair)
 {
     return ::init_pair(pair, fore, back);
 }
 
-int Window::SetPalette(short fore, short back)
+int Window::setPalette(short fore, short back)
 {
-    return SetPalette(fore, back, GetPair());
+    return setPalette(fore, back, getPair());
 }
 
-/*int Window::SetColor(short pair)
+/*int Window::setColor(short pair)
 {
 	if ((pair < 1) || (pair > COLOR_PAIRS)) {
 	    return -1;
@@ -203,17 +206,17 @@ bool Window::isDescendant(Window& win)
     return result;
 }
 
-void Window::killSubwindows()
+void Window::_killSubwindows()
 {
     Window* p = m_subWins;
 
     m_subWins = nullptr;
     while (p != nullptr) {
         Window* q = p->m_sib;
-        p->killSubwindows();
+        p->_killSubwindows();
         //if (p->alloced) {
-            if (p->GetHandle())
-                ::delwin(p->GetHandle());
+            if (p->getHandle())
+                ::delwin(p->getHandle());
         //}
         delete p;
         p = q;

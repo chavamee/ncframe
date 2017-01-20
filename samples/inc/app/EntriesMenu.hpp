@@ -19,12 +19,12 @@ class EntriesMenu : public Menu {
         {
         }
 
-        EntriesMenu(int rows, int cols, int y, int x) :
-            Menu(rows, cols, y, x)
+        EntriesMenu(const Rect& rect) :
+            Menu(rect)
         {
         }
 
-        void OnItemSelected(MenuItem* item) override
+        void onItemSelected(MenuItem* item) override
         {
             (void)item;
         }
@@ -54,7 +54,7 @@ class EntriesMenu : public Menu {
                 }
                 pclose(stream);
             }
-            m_previewTextView->SetContent(content);
+            m_previewTextView->setContent(content);
         }
 
     private:
@@ -67,9 +67,9 @@ class EntryItem : public MenuItem {
         {
         }
 
-        bool Action() override
+        bool action() override
         {
-            static_cast<EntriesMenu*>(Menu())->ShowPreview(m_entry.content);
+            static_cast<EntriesMenu*>(menu())->ShowPreview(m_entry.content);
             return true;
         }
 

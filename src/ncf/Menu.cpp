@@ -12,60 +12,6 @@
 
 using namespace std;
 
-MenuItem::MenuItem()
-{
-}
-
-MenuItem::MenuItem(
-        std::string name,
-        std::string description
-        ) :
-    m_name(name),
-    m_description(description)
-{
-    m_handle = new_item(m_name.c_str(), m_description.c_str());
-    if (m_handle == NULL) {
-        throw std::runtime_error("menu item failed");
-    }
-}
-
-MenuItem::MenuItem(const MenuItem& item) :
-    m_name(item.m_name),
-    m_description(item.m_description)
-{
-    m_handle = new_item(m_name.c_str(), m_description.c_str());
-    if (m_handle == NULL) {
-        throw std::runtime_error("menu item failed");
-    }
-}
-
-MenuItem::~MenuItem()
-{
-    free_item(m_handle);
-}
-
-MenuItem& MenuItem::operator=(const MenuItem& other)
-{
-    if (this != &other) {
-        m_name = other.m_name;
-        m_description = other.m_description;
-        m_handle = new_item(m_name.c_str(), m_description.c_str());
-        if (m_handle == NULL) {
-            throw std::runtime_error("menu item failed");
-        }
-    }
-    return *this;
-}
-
-Menu_Options MenuItem::options() {
-    return ::item_opts(m_handle);
-}
-
-void MenuItem::set_options (Menu_Options opts) {
-    set_item_opts (m_handle, opts);
-}
-
-
 Menu::Menu() :
     m_handle(NULL),
     m_itemMark(nullptr),
@@ -73,14 +19,16 @@ Menu::Menu() :
 {
 }
 
-Menu::Menu(int height, int width, int y, int x) :
+Menu::Menu(const Rect& rect) :
+    Widget {rect},
     m_handle(NULL),
     m_itemMark(nullptr),
     m_items()
 {
 }
 
-Menu::Menu(int height, int width, int y, int x, vector<MenuItem*>& items) :
+Menu::Menu(const Rect& rect, vector<MenuItem*>& items) :
+    Widget {rect},
     m_handle(NULL),
     m_itemMark(nullptr),
     m_items(items)
@@ -106,45 +54,43 @@ Menu::~Menu()
 //  item.m_handle = new_item(...)
 //}
 
-void Menu::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     if (window.get() != nullptr) {
 
-        keypad(window->GetHandle(), true);
-        meta(window->GetHandle(), true);
+        keypad(window->getHandle(), true);
+        meta(window->getHandle(), true);
 
         //TODO: initializeItems()
 
-        m_handle = new_menu(unpackItems(m_items));
+        m_handle = new_menu(_unpackItems(m_items));
         if (m_handle == NULL) {
-            throw std::runtime_error("menu error");
+            onError(E_SYSTEM_ERROR);
         }
 
-        int subRows = 0;
-        int subCols = 0;
-        Scale(subRows, subCols);
+        Size size  = scale();
 
-        set_menu_win(m_handle, window->GetHandle());
+        set_menu_win(m_handle, window->getHandle());
 
-        if (subRows < window->Height() - 2 && subCols < window->Width() - 2) {
+        if (size.height < window->height() - 2 && size.width < window->width() - 2) {
             subWindow = make_unique<Window>(
                     *window,
-                    subRows, subCols, 1, 1,
+                    size.height, size.width, 1, 1,
                     false
                     );
 
-            set_menu_sub(m_handle, subWindow->GetHandle());
-            set_menu_mark(m_handle, m_itemMark ? m_itemMark : "*");
+            set_menu_sub(m_handle, subWindow->getHandle());
+            setMark(m_itemMark ? m_itemMark : "*");
 
-            Post();
-            window->Show();
-            window->Refresh();
-            window->Refresh();
+            post();
+            window->show();
+            window->refresh();
+            window->refresh();
 
-            SetWindow(std::move(window));
-            SetSubWindow(std::move(subWindow));
+            setWindow(std::move(window));
+            setSubWindow(std::move(subWindow));
         } else {
-            throw NCException("No room left for menu");
+            throw NCMenuException {"No room left for menu", E_SYSTEM_ERROR};
         }
 
     } else {
@@ -154,7 +100,7 @@ void Menu::Draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
     m_isDrawn = true;
 }
 
-void Menu::SetItems(vector<MenuItem*>& items)
+void Menu::setItems(vector<MenuItem*>& items)
 {
     //TODO: Implement with a swap or clone function
     m_items = items;
@@ -165,22 +111,28 @@ void Menu::SetItems(vector<MenuItem*>& items)
     if (m_isDrawn) {
         ITEM** oldItems = menu_items(m_handle);
 
+        if (m_isPosted) {
+            unpost();
+        }
         if (m_items.empty()) {
             set_menu_items(m_handle, NULL);
         } else {
-            set_menu_items(m_handle, unpackItems(m_items));
+            set_menu_items(m_handle, _unpackItems(m_items));
+        }
+        if (!m_isPosted) {
+            post();
         }
 
         delete[] oldItems;
     }
 }
 
-void Menu::OnMouseEvent(int ch)
+void Menu::onMouseEvent(int ch)
 {
     (void)ch;
 }
 
-int Menu::OnKeyEvent(int ch)
+int Menu::onKeyEvent(int ch)
 {
     switch(ch) {
         case KEY_DOWN      : return ::menu_driver(m_handle, REQ_DOWN_ITEM);
@@ -196,7 +148,7 @@ int Menu::OnKeyEvent(int ch)
                               */
         case '\r'          :
         case '\n'          :
-        case KEY_ENTER     : invokeAction(CurrentItem()); return 1;
+        case KEY_ENTER     : _invokeAction(currentItem()); return 1;
 
         case KEY_HOME      : return ::menu_driver(m_handle, REQ_FIRST_ITEM);
         case KEY_LEFT      : return ::menu_driver(m_handle, REQ_LEFT_ITEM);
@@ -206,18 +158,18 @@ int Menu::OnKeyEvent(int ch)
     return 0;
 }
 
-bool Menu::OnEvent(int ch)
+bool Menu::onEvent(int ch)
 {
     (void)ch;
     return false;
 }
 
-bool Menu::invokeAction(MenuItem& item)
+bool Menu::_invokeAction(MenuItem& item)
 {
     if (static_cast<int>(item.options()) & O_SELECTABLE)
     {
-        item.Action();
-        OnItemAction(&item);
+        item.action();
+        onItemAction(&item);
         refresh();
     } else {
         //On_Not_Selectable(c);
@@ -226,7 +178,7 @@ bool Menu::invokeAction(MenuItem& item)
     return true;
 }
 
-ITEM** Menu::unpackItems(vector<MenuItem*>& items)
+ITEM** Menu::_unpackItems(vector<MenuItem*>& items)
 {
     ITEM** rawItems = new ITEM*[items.size()+1];
 
@@ -242,12 +194,17 @@ ITEM** Menu::unpackItems(vector<MenuItem*>& items)
     return rawItems;
 }
 
-void Menu::SetDefaultAttributes()
+void Menu::setDefaultAttributes()
 {
-  Application* app = Application::GetApplication();
+  Application* app = Application::getApplication();
   if (app) {
-    ::set_menu_fore(m_handle, app->Foregrounds());
-    ::set_menu_back(m_handle, app->Backgrounds());
-    ::set_menu_grey(m_handle, app->Inactives());
+    ::set_menu_fore(m_handle, app->foregrounds());
+    ::set_menu_back(m_handle, app->backgrounds());
+    ::set_menu_grey(m_handle, app->inactives());
   }
+}
+
+// Set the current item
+void Menu::setCurrentItem(MenuItem& item) {
+    onError (::set_current_item(m_handle, item.m_handle));
 }
