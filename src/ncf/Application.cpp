@@ -87,6 +87,7 @@ void Application::start()
                 it = prev(it);
                 additionalEvent = true;
             }  else if (ch == '\t') {
+                fwd = true;
                 it = next(it);
                 additionalEvent = true;
             }
