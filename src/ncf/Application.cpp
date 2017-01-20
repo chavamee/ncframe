@@ -14,16 +14,16 @@ Application* Application::getApplication()
 
 Application::Application()
 {
-    setlocale(LC_ALL, "");
-    initscr();
+    ::setlocale(LC_ALL, "");
+    ::initscr();
 
-    start_color();
+    ::start_color();
 
-    cbreak();
-    noecho();
-    keypad(stdscr, true);
-    meta(stdscr, true);
-    curs_set(0);
+    ::cbreak();
+    ::noecho();
+    ::keypad(stdscr, true);
+    ::meta(stdscr, true);
+    ::curs_set(0);
     m_rootWindow = new Window(::stdscr);
 
     m_rootWindow->setColor(1);
@@ -105,8 +105,8 @@ void Application::start()
             m_currWdgtWithFocus->onKeyEvent(ch);
         }
 
-        refresh();
-        update_panels();
-        doupdate();
+        ::refresh();
+        ::update_panels();
+        ::doupdate();
     }
 }

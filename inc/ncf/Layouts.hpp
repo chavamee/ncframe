@@ -55,9 +55,9 @@ class RowLayout : public Layout {
 
         void remove(Component* component) override;
 
-        Component* child(unsigned int pos) override;
+        Component* child(std::size_t pos) override;
 
-        unsigned int childCount() override;
+        std::size_t childCount() override;
 
     private:
         std::vector<Component*> m_components;
@@ -97,9 +97,9 @@ class ColumnLayout : public Layout {
 
         void remove(Component* component) override;
 
-        Component* child(unsigned int pos) override;
+        Component* child(std::size_t pos) override;
 
-        unsigned int childCount() override;
+        std::size_t childCount() override;
 
     private:
         std::vector<Component*> m_components;

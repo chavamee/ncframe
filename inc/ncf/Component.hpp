@@ -46,13 +46,13 @@ class Component {
         }
 
 
-        virtual Component* child(unsigned int pos)
+        virtual Component* child(std::size_t pos)
         {
             NCF_UNUSED(pos);
             return nullptr;
         }
 
-        virtual unsigned int childCount()
+        virtual std::size_t childCount()
         {
             return 0;
         }

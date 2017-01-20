@@ -25,12 +25,12 @@ class Row : public Component {
             m_components.erase(std::find(m_components.begin(), m_components.end(), component));
         }
 
-        Component* child(unsigned int pos) override
+        Component* child(std::size_t pos) override
         {
             return m_components.at(pos);
         }
 
-        unsigned int childCount() override
+        size_t childCount() override
         {
             return m_components.size();
         }

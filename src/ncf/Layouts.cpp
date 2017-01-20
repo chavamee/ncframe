@@ -79,12 +79,12 @@ void RowLayout::remove(Component* component)
     m_components.erase(std::find(m_components.begin(), m_components.end(), component));
 }
 
-Component* RowLayout::child(unsigned int pos)
+Component* RowLayout::child(std::size_t pos)
 {
     return m_components.at(pos);
 }
 
-unsigned int RowLayout::childCount()
+std::size_t RowLayout::childCount()
 {
     return m_components.size();
 }
@@ -107,11 +107,11 @@ void UniformRowCompositor::compose()
     unsigned int maxHeight = composition->MaxHeight;
     unsigned int maxWidth = composition->MaxWidth;
 
-    unsigned int numCmps = composition->childCount();
+    size_t numCmps = composition->childCount();
     int cmpWidth = maxWidth / numCmps;
     int currentX = 0;
 
-    for (unsigned int i = 0; i < numCmps; i++) {
+    for (size_t i = 0; i < numCmps; i++) {
         m_row.add(composition->child(i));
         unique_ptr<Window> window = make_unique<Window>(maxHeight, cmpWidth, 0, currentX);
         composition->child(i)->draw(std::move(window));
@@ -168,12 +168,12 @@ void ColumnLayout::remove(Component* component)
     m_components.erase(std::find(m_components.begin(), m_components.end(), component));
 }
 
-Component* ColumnLayout::child(unsigned int pos)
+Component* ColumnLayout::child(std::size_t pos)
 {
     return m_components.at(pos);
 }
 
-unsigned int ColumnLayout::childCount()
+std::size_t ColumnLayout::childCount()
 {
     return m_components.size();
 }
@@ -192,11 +192,11 @@ void UniformColumnCompositor::compose()
 
     unsigned int maxHeight = composition->MaxHeight;
     unsigned int maxWidth = composition->MaxWidth;
-    unsigned int numCmps = composition->childCount();
+    size_t numCmps = composition->childCount();
     int cmpHeight = maxHeight / numCmps;
     int currentY = 0;
 
-    for (unsigned int i = 0; i < numCmps; i++) {
+    for (size_t i = 0; i < numCmps; i++) {
         m_column.add(composition->child(i));
         unique_ptr<Window> window = make_unique<Window>(cmpHeight, maxWidth, currentY, 0);
         composition->child(i)->draw(std::move(window));
