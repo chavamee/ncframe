@@ -17,6 +17,9 @@ Row::~Row()
 
 void Row::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
+    if (window) {
+        maxHeight = window->height();
+    }
     size_t numCmps = childCount();
     int cmpWidth = maxWidth / numCmps;
     int currentX = 0;

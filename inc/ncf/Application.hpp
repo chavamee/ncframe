@@ -88,10 +88,9 @@ class Application {
         }
 
         // Attributes to use for the title window
-        virtual chtype screen_titles() const {
+        virtual chtype screenTitles() const {
             return m_hasColors ? static_cast<chtype>(COLOR_PAIR(6)) : A_BOLD;
         }
-
 
         static Application* getApplication();
 
