@@ -3,7 +3,8 @@
 #include "ncf/Decorators.hpp"
 #include "ncf/TextView.hpp"
 #include "ncf/Application.hpp"
-#include "ncf/Layouts.hpp"
+#include "ncf/RowLayout.hpp"
+#include "ncf/ColumnLayout.hpp"
 
 #include "app/CategoryMenu.hpp"
 #include "app/EntriesMenu.hpp"
