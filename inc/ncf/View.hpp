@@ -3,10 +3,6 @@
 #include "ncf/Widget.hpp"
 #include "ncf/Pad.hpp"
 
-// TODO: ScrollableView and View should own the window not Widget
-//       ScrollableView will own a pad
-//       View will own a Window
-
 //TODO: Turn into model/view
 
 class View : public Widget {

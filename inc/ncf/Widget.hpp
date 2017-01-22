@@ -14,11 +14,22 @@ class Widget : public Component {
 
         Widget(const Rect& rect);
 
-        virtual int onKeyEvent(int ch) = 0;
+        virtual int onKeyEvent(int ch)
+        {
+            NCF_UNUSED(ch);
+            return ch;
+        }
 
-        virtual void onMouseEvent(int ch) = 0;
+        virtual void onMouseEvent(int ch)
+        {
+            NCF_UNUSED(ch);
+        }
 
-        virtual bool onEvent(int ch) = 0;
+        virtual bool onEvent(int ch)
+        {
+            NCF_UNUSED(ch);
+            return false;
+        }
 
         inline int width() const
         {

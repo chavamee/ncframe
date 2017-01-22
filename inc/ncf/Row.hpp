@@ -1,39 +1,30 @@
 #ifndef NCF_NCURSES_ROW_H_
 #define NCF_NCURSES_ROW_H_
 
-#include "ncf/Component.hpp"
+#include "ncf/Widget.hpp"
 
 #include <algorithm>
 
-class Row : public Component {
+class Row : public Widget {
     public:
-        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
-        {
-            //TODO: This is wrong
-            for (auto& cmp : m_components) {
-                cmp->draw(std::move(window), std::move(subWindow));
-            }
-        }
+        Row();
 
-        void add(Component* component, unsigned int pos = 0) override
-        {
-            m_components.insert(m_components.begin()+pos, component);
-        }
+        Row(const Rect& rect);
 
-        void remove(Component* component) override
-        {
-            m_components.erase(std::find(m_components.begin(), m_components.end(), component));
-        }
+        ~Row();
 
-        Component* child(std::size_t pos) override
-        {
-            return m_components.at(pos);
-        }
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
-        size_t childCount() override
-        {
-            return m_components.size();
-        }
+        void add(Component* component, unsigned int pos = 0) override;
+
+        void remove(Component* component) override;
+
+        Component* child(std::size_t pos) override;
+
+        size_t childCount() override;
+
+        size_t maxHeight = LINES - 1;
+        size_t maxWidth  = COLS - 1;
 
     private:
         std::vector<Component*> m_components;

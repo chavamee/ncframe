@@ -3,8 +3,8 @@
 #include "ncf/Decorators.hpp"
 #include "ncf/TextView.hpp"
 #include "ncf/Application.hpp"
-#include "ncf/RowLayout.hpp"
-#include "ncf/ColumnLayout.hpp"
+#include "ncf/Row.hpp"
+#include "ncf/Column.hpp"
 
 #include "app/CategoryMenu.hpp"
 #include "app/EntriesMenu.hpp"
@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
         user
     };
 
-    ColumnLayout body        {};
-    RowLayout    top         {};
+    Column body        {};
+    Row    top         {};
 
     TextView     prev        {};
     EntriesMenu  entriesMenu {&prev};
@@ -59,14 +59,14 @@ int main(int argc, char *argv[])
     top.add(new Border(&entriesMenu));
     top.add(new Border(&ctgMenu));
 
-    body.add(new Border(&prev));
-    body.add(&top);
+    body.add(&top, 0);
+    body.add(new Border(&prev), 1);
 
     prev.setContent("Hello, World!");
 
-    body.show();
-
     app.setInitialContext(&ctgMenu);
+
+    body.draw();
 
     app.start();
 
