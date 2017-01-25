@@ -1,12 +1,14 @@
 #include "ncf/MenuItem.hpp"
 
+using namespace std;
+
 MenuItem::MenuItem()
 {
 }
 
 MenuItem::MenuItem(
-        std::string name,
-        std::string description
+        const std::string& name,
+        const std::string& description
         ) :
     m_name(name),
     m_description(description)

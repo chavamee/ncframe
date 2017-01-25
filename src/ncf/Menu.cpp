@@ -68,31 +68,27 @@ void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
             onError(E_SYSTEM_ERROR);
         }
 
-        Size size  = scale();
-
         set_menu_win(m_handle, window->getHandle());
 
-        if (size.height < window->height() - 2 && size.width < window->width() - 2) {
-            auto newSubWindow = make_unique<Window>(
-                    *window,
-                    size.height, size.width, 1, 1,
-                    false
-                    );
+        subWindow = make_unique<Window>(
+                *window,
+                window->height()-2, window->width()-2, 1, 1,
+                false
+                );
 
-            set_menu_sub(m_handle, newSubWindow->getHandle());
-            setMark(m_itemMark ? m_itemMark : "*");
+        set_menu_sub(m_handle, subWindow->getHandle());
 
-            post();
-            window->refresh();
+        //TODO: These should be treated as defaults. Maybe do at construction
+        // to ensure that after construction if the user needs to change the
+        // format this will not conflict.
+        setFormat({.height = window->height() - 2, .width = 1});
+        setMark(m_itemMark ? m_itemMark : "*");
 
-            newSubWindow->refresh();
+        post();
+        window->refresh();
 
-            setWindow(std::move(window));
-            setSubWindow(std::move(newSubWindow));
-        } else {
-            throw NCMenuException {"No room left for menu", E_SYSTEM_ERROR};
-        }
-
+        setWindow(std::move(window));
+        setSubWindow(std::move(subWindow));
     } else {
         //TODO: Define defaults
     }

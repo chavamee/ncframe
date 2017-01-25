@@ -13,8 +13,8 @@ friend Menu;
         MenuItem();
 
         MenuItem(
-            std::string name,
-            std::string description
+            const std::string& name,
+            const std::string& description
                 );
 
         /**

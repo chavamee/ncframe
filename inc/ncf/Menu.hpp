@@ -111,7 +111,7 @@ class Menu : public Widget {
 
         // Set the format of this menu
         inline void setFormat(const Size& size) {
-            onError (::set_menu_format(m_handle, size.height, size.width));
+            onError (::set_menu_format(m_handle, (int)size.height, (int)size.width));
         }
 
         // Get the format of this menu
