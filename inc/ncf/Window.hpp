@@ -76,24 +76,11 @@ class Window {
               );
 
 
-        Window(const Window& rhs) :
-            m_handle(rhs.m_handle),
-            m_parent(rhs.m_parent),
-            m_subWins(rhs.m_subWins),
-            m_sib(rhs.m_sib),
-            m_isOwner(rhs.m_isOwner)
-        {
-        }
+        Window(const Window& rhs) = delete;
 
-        Window(Window&& rhs) :
-            m_handle(rhs.m_handle),
-            m_parent(rhs.m_parent),
-            m_subWins(rhs.m_subWins),
-            m_sib(rhs.m_sib),
-            m_isOwner(rhs.m_isOwner)
-        {
-            rhs.m_handle = NULL;
-        }
+        Window(Window&& rhs);
+
+        Window& operator=(Window&& rhs);
 
         //TODO; If we used the ncurses window handle constructor
         //      and we do not take ownership we should not delete
@@ -648,8 +635,7 @@ class Window {
 
     protected:
         WINDOW* m_handle = NULL;
-        PANEL* m_panel = NULL;
-
+        PANEL* m_panel   = NULL;
 
         Window* m_parent  = nullptr;   // parent, if subwindow
         Window* m_subWins = nullptr;   // head of subwindows list
@@ -657,8 +643,7 @@ class Window {
 
     private:
         void _killSubwindows();
-        bool m_isOwner = true;
-
+        static bool s_isInitialized;
 };
 
 #endif

@@ -22,8 +22,7 @@ void Column::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
     int currentY = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        unique_ptr<Window> window = make_unique<Window>(cmpHeight, maxWidth, currentY, 0);
-        child(i)->draw(std::move(window));
+        child(i)->draw(make_unique<Window>(cmpHeight, maxWidth, currentY, 0));
         currentY += cmpHeight;
     }
 }

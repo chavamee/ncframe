@@ -25,9 +25,12 @@ void Row::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
     int currentX = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        unique_ptr<Window> window = make_unique<Window>(maxHeight, cmpWidth, 0, currentX);
-        child(i)->draw(std::move(window));
+        child(i)->draw(make_unique<Window>(maxHeight, cmpWidth, 0, currentX));
         currentX += cmpWidth;
+    }
+
+    if (window) {
+        setWindow(std::move(window));
     }
 }
 

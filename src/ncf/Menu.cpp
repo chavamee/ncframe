@@ -73,22 +73,22 @@ void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         set_menu_win(m_handle, window->getHandle());
 
         if (size.height < window->height() - 2 && size.width < window->width() - 2) {
-            subWindow = make_unique<Window>(
+            auto newSubWindow = make_unique<Window>(
                     *window,
                     size.height, size.width, 1, 1,
                     false
                     );
 
-            set_menu_sub(m_handle, subWindow->getHandle());
+            set_menu_sub(m_handle, newSubWindow->getHandle());
             setMark(m_itemMark ? m_itemMark : "*");
 
             post();
-            window->show();
-            window->refresh();
             window->refresh();
 
+            newSubWindow->refresh();
+
             setWindow(std::move(window));
-            setSubWindow(std::move(subWindow));
+            setSubWindow(std::move(newSubWindow));
         } else {
             throw NCMenuException {"No room left for menu", E_SYSTEM_ERROR};
         }

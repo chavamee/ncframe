@@ -2,8 +2,20 @@
 #include "ncf/NCException.hpp"
 //TODO: Destructors
 
+bool Window::s_isInitialized = false;
+
 Window::Window()
 {
+    if (!s_isInitialized) {
+	    ::initscr();
+	    s_isInitialized = true;
+        /*if (colorInitialized == COLORS_NEED_INITIALIZATION) {
+            colorInitialized = COLORS_NOT_INITIALIZED;
+            useColors();
+        }*/
+        ::noecho();
+        ::cbreak();
+    }
 }
 
 Window::Window(WINDOW* win) :
@@ -13,16 +25,17 @@ Window::Window(WINDOW* win) :
     m_panel = ::new_panel(m_handle);
 }
 
-Window::Window(int height, int width, int y, int x)
+Window::Window(int height, int width, int y, int x) :
+    Window()
 {
-    m_handle = newwin(height, width, y, x);
+    m_handle = ::newwin(height, width, y, x);
     if (m_handle == NULL) {
-        throw NCException("Could not create window");
+        throw NCException {"Could not create window"};
     }
 
     m_panel = ::new_panel(m_handle);
     if (m_panel == NULL) {
-        throw NCException("window error");
+        throw NCException {"window error"};
     }
 }
 
@@ -32,15 +45,14 @@ Window::Window(const Rect& rect) :
 }
 
 Window::Window(Window& parent, int height, int width, int y, int x, bool derived) :
-    m_parent(&parent),
-    m_sib(parent.m_subWins)
+    Window()
 {
     if (derived) {
         y -= parent.originY();
         x -= parent.originX();
     }
 
-    m_handle = derwin(parent.getHandle(), height, width, y, x);
+    m_handle = ::derwin(parent.getHandle(), height, width, y, x);
     if (m_handle == NULL) {
         throw NCException("window error");
     }
@@ -49,7 +61,19 @@ Window::Window(Window& parent, int height, int width, int y, int x, bool derived
     if (m_panel == NULL) {
         throw NCException("window error");
     }
+
+    m_parent = &parent;
+    m_sib = parent.m_subWins;
     parent.m_subWins = this;
+}
+
+Window::Window(Window&& rhs) :
+    m_handle(rhs.m_handle),
+    m_parent(rhs.m_parent),
+    m_subWins(rhs.m_subWins),
+    m_sib(rhs.m_sib)
+{
+    rhs.m_handle = NULL;
 }
 
 void Window::printStr(const std::string& str)
@@ -79,10 +103,16 @@ Window::~Window()
         }
     }
 
-    if (/*alloced &&*/ m_handle != NULL) {
+    if (m_handle != NULL) {
         ::delwin(m_handle);
     }
+}
 
+Window& Window::operator=(Window&& rhs)
+{
+    this->m_handle = rhs.m_handle;
+    rhs.m_handle = NULL;
+    return *this;
 }
 
 Point Window::getCursorPosition() const

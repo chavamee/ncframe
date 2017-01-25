@@ -18,8 +18,6 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    Application app(argc, argv);
-
     Feedly::User user{
         "0f558b72-8e00-48b4-9f4a-7f97d8621968",
         "Az8RkrRAn5dR0MpoZUmSaYr55MsrclittquxiHIPiHgOU1hpkzCiH881WYeIMqKzo3fy5ZKzqjgMCjml9OYxTwkRXjAmycKeXoBh4ddQVwAr6Efb5kJy4_iR1q8-0OkOw2ZXiZC1m_x88lmUwp04ByckJq2ErTL0G8AhTlNfmWtvbVjF7Cqju3_x_WJTnsbCzPRSR6zg5kxLhVgzoIxgEtlgSQNmFw:feedlydev"
@@ -28,6 +26,8 @@ int main(int argc, char *argv[])
     Feedly server {
         user
     };
+
+    Application app(argc, argv);
 
     Column body        {};
     Row    top         {};
