@@ -1,6 +1,8 @@
 #include "ncf/Window.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/NCWindowException.hpp"
 //TODO: Destructors
+
+using namespace std;
 
 bool Window::s_isInitialized = false;
 
@@ -76,11 +78,6 @@ Window::Window(Window&& rhs) :
     rhs.m_handle = NULL;
 }
 
-void Window::printStr(const std::string& str)
-{
-    waddnstr(m_handle, str.c_str(), str.size());
-}
-
 Window::~Window()
 {
     _killSubwindows();
@@ -129,44 +126,39 @@ Point Window::getOriginPoint() const
     return pt;
 }
 
-int Window::size() const
+Size Window::size() const
 {
-    int x = 0;
-    int y = 0;
-    getmaxyx(m_handle, y, x);
-    return x * y;
+    Size size {};
+    getmaxyx(m_handle, size.height, size.width);
+    return size;
 }
 
-int Window::getline(std::string& str, int n)
+string Window::getline(int n)
 {
     char* cstr = nullptr;
-    int count = wgetnstr(m_handle, cstr, n);
-    str = cstr;
-    return count;
+    wgetnstr(m_handle, cstr, n);
+    return string {cstr};
 }
 
-int Window::getlineFromPos(int y, int x, std::string& str, int n)
+string Window::getlineFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    int count = mvwgetnstr(m_handle, y, x, cstr, n);
-    str = cstr;
-    return count;
+    ::mvwgetnstr(m_handle, point.y, point.x, cstr, n);
+    return string {cstr};
 }
 
-int Window::extractString(std::string& str, int n)
+string Window::extractString(int n)
 {
     char* cstr = nullptr;
-    int count = winnstr(m_handle, cstr, n);
-    str = cstr;
-    return count;
+    winnstr(m_handle, cstr, n);
+    return string {cstr};
 }
 
-int Window::extractStringFromPos(int y, int x, std::string& str, int n)
+string Window::extractStringFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    int count = mvwinnstr(m_handle, y, x, cstr, n);
-    str = cstr;
-    return count;
+    ::mvwinnstr(m_handle, point.y, point.x, cstr, n);
+    return string {cstr};
 }
 
 int Window::getStrAtPos(int y, int x, chtype* str, int n)
@@ -197,43 +189,72 @@ void Window::show()
     ::show_panel(m_panel);
 }
 
-void Window::move(int x, int y)
+void Window::move(const Point& point)
 {
-    ::move_panel(m_panel, x, y);
+    _onError( ::move_panel(m_panel, point.x, point.y) );
 }
 
-int Window::setPalette(short fore, short back, short pair)
+void Window::setPalette(const colorPair& color, colorPairID pair)
 {
-    return ::init_pair(pair, fore, back);
+    _onError ( ::init_pair(pair, color.first, color.second) );
 }
 
-int Window::setPalette(short fore, short back)
+void Window::setPalette(colorPair color)
 {
-    return setPalette(fore, back, getPair());
+    setPalette(color, getPair());
 }
 
-/*int Window::setColor(short pair)
+void Window::setColor(colorPairID pair)
 {
-	if ((pair < 1) || (pair > COLOR_PAIRS)) {
-	    return -1;
+
+    if ((pair < 1) || (pair > COLOR_PAIRS)) {
+        throw NCException("Can't set color pair");
     }
 
-	attroff(A_COLOR);
-	attrset(COLOR_PAIR(pair));
-    return OK;
-}*/
+    attroff(A_COLOR);
+    attrset(COLOR_PAIR(pair));
+}
 
 bool Window::isDescendant(Window& win)
 {
     bool result = false;
 
     for (Window* p = m_subWins; p != NULL; p = p->m_sib) {
-	if (p == &win || p->isDescendant(win)) {
-	    result = TRUE;
-	    break;
-	}
+        if (p == &win || p->isDescendant(win)) {
+            result = TRUE;
+            break;
+        }
     }
     return result;
+}
+
+void Window::centerText(int y, const std::string& label)
+{
+    if (not label.empty()) {
+        int x = (maxX() - label.size()) / 2;
+        if (x<0) {
+            x=0;
+        }
+        writeStringAtPos({y, x}, label.c_str());
+    }
+}
+
+void Window::label(const std::string& topLabel, const std::string& bottomLabel)
+{
+    if (not topLabel.empty()) {
+        centerText(0, topLabel);
+    }
+    if (not bottomLabel.empty()) {
+        centerText(maxY(), bottomLabel);
+    }
+}
+
+void Window::frame(const std::string& title,const std::string& btitle)
+{
+    box();
+    if (not title.empty() && not btitle.empty()) {
+        label(title, btitle);
+    }
 }
 
 void Window::_killSubwindows()
@@ -244,11 +265,29 @@ void Window::_killSubwindows()
     while (p != nullptr) {
         Window* q = p->m_sib;
         p->_killSubwindows();
-        //if (p->alloced) {
-            if (p->getHandle())
-                ::delwin(p->getHandle());
-        //}
+        if (p->getHandle())
+            ::delwin(p->getHandle());
         delete p;
         p = q;
     }
+}
+
+void Window::_onError(int err)
+{
+    if (err != E_OK) {
+        throw NCWindowException("Window error", err);
+    }
+}
+
+void Window::redrawAll()
+{
+    PANEL *pan;
+
+    pan = ::panel_above(NULL);
+    while (pan) {
+        ::touchwin(panel_window(pan));
+        pan = ::panel_above(pan);
+    }
+    ::update_panels();
+    ::doupdate();
 }

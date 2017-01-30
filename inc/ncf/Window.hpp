@@ -16,634 +16,1137 @@ extern "C" {
 
 class Window;
 
+//TODO: Ensure that all ncurses functions that return ERR are properly wrapped with _onError
+//TODO: Describe decorator functions as helper functions
+//TODO: Normalize vocabulary in respect to row and col vs x and y
+//TODO: If move cosntructors do soemthing special, document as appropriate
 //TODO: make attribute a struct/class to use RAII to reset attron/attroff
 //TODO: implement interface for all window functionality that needs to be
 //      exposed in Window class
 //
-//TODO: Make int y, int x pairs to Point structs
-//TODO: Complete panel implementation
+//TODO: All functions that take an n param and have n=-1 as part of there sginature
+//      should change to use std::strings and not using the n param
+//TODO: Do we need this in the global namespace? In other words should we move it to
+//      another header?
+//TODO: Find a better way to define attribute types
+
+/**
+ * NCurses char type alias.
+ *
+ * This type encompases normal and wide characters.
+ */
+using ncCharType = chtype;
+using colorPairID = short;
+using colorType = short;
+using colorPair = std::pair<colorType, colorType>;
+
+struct borderType {
+    ncCharType left         = 0;
+    ncCharType right        = 0;
+    ncCharType top          = 0;
+    ncCharType bottom       = 0;
+    ncCharType top_left     = 0;
+    ncCharType top_right    = 0;
+    ncCharType bottom_left  = 0;
+    ncCharType bottom_right = 0;
+};
 
 class Window {
     friend Window;
 
     public:
-        /**
-         * Defualt constructor
-         */
-        Window();
 
-        //TODO: Should we take ownership of win?
-        /**
-         * Construct a Window object off of a ncurses WINDOW handle
-         */
-        Window(WINDOW* win);
+    /**
+     * Defualt constructor
+     */
+    Window();
 
-        /**
-         * Construct a new window
-         *
-         * @param height height of the window
-         * @param width  width of the window
-         * @param y      y coordinate of the window origin
-         * @param x      x coordinate of the window origin
-         */
-        Window(
-                int height,
-                int width,
-                int y = 0,
-                int x = 0
-              );
+    //TODO: Should we take ownership of win?
+    /**
+     * Construct a Window object off of a ncurses WINDOW handle
+     */
+    Window(WINDOW* win);
 
-        Window(
-                const Rect& rect
-              );
+    /**
+     * Construct a new window
+     *
+     * @param height height of the window
+     * @param width  width of the window
+     * @param y      y coordinate of the window origin
+     * @param x      x coordinate of the window origin
+     */
+    Window(
+            int height,
+            int width,
+            int y = 0,
+            int x = 0
+          );
 
-        /**
-         * Construct a new window with a parent window
-         *
-         * @param parent parent window of this window.
-         *               The window becomes a sub window of parent
-         * @param height height of the window
-         * @param width  width of the window
-         * @param y      y coordinate of the window origin
-         * @param x      x coordinate of the window origin
-         */
-        Window( Window& parent,
-                int height,
-                int width,
-                int y = 0,
-                int x = 0,
-                bool derived = false
-              );
+    Window(
+            const Rect& rect
+          );
+
+    /**
+     * Construct a new window with a parent window
+     *
+     * @param parent parent window of this window.
+     *               The window becomes a sub window of parent
+     * @param height height of the window
+     * @param width  width of the window
+     * @param y      y coordinate of the window origin
+     * @param x      x coordinate of the window origin
+     */
+    Window( Window& parent,
+            int height,
+            int width,
+            int y = 0,
+            int x = 0,
+            bool derived = false
+          );
 
 
-        Window(const Window& rhs) = delete;
+    /*
+     * TODO: Is it better to not allow copying at all or
+     *       proceed with copying but clone the ncurses WINDOWs
+     *       esentially having new ones in the copied object.
+     */
+    Window(const Window& rhs) = delete;
 
-        Window(Window&& rhs);
+    /**
+     * Move constructor
+     */
+    Window(Window&& rhs);
 
-        Window& operator=(Window&& rhs);
+    /**
+     * Move assignemnt operator
+     */
+    Window& operator=(Window&& rhs);
 
-        //TODO; If we used the ncurses window handle constructor
-        //      and we do not take ownership we should not delete
-        //      the handle
-        /**
-         * Window destructor
-         */
-        virtual ~Window();
+    //TODO; If we used the ncurses window handle constructor
+    //      and we do not take ownership we should not delete
+    //      the handle
+    /**
+     * Window destructor
+     */
+    virtual ~Window();
 
-        //int            tabsize() const { initialize(); return TABSIZE; }
-        // Size of a tab on terminal, *not* window
+    //TODO: int            tabsize() const { initialize(); return TABSIZE; }
+    // Size of a tab on terminal, *not* window
 
-        static int     numberOfColors();
-        // Number of available colors
+    // Number of available colors
+    /**
+     * Returns tha amount of available colors for all windows
+     *
+     * @return number of available colors
+     */
+    static int colorCount();
 
-        /**
-         * Returns the number of available for this window
-         * @return the number of colors
-         */
-        int colors() const { return numberOfColors(); }
+    /**
+     * Returns the number of available for this window
+     *
+     * @return the number of colors
+     */
+    int colors() const { return colorCount(); }
 
-        // -------------------------------------------------------------------------
-        // window status
-        // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // window status
+    // -------------------------------------------------------------------------
 
-        int getCursorX() const { return getcurx(m_handle); }
-        // Column of top left corner relative to stdscr
+    //TODO: Return color struct
+    /*colorPairID getcolor() const;
+    // Actual color pair
 
-        int getCursorY() const { return getcury(m_handle); }
-        // Line of top left corner relative to stdscr
+    NCURSES_COLOR_T foreground() const { return getcolor(0); }
+    // Actual foreground color
 
-        //TODO: Return color struct
-        /*NCURSES_PAIRS_T getcolor() const;
-        // Actual color pair
+    NCURSES_COLOR_T background() const { return getcolor(1); }
+    // Actual background color*/
 
-        NCURSES_COLOR_T Foreground() const { return getcolor(0); }
-        // Actual foreground color
 
-        NCURSES_COLOR_T Background() const { return getcolor(1); }
-        // Actual background color*/
+    void setPalette(colorPair color);
+    // Set color palette entry
 
-        // -------------------------------------------------------------------------
-        // window positioning
-        // -------------------------------------------------------------------------
-        // TODO: Do we need this if we are mergin panel with window and using move_panel?
-        /*int Move(int begin_y, int begin_x) {
-            return ::mvwin(m_handle, begin_y, begin_x); }*/
-        // Move window to new position with the new position as top left corner.
+    /**
+     * Set actually used palette entry.
+     *
+     * @param pair Color pair id to use
+     */
+    void setColor(colorPairID pair);
 
-        // -------------------------------------------------------------------------
-        // coordinate positioning
-        // -------------------------------------------------------------------------
-        int moveCursor(int y, int x) { return ::wmove(m_handle, y, x); }
-        // Move cursor the this position. Only moves cursor on virtual screen and
-        // needs refresh to update position in physical screen
+    // -------------------------------------------------------------------------
+    // window positioning
+    // -------------------------------------------------------------------------
+    // TODO: Do we need this if we are mergin panel with window and using move_panel?
+    /*int Move(int begin_y, int begin_x) {
+      return ::mvwin(m_handle, begin_y, begin_x); }*/
+    // Move window to new position with the new position as top left corner.
 
-        Point getCursorPosition() const;
-        // Get current position of the cursor
+    /**
+     * Move the cursor to the given point.
+     *
+     * Only moves the cursor on the virtual screen and needs a refresh to update
+     * the psoition on the physical screen.
+     *
+     * @param point point to place the cursor at
+     */
+    void moveCursor(const Point& point) { return _onError (::wmove(m_handle, point.y, point.x)); }
 
-        Point getOriginPoint() const;
-        // Get beginning of the window
+    /**
+     * Get the current position of the cursor
+     *
+     * @return the position of the cursor
+     */
+    Point getCursorPosition() const;
 
-        int size() const;
-        // Get size of the window
+    /**
+     * Get the beginnging point of the window
+     *
+     * @return point of origin for this window
+     */
+    Point getOriginPoint() const;
 
-        int moveCursorImmediately(int oldrow, int oldcol, int newrow, int newcol) const {
-            return ::mvcur(oldrow, oldcol, newrow, newcol); }
-        // Perform lowlevel cursor motion that takes effect immediately.
+    /**
+     * Get the size of the window
+     *
+     * @return window size
+     */
+    Size size() const;
 
-        // -------------------------------------------------------------------------
-        // input
-        // -------------------------------------------------------------------------
-        //TODO: Return of GetKeyStroke should probably have alias/user type
-        int getKeystroke() { return ::wgetch(m_handle); }
-        // Get a keystroke from the window.
+    /**
+     * Perform lowlevel cursor motion that takes effect immediately.
+     *
+     * @param prevPoint previous position of cursor
+     * @param newPoint  new position of cursor
+     */
+    void moveCursorImmediately(const Point& prevPoint, const Point& newPoint) {
+        _onError ( ::mvcur(prevPoint.y, prevPoint.x, newPoint.y, newPoint.x) );
+    }
 
-        int  getKeyStrokeFromPos(int y, int x) { return mvwgetch(m_handle, y, x); }
-        // Move cursor to position and get a keystroke from the window
+    //TODO: Return of GetKeyStroke should probably have alias/user type
+    //TODO: This can return ERR, check for it and throw appropriatetly
+    /**
+     * Get a keystroke from the window
+     *
+     * @return the key stroke read from the window
+     */
+    int getKeystroke() { return ::wgetch(m_handle); }
 
-        int  getline(std::string& str, int n=-1);
-        // Read a series of characters into str until a newline or carriage return
-        // is received. Read at most n characters. If n is negative, the limit is
-        // ignored.
+    /**
+     * Move the cursor and get a keystore from the window
+     *
+     * @return the key stroke read from the window
+     */
+    int  getKeyStrokeFromPos(const Point& pos) { return mvwgetch(m_handle, pos.y, pos.x); }
 
-        int getlineFromPos(int y, int x, std::string& str, int n=-1);
-        // Move the cursor to the requested position and then perform the getstr()
-        // as described above.
+    //TODO: getline functions and extractString functions should throw on error
+    /**
+     * Read a series of characters until a newline or carriage return is received.
+     *
+     * @param n read at most n characters. If n is negative, the limit is ignored.
+     *
+     * @return a string conatining the read characters.
+     */
+    std::string getline(int n=-1);
 
-        int extractString(std::string& str, int n=-1);
-        // Get a string of characters from the window into the buffer s. Retrieve
-        // at most n characters, if n is negative retrieve all characters up to the
-        // end of the current line. Attributes are stripped from the characters.
+    /**
+     * Move the cursor and read a line.
+     *
+     * This is equivalent to calling getline after moveCursor.
+     *
+     * @param n read at most n characters. If n is negative, the limit is ignored.
+     *
+     * @return a string conatining the read characters.
+     */
+    std::string getlineFromPos(const Point& ps, int n=-1);
 
-        int extractStringFromPos(int y, int x, std::string& s, int n=-1);
-        // Move the cursor to the requested position and then perform the instr()
-        // as described above.
+    /**
+     * Get a string from the window.
+     *
+     * Note that attributes are stripped from the characters.
+     *
+     * @param n read at most n characters. If n is negative, the limit is ignored.
+     *
+     * @return a string conatining the extracted characters.
+     */
+    std::string extractString(int n=-1);
 
-        int            scanw(const char* fmt, ...);
-            // Perform a scanw function from the window.
+    /**
+     * Move the cursor and extract a string from the window.
+     *
+     * This is equivalent to calling extractStr after moveCursor.
+     * Note that attributes are stripped from the characters.
+     *
+     * @param n read at most n characters. If n is negative, the limit is ignored.
+     *
+     * @return a string conatining the extracted characters.
+     */
+    std::string extractStringFromPos(const Point& pos, int n=-1);
 
-        int            scanw(const char*, va_list);
-        // Perform a scanw function from the window.
+    //TODO: Should throw on error ERR
+    //TODO: Make these into variadic template functions
+    //TODO: Docs for variants after variadic template function implementation
+    /**
+     * Perform a scanw operation on the window
+     */
+    void scanw(const char* fmt, ...);
 
-        int            scanw(int y, int x, const char* fmt, ...);
-            // Move the cursor to the requested position and then perform a scanw
-            // from the window.
+    /**
+     * Move the cursor and perform a scanw operation on the window
+     */
+    void scanw(const Point& pos, const char* fmt, ...);
 
-        int            scanw(int y, int x, const char* fmt, va_list);
-        // Move the cursor to the requested position and then perform a scanw
-        // from the window.
+    //TODO: Change ncCharType to something more expressive
+    /**
+     * Put attributed character to the window.
+     */
+    int putChr(const ncCharType ch) { return ::waddch(m_handle, ch); }
 
-        // -------------------------------------------------------------------------
-        // output
-        // -------------------------------------------------------------------------
-        int putChr(const chtype ch) { return ::waddch(m_handle, ch); }
-        // Put attributed character to the window.
+    //TODO
+    /**
+     * Move the cursor and put attributed character to the window.
+     */
+    int putChrAtPos(int y, int x, const ncCharType ch) {
+        return mvwaddch(m_handle, y, x, ch);
+    }
 
-        int putChrAtPos(int y, int x, const chtype ch) {
-            return mvwaddch(m_handle, y, x, ch); }
-        // Move cursor to the requested position and then put attributed character
-        // to the window.
+    /**
+     * Put attributed character to the window and refresh it immediately.
+     */
+    virtual int echoChar(const ncCharType ch) { return ::wechochar(m_handle, ch); }
 
-        virtual int echoChar(const chtype ch) { return ::wechochar(m_handle, ch); }
-        // Put attributed character to the window and refresh it immediately.
+    /**
+     * Write a string to the window.
+     *
+     * Stop writing if the terminating null or the limit n is reached.
+     *
+     * @param str the string to write
+     * @param n   number of characters to write up to
+     */
+    void writeString(const std::string& str, int n=-1) {
+        _onError ( ::waddnstr(m_handle, str.c_str(), n) );
+    }
 
-        int writeString(const std::string& str, int n=-1) {
-            return ::waddnstr(m_handle, str.c_str(), n);
-        }
-        // Write the string str to the window, stop writing if the terminating
-        // NUL or the limit n is reached. If n is negative, it is ignored.
+    /**
+     * Move the cursor and then wrte a string to the window
+     *
+     * @param pos the position to move the cursor to
+     * @param str the string to write
+     */
+    void writeStringAtPos(const Point& pos, const std::string& str) {
+        _onError ( mvwaddnstr(m_handle, pos.y, pos.x, str.c_str(), str.size()) );
+    }
 
-        int writeStringAtPos(int y, int x, const std::string& str, int n=-1) {
-            return mvwaddnstr(m_handle, y, x, str.c_str(), n);
-        }
-        // Move the cursor to the requested position and then perform the addchstr
-        // as described above.
+    //TODO:
+    //namspace lowlevel {
+    /*int            addchstr(const ncCharType* str, int n=-1) {
+      return ::waddchnstr(m_handle, str, n); }
+    // Write the string str to the window, stop writing if the terminating
+    // NUL or the limit n is reached. If n is negative, it is ignored.
 
-        //namspace lowlevel {
-        /*int            addchstr(const chtype* str, int n=-1) {
-            return ::waddchnstr(m_handle, str, n); }
-        // Write the string str to the window, stop writing if the terminating
-        // NUL or the limit n is reached. If n is negative, it is ignored.
+    int            addchstr(int y, int x, const ncCharType * str, int n=-1) {
+    return ::mvwaddchnstr(m_handle, y, x, str, n); }
+    // Move the cursor to the requested position and then perform the addchstr
+    // as described above.
+    //}*/
 
-        int            addchstr(int y, int x, const chtype * str, int n=-1) {
-            return ::mvwaddchnstr(m_handle, y, x, str, n); }
-        // Move the cursor to the requested position and then perform the addchstr
-        // as described above.
-        //}*/
-
-        int print(const char* fmt, ...)
-            // Do a formatted print to the window.
+    //TODO: This should also be variadic
+    /**
+     * Do a formatted print to the window.
+     */
+    int print(const char* fmt, ...)
 #if (__GNUG__ >= 2) && !defined(printf)
-            __attribute__ ((format (printf, 2, 3)));
+        __attribute__ ((format (printf, 2, 3)));
 #else
-        ;
+    ;
 #endif
 
-        int printAt(int y, int x, const char * fmt, ...)
-            // Move the cursor and then do a formatted print to the window.
+    /**
+     * Move the cursor and then do a formatted print to the window.
+     */
+    int printAt(int y, int x, const char * fmt, ...)
 #if (__GNUG__ >= 2) && !defined(printf)
-            __attribute__ ((format (printf, 4, 5)));
+        __attribute__ ((format (printf, 4, 5)));
 #else
-        ;
+    ;
 #endif
 
-        chtype getChrOnCursor() const { return ::winch(m_handle); }
-        // Retrieve attributed character under the current cursor position.
-
-        chtype getChrAtPos(int y, int x) { return mvwinch(m_handle, y, x); }
-        // Move cursor to requested position and then retrieve attributed character
-        // at this position.
-
-        int getStr(chtype* str, int n=-1) {
-            return ::winchnstr(m_handle, str, n);
-        }
-        // Read the string str from the window, stop reading if the terminating
-        // NUL or the limit n is reached. If n is negative, it is ignored.
-
-        int getStrAtPos(int y, int x, chtype* str, int n=-1);
-        // Move the cursor to the requested position and then perform the inchstr
-        // as described above.
-
-        int insertChar(chtype ch) { return ::winsch(m_handle, ch); }
-        // Insert attributed character into the window before current cursor
-        // position.
-
-        int insertCharAtPos(int y, int x, chtype ch) {
-            return mvwinsch(m_handle, y, x, ch);
-        }
-        // Move cursor to requested position and then insert the attributed
-        // character before that position.
-
-        int insertLine(int n=1) {
-            return n > 0 ? ::winsdelln(m_handle, n) : 0;
-        }
-
-        int deleteLine(int n=-1) {
-            return n < 0 ? ::winsdelln(m_handle, n) : 0;
-        }
-
-        int insertStr(const char *s, int n=-1) {
-            return ::winsnstr(m_handle, s, n); }
-        // Insert the string into the window before the current cursor position.
-        // Insert stops at end of string or when the limit n is reached. If n is
-        // negative, it is ignored.
-
-        int insertStrAtPos(int y, int x, const char *s, int n=-1) {
-            return mvwinsnstr(m_handle, y, x, s, n); }
-        // Move the cursor to the requested position and then perform the insstr()
-        // as described above.
-
-        // TODO: Make custom type for methods that manipulate attributes
-        int setAttribute(chtype at) { return wattrset(m_handle, static_cast<int>(at)); }
-        // Set the window attributes;
-
-        chtype getAttributes() { return getattrs(m_handle); }
-        // Get the window attributes;
-        // TODO: Change to struct or other representation
-
-        int setColor(NCURSES_PAIRS_T color_pair_number, void* opts=NULL) {
-            return ::wcolor_set(m_handle, color_pair_number, opts); }
-        // Set the window color attribute;
-
-        int charAttribute(int n, attr_t attr, NCURSES_PAIRS_T color, const void *opts=NULL) {
-            return ::wchgat(m_handle, n, attr, color, opts); }
-        // Change the attributes of the next n characters in the current line. If
-        // n is negative or greater than the number of remaining characters in the
-        // line, the attributes will be changed up to the end of the line.
-
-        int charAttributeAtPos(int y, int x,
-                int n, attr_t attr, NCURSES_PAIRS_T color, const void *opts=NULL) {
-            return mvwchgat(m_handle, y, x, n, attr, color, opts); }
-        // Move the cursor to the requested position and then perform chgat() as
-        // described above.
-
-        // -------------------------------------------------------------------------
-        // background
-        // -------------------------------------------------------------------------
-        chtype getBackgroundAttributes() const { return getbkgd(m_handle); }
-        // Get current background setting.
-
-        int    setBackgroundAttributes(const chtype ch) { return wbkgd(m_handle, ch); }
-        // Set the background property and apply it to the window.
-
-        // TODO: This is for stdcr and should be defined in the globals
-        //void bkgdset(chtype ch) { ::wbkgdset(m_handle, ch); }
-        // Set the background property.
-
-        // -------------------------------------------------------------------------
-        // borders
-        // -------------------------------------------------------------------------
-        int box(chtype vert=0, chtype  hor=0) {
-            return ::wborder(m_handle, vert, vert, hor, hor, 0, 0, 0, 0); }
-        // Draw a box around the window with the given vertical and horizontal
-        // drawing characters. If you specify a zero as character, curses will try
-        // to find a "nice" character.
-
-        int border(chtype left=0, chtype right=0,
-                chtype top =0, chtype bottom=0,
-                chtype top_left =0, chtype top_right=0,
-                chtype bottom_left =0, chtype bottom_right=0) {
-            return ::wborder(m_handle, left, right, top, bottom, top_left, top_right,
-                    bottom_left, bottom_right); }
-        // Draw a border around the window with the given characters for the
-        // various parts of the border. If you pass zero for a character, curses
-        // will try to find "nice" characters.
-
-        // -------------------------------------------------------------------------
-        // lines and boxes
-        // -------------------------------------------------------------------------
-        int horizontalLine(int len, chtype ch=0) { return ::whline(m_handle, ch, len); }
-        // Draw a horizontal line of len characters with the given character. If
-        // you pass zero for the character, curses will try to find a "nice" one.
-
-        int horizontalLineAt(int y, int x, int len, chtype ch=0) {
-            return mvwhline(m_handle, y, x, ch, len); }
-        // Move the cursor to the requested position and then draw a horizontal line.
-
-        int verticalLine(int len, chtype ch=0) { return ::wvline(m_handle, ch, len); }
-        // Draw a vertical line of len characters with the given character. If
-        // you pass zero for the character, curses will try to find a "nice" one.
-
-        int verticalLineAt(int y, int x, int len, chtype ch=0) {
-            return mvwvline(m_handle, y, x, ch, len); }
-        // Move the cursor to the requested position and then draw a vertical line.
-
-        // -------------------------------------------------------------------------
-        // erasure
-        // -------------------------------------------------------------------------
-        int erase() { return ::werase(m_handle); }
-        // Erase the window.
-
-        int clear() { return ::wclear(m_handle); }
-        // Clear the window.
-
-        int setClearOkFlag(bool bf) { return ::clearok(m_handle, bf); }
-        // Set/Reset the clear flag. If set, the next refresh() will clear the
-        // screen.
-
-        int clearBottom() { return ::wclrtobot(m_handle); }
-        // Clear to the end of the window.
-
-        int clearToEndOfLine() { return ::wclrtoeol(m_handle); }
-        // Clear to the end of the line.
-
-        int deleteCharUnderCursor() { return ::wdelch(m_handle); }
-        // Delete character under the cursor.
-
-        int deleteCharAtPos(int y, int x) { return mvwdelch(m_handle, y, x); }
-        // Move cursor to requested position and delete the character under the
-        // cursor.
-
-        int deleteCurrentLine() { return ::winsdelln(m_handle, -1); }
-        // Delete the current line.
-
-        // -------------------------------------------------------------------------
-        // screen control
-        // -------------------------------------------------------------------------
-        int scroll(int amount=1) { return ::wscrl(m_handle, amount); }
-        // Scroll amount lines. If amount is positive, scroll up, otherwise
-        // scroll down.
-
-        int  setScrollOkFlag(bool bf) { return ::scrollok(m_handle, bf); }
-        // If bf is TRUE, window scrolls if cursor is moved off the bottom
-        // edge of the window or a scrolling region, otherwise the cursor is left
-        // at the bottom line.
-
-        int setSoftScrollingRegion(int from, int to) {
-            return ::wsetscrreg(m_handle, from, to); }
-        // Define a soft scrolling region.
-
-        int setLineModefyMode(bool bf) { return ::idlok(m_handle, bf); }
-        // If bf is TRUE, use insert/delete line hardware support if possible.
-        // Otherwise do it in software.
-
-        void setCharacterModifyMode(bool bf) { ::idcok(m_handle, bf); }
-        // If bf is TRUE, use insert/delete character hardware support if possible.
-        // Otherwise do it in software.
-
-        int  touchLine(int s, int c) { return ::touchline(m_handle, s, c); }
-        // Mark the given lines as modified.
-
-        int touch()   { return ::wtouchln(m_handle, 0, height(), 1); }
-        // Mark the whole window as modified.
-
-        int untouch() { return ::wtouchln(m_handle, 0, height(), 0); }
-        // Mark the whole window as unmodified.
-
-        int touchLine(int s, int cnt, bool changed=TRUE) {
-            return ::wtouchln(m_handle, s, cnt, static_cast<int>(changed ? 1 : 0)); }
-        // Mark cnt lines beginning from line s as changed or unchanged, depending
-        // on the value of the changed flag.
-
-        bool isLineTouched(int line) const {
-            return (::is_linetouched(m_handle, line) ? TRUE:FALSE); }
-        // Return TRUE if line is marked as changed, FALSE otherwise
-
-        bool isTouched() const {
-            return (::is_wintouched(m_handle) ? TRUE:FALSE); }
-        // Return TRUE if window is marked as changed, FALSE otherwise
-
-        int setLeaveCursor(bool bf) { return ::leaveok(m_handle, bf); }
-        // If bf is TRUE, curses will leave the cursor after an update whereever
-        // it is after the update.
-
-        int  redrawLines(int from, int n) { return ::wredrawln(m_handle, from, n); }
-        // Redraw n lines starting from the requested line
-
-        int  redraw() { return ::wredrawln(m_handle, 0, height()); }
-        // Redraw the whole window
-
-        int            doupdate()  { return ::doupdate(); }
-        // Do all outputs to make the physical screen looking like the virtual one
-
-        void syncDown()  { ::wsyncdown(m_handle); }
-        // Propagate the changes down to all descendant windows
-
-        void syncUp()    { ::wsyncup(m_handle); }
-        // Propagate the changes up in the hierarchy
-
-        void syncCursorUp() { ::wcursyncup(m_handle); }
-        // Position the cursor in all ancestor windows corresponding to our setting
-
-        int enableSync(bool bf) { return ::syncok(m_handle, bf); }
-        // If called with bf=TRUE, syncup() is called whenever the window is changed
-
-        void enableImmediate(bool bf) { ::immedok(m_handle, bf); }
-        // If called with bf=TRUE, any change in the window will cause an
-        // automatic immediate refresh()
-
-        int intrflush(bool bf) { return ::intrflush(m_handle, bf); }
-
-        int enableKeypad(bool bf) { return ::keypad(m_handle, bf); }
-        // If called with bf=TRUE, the application will interpret function keys.
-
-        int enableNoDelay(bool bf) { return ::nodelay(m_handle, bf); }
-
-        int enableMeta(bool bf) { return ::meta(m_handle, bf); }
-        // If called with bf=TRUE, keys may generate 8-Bit characters. Otherwise
-        // 7-Bit characters are generated.
-
-        int enableStandout() { return wstandout(m_handle); }
-        // Enable "standout" attributes
-
-        int disableStandout() { return wstandend(m_handle); }
-        // Disable "standout" attributes
-        //
-        int enableStandout(bool bf) { return bf ? wstandout(m_handle) : wstandend(m_handle); }
-
-        virtual int refresh() { return ::wrefresh(m_handle); }
-        // Propagate the changes in this window to the virtual screen and call
-        // doupdate(). This is redefined in NCursesPanel.
-
-        virtual int  noutrefresh() { return ::wnoutrefresh(m_handle); }
-        // Propagate the changes in this window to the virtual screen. This is
-        // redefined in NCursesPanel.
-
-
-        // -------------------------------------------------------------------------
-        // multiple window control
-        // -------------------------------------------------------------------------
-        int overlay(Window& win) {
-            return ::overlay(m_handle, win.m_handle); }
-        // Overlay this window over win.
-
-        int overwrite(Window& win) {
-            return ::overwrite(m_handle, win.m_handle); }
-        // Overwrite win with this window.
-
-        int copy(Window& win,
-                int sminrow, int smincol,
-                int dminrow, int dmincol,
-                int dmaxrow, int dmaxcol, bool overlaywin=TRUE) {
-            return ::copywin(m_handle, win.m_handle, sminrow, smincol, dminrow, dmincol,
-                    dmaxrow, dmaxcol, static_cast<int>(overlaywin ? 1 : 0)); }
-        // Overlay or overwrite the rectangle in win given by dminrow,dmincol,
-        // dmaxrow,dmaxcol with the rectangle in this window beginning at
-        // sminrow,smincol.
-
-        // -------------------------------------------------------------------------
-        // Extended functions
-        // -------------------------------------------------------------------------
+    /**
+     * Retrieve attributed character under the current cursor position.
+     *
+     * @return the attributed character under the cursor
+     */
+    ncCharType getChrOnCursor() const { return ::winch(m_handle); }
+
+    /**
+     * Move cursor to requested position and then retrieve attributed character
+     * at this position.
+     *
+     * @param point point to move the cursor to
+     * @return the attributed character under the cursor
+     */
+    ncCharType getChrAtPos(const Point& point) { return mvwinch(m_handle, point.y, point.x); }
+
+    //TODO: Think about this since we have std::string types
+    int getStr(ncCharType* str, int n=-1) {
+        return ::winchnstr(m_handle, str, n);
+    }
+    // Read the string str from the window, stop reading if the terminating
+    // NUL or the limit n is reached. If n is negative, it is ignored.
+
+    int getStrAtPos(int y, int x, ncCharType* str, int n=-1);
+    // Move the cursor to the requested position and then perform the inchstr
+    // as described above.
+
+    /**
+     * Insert attributed character into the window before current cursor position.
+     *
+     * @param ch the character to insert
+     */
+    void insertChar(ncCharType ch) { _onError ( ::winsch(m_handle, ch) ); }
+
+    /**
+     * Move cursor to requested position and then insert the attributed
+     * character before that position.
+     *
+     * @param point point to move the cursor to
+     * @param ch    the character to insert
+     */
+    int insertCharAtPos(const Point& point, ncCharType ch) {
+        return mvwinsch(m_handle, point.y, point.x, ch);
+    }
+
+    //TODO: Docs
+    int insertLine(int n=1) {
+        return n > 0 ? ::winsdelln(m_handle, n) : 0;
+    }
+
+    //TODO: Docs
+    int deleteLine(int n=-1) {
+        return n < 0 ? ::winsdelln(m_handle, n) : 0;
+    }
+
+    /**
+     * Insert the string into the window before the current cursor position.
+     *
+     * @param str string to insert
+     */
+    void insertStr(const std::string& str) {
+        _onError ( ::winsnstr(m_handle, str.c_str(), str.size()) );
+    }
+
+    /**
+     * Move the cursor and insert a string.
+     *
+     * @param pos position to move the cursor to
+     * @param str string to insert
+     */
+    void insertStrAtPos(const Point& pos, const std::string& str) {
+        _onError ( ::mvwinsnstr(m_handle, pos.y, pos.x, str.c_str(), str.size() ));
+    }
+
+    /**
+     * Switch on the window attributes;
+     */
+    void attributeOn (ncCharType attr) { _onError ( ::wattron (m_handle, attr) ); }
+
+    /**
+     * Switch off the window attributes;
+     */
+    void attributeOff(ncCharType attr) { _onError ( ::wattroff(m_handle, static_cast<int>(attr)) ); }
+
+
+    // TODO: Make custom type for methods that manipulate attributes
+    /**
+     * Set the window attributes.
+     */
+     void setAttribute(ncCharType attr) { _onError ( wattrset(m_handle, static_cast<int>(attr)) ); }
+
+    // TODO: Change to struct or other representation
+    /**
+     * Get the window attributes;
+     *
+     * @return  //TODO
+     */
+    ncCharType getAttributes() { return getattrs(m_handle); }
+
+    void charAttribute(int n, attr_t attr, colorPairID color, const void *opts=NULL) {
+        _onError ( ::wchgat(m_handle, n, attr, color, opts) );
+    }
+    // Change the attributes of the next n characters in the current line. If
+    // n is negative or greater than the number of remaining characters in the
+    // line, the attributes will be changed up to the end of the line.
+
+    void charAttributeAtPos(int y, int x,
+            int n, attr_t attr, colorPairID color, const void *opts=NULL) {
+        _onError ( mvwchgat(m_handle, y, x, n, attr, color, opts) );
+    }
+    // Move the cursor to the requested position and then perform chgat() as
+    // described above.
+
+    ncCharType getBackgroundAttributes() const { return getbkgd(m_handle); }
+    // Get current background setting.
+
+    /**
+     * Set the background property and apply it to the window.
+     *
+     * @param ch background property
+     */
+     void setBackgroundAttributes(const ncCharType ch) { _onError ( wbkgd(m_handle, ch) ); }
+
+    // TODO: This is for stdcr and should be defined in the globals
+    //void bkgdset(ncCharType ch) { ::wbkgdset(m_handle, ch); }
+    // Set the background property.
+
+    /**
+     * Draw a box around the window with the given vertical and horizontal drawing characters.
+     *
+     * If you specify a zero as character, curses will try to find a "nice" character.
+     *
+     * @param vert the character that makes up the vertical borders
+     * @param hor  the character that makes up the horizontal borders
+     */
+    void box(ncCharType vert=0, ncCharType hor=0) {
+        _onError ( ::wborder(m_handle, vert, vert, hor, hor, 0, 0, 0, 0) );
+    }
+
+    /**
+     * Put the label text centered in the specified row.
+     *
+     * @param y     the y position to center the text to
+     * @param label the label to center
+     */
+    virtual void centerText(int y, const std::string& label);
+
+    /**
+     * Put the title centered in the top line and btitle in the bottom line.
+     *
+     * @param topLablel   top line title
+     * @param bottomLabel bottom lien ttile
+     *
+     */
+    virtual void label(const std::string& topLabel,
+		               const std::string& bottomLabel);
+
+    //TODO Docs and clean up
+    /**
+     * Draw a border around the window with the given borderType for
+     * various parts of the border. If you pass zero for a character, curses
+     * will try to find "nice" characters.
+     *
+     * @param border the border specification to use
+     */
+    void border(borderType border = {}) {
+        _onError ( ::wborder(m_handle,
+                border.left,        border.right,
+                border.top,         border.bottom,
+                border.top_left,    border.top_right,
+                border.bottom_left, border.bottom_right
+                ));
+    }
+
+    /**
+     * Draw a horizontal line of len characters with the given character.
+     * If you pass zero for the character, curses will try to find a "nice" one.
+     *
+     * @param len length of the line
+     * @param ch  the character that makes up the line
+     */
+    void horizontalLine(int len, ncCharType ch=0) { _onError ( ::whline(m_handle, ch, len) ); }
+
+    /**
+     * Move the cursor to the requested position and then draw a horizontal line.
+     *
+     * @param point the point to move the cursor to
+     * @param len   length of the line
+     * @param ch    the character that makes up the line
+     */
+    void horizontalLineAt(const Point& point, int len, ncCharType ch=0) {
+        _onError ( mvwhline(m_handle, point.y, point.x, ch, len) );
+    }
+
+    /**
+     * Draw a vertical line of len characters with the given character.
+     * If you pass zero for the character, curses will try to find a "nice" one.
+     *
+     * @param len length of the line
+     * @param ch  the character that makes up the line
+     */
+    int verticalLine(int len, ncCharType ch=0) { return ::wvline(m_handle, ch, len); }
+
+    /**
+     * Move the cursor to the requested position and then draw a vertical line.
+     *
+     * @param point the point to move the cursor to
+     * @param len   length of the line
+     * @param ch    the character that makes up the line
+     */
+    int verticalLineAt(const Point& point, int len, ncCharType ch=0) {
+        return mvwvline(m_handle, point.y, point.x, ch, len);
+    }
+
+    /**
+     * Erase the window.
+     */
+    void erase() { _onError ( ::werase(m_handle) ); }
+
+    /**
+     * Clear the window.
+     */
+    void clear() { _onError ( ::wclear(m_handle) ); }
+
+    /**
+     * Set/Reset the clear flag.
+     *
+     * @param bf If set to true, the next refresh will clear the screen.
+     */
+    void setClearOkFlag(bool bf) { _onError ( ::clearok(m_handle, bf) ); }
+
+    /**
+     * Clear to the end of the window.
+     */
+    void clearBottom() { _onError ( ::wclrtobot(m_handle) ); }
+
+    /**
+     * Clear to the end of the line.
+     *
+     * Erases the current line to the right of the cursor, inclusive, to
+     * the end of the current line.
+     */
+    void clearToEndOfLine() { _onError ( ::wclrtoeol(m_handle) ); }
+
+    /**
+     * Delete character under the cursor.
+     */
+    void deleteCharUnderCursor() { _onError ( ::wdelch(m_handle) ); }
+
+    /**
+     * Move cursor to requested position and delete the character under the cursor.
+     */
+    void deleteCharAtPos(const Point& pos) { _onError ( ::mvwdelch(m_handle, pos.y, pos.x) ); }
+
+    /**
+     * Delete the current line.
+     */
+    void deleteCurrentLine() { _onError ( ::winsdelln(m_handle, -1) ); }
+
+    /**
+     * Scroll an amount lines.
+     *
+     * If amount is positive, scroll up, otherwise scroll down.
+     *
+     * @param amount the amount of lines to scroll
+     */
+    void scroll(int amount=1) { _onError ( ::wscrl(m_handle, amount) ); }
+
+    /**
+     * Set the scrollok flag.
+     *
+     * If set to true, the window scrolls if cursor is moved off the bottom
+     * edge of the window or a scrolling region, otherwise the cursor is left
+     * at the bottom line.
+     *
+     * @param bf value to set the flag to
+     */
+    void setScrollOkFlag(bool bf) { _onError ( ::scrollok(m_handle, bf) ); }
+
+    /**
+     * Define a soft scrolling region.
+     *
+     * @param from the line number of the top margin
+     * @param to   the line number of the bottom margin
+     */
+    void setSoftScrollingRegion(int from, int to) {
+        _onError ( ::wsetscrreg(m_handle, from, to) );
+    }
+
+    /**
+     * Set the idlok flag.
+     *
+     * If bf is true, use insert/delete line hardware support if possible.
+     * Otherwise do it in software.
+     *
+     * @param bf value to set the flag to
+     */
+    void setLineModefyMode(bool bf) { _onError ( ::idlok(m_handle, bf) ); }
+
+    /**
+     * Set the idcok flag.
+     *
+     * If bf is true, use insert/delete character hardware support if possible.
+     * Otherwise do it in software.
+     *
+     * @param bf value to set the flag to
+     */
+    void setCharacterModifyMode(bool bf) { ::idcok(m_handle, bf); }
+
+    //TODO: this is for standard screen. Have a static function that retunrs a handle
+    //      to a Window object of stdscr instead and call it from there
+    /**
+     * Mark the given lines as modified.
+     *
+     * @param start the line to start from
+     * @param count the number of lines to touch after start
+     */
+    void touchLine(int start, int count) { _onError ( ::touchline(m_handle, start, count) ); }
+
+    /**
+     * Mark the whole window as modified.
+     */
+    void touch() { _onError ( ::wtouchln(m_handle, 0, height(), 1) ); }
+
+    /**
+     * Mark the whole window as unmodified.
+     */
+    void untouch() { _onError ( ::wtouchln(m_handle, 0, height(), 0) ); }
+
+    /**
+     * Mark the given lines as modified.
+     *
+     * @param start   the line to start from
+     * @param count   the number of lines to touch after start
+     * @param changed marked as changed if true, otherwise mark as unchanged
+     */
+    int touchLine(int s, int cnt, bool changed=true) {
+        return ::wtouchln(m_handle, s, cnt, static_cast<int>(changed ? 1 : 0));
+    }
+
+    /**
+     * Check if line is marked as chagned.
+     *
+     * @return true if line is marked as changed, false otherwise
+     */
+    bool isLineTouched(int line) const {
+        return (::is_linetouched(m_handle, line) ? true:false);
+    }
+
+    /**
+     * Checked if the whole window is marked as changed.
+     *
+     *@return true if window is marked as changed, false otherwise
+     */
+    bool isTouched() const {
+        return (::is_wintouched(m_handle) ? true:false);
+    }
+
+    /**
+     * Set leaveok flag.
+     *
+     * @param bf if true, curses will leave the cursor after an update whereever
+     *           it is after the update.
+     */
+    void setLeaveCursor(bool bf) { _onError ( ::leaveok(m_handle, bf) ); }
+
+    /**
+     * Redraw lines.
+     *
+     * @param from the lien to start from
+     * @param n    the number of lines to redraw after start
+     */
+    int  redrawLines(int from, int n) { return ::wredrawln(m_handle, from, n); }
+
+    /**
+     * Redraw the whole window
+     */
+    void redraw() { _onError ( ::wredrawln(m_handle, 0, height()) ); }
+
+    /**
+     * Do all outputs to make the physical screen looking like the virtual one
+     */
+    void doupdate()  { _onError ( ::doupdate() ); }
+
+    /**
+     * Propagate the changes down to all descendant windows
+     */
+    void syncDown()  { ::wsyncdown(m_handle); }
+
+    /**
+     * Propagate the changes up in the hierarchy
+     */
+    void syncUp()    { ::wsyncup(m_handle); }
+
+    /**
+     * Position the cursor in all ancestor windows corresponding to our setting
+     */
+    void syncCursorUp() { ::wcursyncup(m_handle); }
+
+    /**
+     * Set syncok flag.
+     *
+     * @param bf if true syncup() is called whenever the window is changed
+     */
+    void enableSync(bool bf) { _onError ( ::syncok(m_handle, bf) ); }
+
+    /**
+     * Set immedok flag.
+     *
+     * @param bf if true any change in the window will cause an automatic immediate refresh()
+     */
+    void enableImmediate(bool bf) { ::immedok(m_handle, bf); }
+
+    /**
+     * Toggle intrflush.
+     *
+     * If enabled and an interrupt key is pressed, all output in the tty driver
+     * queue will be flushed, giving the effect of faster response to the interrupt.
+     * See man curs_inopts(3X).
+     *
+     * @param bf if true intrflush will be enabled
+     */
+    void intrflush(bool bf) { _onError ( ::intrflush(m_handle, bf) ); }
+
+    /**
+     * Toggle keypad.
+     *
+     * If enabled, the user can press a function key and wgetch returns a single value
+     * representing the function key.
+     * See man curs_inopts(3X)
+     *
+     * @param bf if true the application will interpret function keys.
+     */
+    void enableKeypad(bool bf) { _onError ( ::keypad(m_handle, bf) ); }
+
+    /**
+     * Toggle nodelay mode.
+     *
+     * This will cause getch to be a non-blocking call.
+     *
+     * @param bf if true, enable nodelay mode
+     */
+    void enableNoDelay(bool bf) { _onError ( ::nodelay(m_handle, bf) ); }
+
+    /**
+     * Enforce 7 or 8-bit inputs
+     *
+     * @param bf If true, keys may generate 8-Bit characters.
+     *           Otherwise 7-Bit characters are generated.
+     */
+    void enableMeta(bool bf) { _onError ( ::meta(m_handle, bf) ); }
+
+    /**
+     * Enable "standout" attributes
+     */
+    void enableStandout() { _onError ( ::wstandout(m_handle) ); }
+
+    /**
+     * Disable "standout" attributes
+     */
+    void disableStandout() { _onError ( ::wstandend(m_handle) ); }
+
+    /**
+     * Toggle "standout" attirbues
+     *
+     * @param bf if true, "standout" attributes will be enabled
+     */
+    void enableStandout(bool bf) { _onError ( bf ? wstandout(m_handle) : wstandend(m_handle) ); }
+
+    /**
+     * Propagate the changes in this window to the virtual screen and call doupdate().
+     */
+    virtual void refresh() { _onError ( ::wrefresh(m_handle) ); }
+
+    /**
+     * Propagate the changes in this window to the virtual screen.
+     */
+    virtual void noutrefresh() { _onError ( ::wnoutrefresh(m_handle) ); }
+
+    /**
+     * Overlay this window over another window.
+     *
+     * @param win the window to overlay over
+     */
+    void overlay(Window& win) {
+        _onError ( ::overlay(m_handle, win.m_handle) );
+    }
+
+    /**
+     * Overwrite a window with this window.
+     *
+     * @param win the window to overwrite
+     */
+    void overwrite(Window& win) {
+        _onError ( ::overwrite(m_handle, win.m_handle) );
+    }
+
+    //TODO: Fix this
+    /**
+     * Overlay or overwrite the rectangle in win given by dminrow,dmincol,
+    dmaxrow,dmaxcol with the rectangle in this window beginning at
+     sminrow,smincol.
+     */
+    void copy(Window& win,
+            int sminrow, int smincol,
+            int dminrow, int dmincol,
+            int dmaxrow, int dmaxcol, bool overlaywin=TRUE) {
+        _onError (::copywin(m_handle, win.m_handle, sminrow, smincol, dminrow, dmincol,
+                dmaxrow, dmaxcol, static_cast<int>(overlaywin ? 1 : 0)) );
+    }
+
+    //TODO: Docs
+    /**
+     * Resize the window.
+     *
+     * See man wresize(3X)
+     *
+     * @param size the dimensions to resize the window to
+     */
 #if defined(NCURSES_EXT_FUNCS) && (NCURSES_EXT_FUNCS != 0)
-        int            wresize(int newLines, int newColumns) {
-            return ::wresize(m_handle, newLines, newColumns); }
+    void resize(const Size& size) {
+        _onError ( ::wresize(m_handle, size.height, size.width) );
+    }
 #endif
 
-        // -------------------------------------------------------------------------
-        // Mouse related
-        // -------------------------------------------------------------------------
-        bool hasMouse() const;
-        // Return TRUE if terminal supports a mouse, FALSE otherwise
+    /**
+     * Check if we have a mouse.
+     *
+     * @return Return true if terminal supports a mouse, false otherwise
+     */
+    bool hasMouse() const;
 
+    //TODO: Should these be static?
+    //int lines() const { return LINES; }
+    // Number of lines on terminal, *not* window
 
-        int height() const { return maxY() + 1; }
+    //int cols() const { initialize(); return COLS; }
+    // Number of cols  on terminal, *not* window
 
-        int width() const { return maxX() + 1; }
+    //int tabsize() const { initialize(); return TABSIZE; }
+    // Size of a tab on terminal, *not* window
 
-        int originX() const { return getbegx(m_handle); }
+    /**
+     * Height of this window.
+     *
+     * @return the number of lines in the curses window
+     */
+    int height() { return maxY() + 1; }
 
-        int originY() const { return getbegy(m_handle); }
+    /**
+     * Width of this window.
+     *
+     * @return the number of columns in the curses window
+     */
+    int width() { return maxX() + 1; }
 
-        int currentX() const { return getcurx(m_handle); }
+    /**
+     * X Coordinate of window origin relative to stdscr
+     *
+     * @return origin x coordinate
+     */
+    int originX() const { return getbegx(m_handle); }
 
-        int currentY() const { return getcury(m_handle); }
+    /**
+     * Y Coordinate of window origin relative to stdscr
+     *
+     * @return origin y coordinate
+     */
+    int originY() const { return getbegy(m_handle); }
 
-        void top();
+    /**
+     * Coordinate pair of the window origin relative to stdscr
+     *
+     * @return origin coordinate pair
+     */
+    Point origin() const {
+        Point point {};
+        ::getbegyx(m_handle, point.y, point.x);
+        return point;
+    }
 
-        void bottom();
+    /**
+     * X Coordinate of cursor position relative to stdscr
+     *
+     * @return cursor x coordinate
+     */
+    int cursorX() const { return getcurx(m_handle); }
 
-        void show();
+    /**
+     * Y Coordinate of cursor position relative to stdscr
+     *
+     * @return cursor y coordinate
+     */
+    int cursorY() const { return getcury(m_handle); }
 
-        void hide();
+    /**
+     * Coordinate pair of cursor position relative to stdscr
+     *
+     * @return cursor coordinate pair
+     */
+    Point cursorPos() const {
+        Point point {};
+        ::getyx(m_handle, point.y, point.x);
+        return point;
+    }
 
-        bool isHidden()
-        {
-            return ::panel_hidden(m_panel);
+    /**
+     * Largest x coordinate in window
+     *
+     * @return window max x coordinate
+     */
+    int maxX() {
+        if (getmaxx(m_handle) == ERR) {
+            _onError(ERR);
+            return 0;
         }
+        return getmaxx(m_handle)-1;
+    }
 
-        void move(int x, int y);
-
-        //TODO: Resize()
-
-        //Window* WhichAbove();
-
-        //Window* WhichBelow();
-
-
-        int maxX() const
-        {
-            return getmaxx(m_handle) == ERR ? ERR : getmaxx(m_handle)-1;
+    /**
+     * Largest y coordinate in window
+     *
+     * @return window max y coordinate
+     */
+    int maxY() {
+        if (getmaxy(m_handle) == ERR) {
+            _onError(ERR);
+            return 0;
         }
+        return getmaxy(m_handle)-1;
+    }
 
-        int maxY() const
-        {
-            return getmaxy(m_handle) == ERR ? ERR : getmaxy(m_handle)-1;
-        }
+    /**
+     * Make this window the top window in the stack.
+     */
+    void top();
 
-        int setPalette(short fore, short back, short pair);
+    /**
+     * Make this window the bottom window in the stack.
+     *
+     * N.B.: The panel associated with ::stdscr is always on the bottom. So
+     * actually bottom() makes the panel the first above ::stdscr.
+     */
+    void bottom();
 
-        int setPalette(short fore, short back);
+    /**
+     * Show the window, i.e. make it visible.
+     */
+    void show();
 
-        //int SetColor(short pair);
+    /**
+     * Hide the window.
+     *
+     * It stays in the stack but becomes invisible.
+     */
+    void hide();
 
-        void attributeOn(int attr)
-        {
-            wattron(m_handle, attr);
-        }
+    /**
+     * Check if the window is hidden.
+     *
+     * @return true if the panel is hidden, false otherwise.
+     */
+    bool isHidden()
+    {
+        return ::panel_hidden(m_panel);
+    }
 
-        void attributeOff(int attr)
-        {
-            wattroff(m_handle, attr);
-        }
+    /**
+     * Move the window.
+     *
+     * @param point move the window origin to the given point
+     */
+    void move(const Point& point);
 
-        void frame()
-        {
-            ::box(m_handle, 0, 0);
-        }
+    /**
+     * Put a frame around the panel and put the title centered in the top line
+     * and a bottom title in the bottom line.
+     *
+     * @param title      top title
+     * @param btmm_title bottom title
+     */
+    virtual void frame(const std::string& title = "", const std::string& bttm_title = "");
 
-        void printStr(const std::string& str);
+    /**
+     * Check if we are a descendant of the given window.
+     *
+     * @param win window to check inherantace
+     *
+     * @return true if the window is a descendant of win
+     *         false otherwise
+     */
+    bool isDescendant(Window& win);
 
+    /**
+     * Get parent's origin of the window
+     *
+     * @return coordinate pair of parent's origin
+     */
+    Point getParentPoint() const {
+        int x = 0;
+        int y = 0;
+        ::getparyx(m_handle, y, x);
+        return Point{x, y};
+    }
 
-        bool isDescendant(Window& win);
-        // Return TRUE if win is a descendant of this.
+    /**
+     * Get the first child window
+     *
+     * @return pointer to child window
+     */
+    Window*  child() { return m_subWins; }
 
-        Point getParentPoint() const {
-            int x = 0;
-            int y = 0;
-            ::getparyx(m_handle, y, x);
-            return Point{x, y};
-        }
-        // Get parent's beginning of the window
-        //
-        // -------------------------------------------------------------------------
-        // traversal support
-        // -------------------------------------------------------------------------
-        Window*  child() { return m_subWins; }
-        // Get the first child window.
+    /**
+     * Get the next child from the parent.
+     *
+     * @return ponter to the sibling of the parent
+     */
+    Window*  sibling() { return m_sib; }
 
-        Window*  sibling() { return m_sib; }
-        // Get the next child of my parent.
+    /**
+     * Get this window's parent
+     *
+     * @return pointer to the window's parent
+     */
+    Window*  parent() { return m_parent; }
 
-        Window*  parent() { return m_parent; }
-        // Get my parent.
-
-        WINDOW* getHandle() const
-        {
-            return m_handle;
-        }
-
-        short getPair() const;
+    /**
+     * Get the NCurses WINDOW* handle.
+     *
+     * This is should be used with care.
+     */
+    WINDOW* getHandle() const
+    {
+        return m_handle;
+    }
 
     protected:
-        WINDOW* m_handle = NULL;
-        PANEL* m_panel   = NULL;
+    /**
+     * NCurses WINDOW handle
+     */
+    WINDOW* m_handle = NULL;
 
-        Window* m_parent  = nullptr;   // parent, if subwindow
-        Window* m_subWins = nullptr;   // head of subwindows list
-        Window* m_sib     = nullptr;   // next subwindow of parent
+    /**
+     * NCurses PANEL handle
+     */
+    PANEL* m_panel   = NULL;
+
+    /**
+     * Reference to a parent window.
+     *
+     * This wiil be null if this window is not a subwindow.
+     */
+    Window* m_parent  = nullptr;
+
+    //TODO: This is a linked list and should be reflect as such in code.
+    //      Consider a modern C++ alternative
+    /**
+     * Head of subwindows list
+     */
+    Window* m_subWins = nullptr;
+
+    /**
+     * Next subwindow of the parent
+     */
+    Window* m_sib     = nullptr;   // next subwindow of parent
 
     private:
-        void _killSubwindows();
-        static bool s_isInitialized;
+
+    //TODO: Docs
+    void _killSubwindows();
+    static void setPalette(const colorPair& color, colorPairID pair);
+    short getPair() const;
+    static void _onError(int err);
+
+    static void redrawAll();
+
+    static bool s_isInitialized;
 };
 
 #endif

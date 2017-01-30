@@ -13,33 +13,26 @@ Pad::Pad(int height, int width) :
     }
 }
 
-int Pad::refresh()
+void Pad::refresh()
 {
-    int res = noutrefresh();
-    if (res==OK && (m_viewWin)) {
-        res = (m_viewWin->refresh());
+    noutrefresh();
+    if (m_viewWin) {
+        m_viewWin->refresh();
     }
-
-    return res;
 }
 
-int Pad::noutrefresh()
+void Pad::noutrefresh()
 {
-    int res = OK;
     Window* window = win();
     if (window) {
         int high = window->maxY();
         int wide = window->maxX();
-        res = copy(*window, m_minRow, m_minCol,
+        copy(*window, m_minRow, m_minCol,
                 0, 0, high, wide,
                 FALSE);
-        if (res==OK) {
-            window->syncUp();
-            res = m_viewWin->noutrefresh();
-        }
+        window->syncUp();
+        m_viewWin->noutrefresh();
     }
-
-    return res;
 }
 
 void Pad::setWindow(Window* view,

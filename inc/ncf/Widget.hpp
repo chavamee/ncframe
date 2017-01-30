@@ -82,6 +82,8 @@ class Widget : public Component {
             return m_subWindow.get();
         }
 
+        void hide();
+
         static std::vector<Widget*> WidgetList;
 
         bool shouldListenForKeyEvents = false;

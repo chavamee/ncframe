@@ -18,7 +18,7 @@ class View : public Widget {
             m_content = content;
             if (getSubWindow()) {
                 getSubWindow()->clear();
-                getSubWindow()->printStr(m_content);
+                getSubWindow()->writeString(m_content);
             }
         }
 

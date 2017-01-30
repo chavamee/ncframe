@@ -29,7 +29,7 @@ void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         m_pad->setSubWindow(subWindow.get());
 
         if (!m_content.empty()) {
-            subWindow->printStr(m_content);
+            subWindow->writeString(m_content);
         }
 
         setWindow(std::move(window));

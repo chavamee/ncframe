@@ -37,7 +37,7 @@ class Pad : public Window {
         // Put the attributed character onto the pad and immediately do a
         // prefresh().
 
-        int refresh();
+        void refresh();
         // If a viewport is defined the pad is displayed in this window, otherwise
         // this is a noop.
 
@@ -51,15 +51,15 @@ class Pad : public Window {
         // on the screen. <b>refresh</b> copies a rectangle of this size beginning
         // with top left corner pminrow,pmincol onto the screen and calls doupdate().
 
-        int noutrefresh();
+        void noutrefresh();
         // If a viewport is defined the pad is displayed in this window, otherwise
         // this is a noop.
 
-        int routrefresh(int pminrow, int pmincol,
+        void routrefresh(int pminrow, int pmincol,
                 int sminrow, int smincol,
                 int smaxrow, int smaxcol) {
-            return ::pnoutrefresh(m_handle, pminrow, pmincol,
-                    sminrow, smincol, smaxrow, smaxcol);
+            _onError ( ::pnoutrefresh(m_handle, pminrow, pmincol,
+                    sminrow, smincol, smaxrow, smaxcol) );
         }
         // Does the same as refresh() but without calling doupdate().
 
@@ -112,6 +112,8 @@ class Pad : public Window {
     private:
         Window* m_viewWin = nullptr;       // the "viewport" window*/
         Window* m_viewSub = nullptr;       // the "viewport" subwindow*/
+
+        void _onError(int err);
 
         int m_horizGridsize = 0;
         int m_vertGridsize  = 0;

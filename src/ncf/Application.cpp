@@ -27,17 +27,17 @@ Application::Application()
     m_rootWindow = new Window(::stdscr);
 
     m_rootWindow->setColor(1);
-    m_rootWindow->setPalette(COLOR_YELLOW,COLOR_BLUE);
+    m_rootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
     m_rootWindow->setColor(2);
-    m_rootWindow->setPalette(COLOR_CYAN,COLOR_BLUE);
+    m_rootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
     m_rootWindow->setColor(3);
-    m_rootWindow->setPalette(COLOR_BLACK,COLOR_BLUE);
+    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
     m_rootWindow->setColor(4);
-    m_rootWindow->setPalette(COLOR_BLACK,COLOR_CYAN);
+    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
     m_rootWindow->setColor(5);
-    m_rootWindow->setPalette(COLOR_BLUE,COLOR_YELLOW);
+    m_rootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
     m_rootWindow->setColor(6);
-    m_rootWindow->setPalette(COLOR_BLACK,COLOR_GREEN);
+    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
 
     m_instance = this;
 }
