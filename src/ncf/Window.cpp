@@ -8,27 +8,20 @@ bool Window::s_isInitialized = false;
 
 Window::Window()
 {
-    if (!s_isInitialized) {
-	    ::initscr();
-	    s_isInitialized = true;
-        /*if (colorInitialized == COLORS_NEED_INITIALIZATION) {
-            colorInitialized = COLORS_NOT_INITIALIZED;
-            useColors();
-        }*/
-        ::noecho();
-        ::cbreak();
-    }
 }
 
-Window::Window(WINDOW* win) :
-    Window()
+Window::Window(WINDOW*& win, bool takeOnwership) :
+    m_isHandleOwner(takeOnwership)
 {
     m_handle = win ? win : ::stdscr;
     m_panel = ::new_panel(m_handle);
+
+    if (takeOnwership) {
+        win = NULL;
+    }
 }
 
-Window::Window(int height, int width, int y, int x) :
-    Window()
+Window::Window(int height, int width, int y, int x)
 {
     m_handle = ::newwin(height, width, y, x);
     if (m_handle == NULL) {
@@ -46,8 +39,7 @@ Window::Window(const Rect& rect) :
 {
 }
 
-Window::Window(Window& parent, int height, int width, int y, int x, bool derived) :
-    Window()
+Window::Window(Window& parent, int height, int width, int y, int x, bool derived)
 {
     if (derived) {
         y -= parent.originY();
@@ -67,6 +59,11 @@ Window::Window(Window& parent, int height, int width, int y, int x, bool derived
     m_parent = &parent;
     m_sib = parent.m_subWins;
     parent.m_subWins = this;
+}
+
+Window::Window(Window& parent, const Rect& rect, bool dervied) :
+    Window(parent, rect.size.height, rect.size.width, rect.origin.y, rect.origin.x, dervied)
+{
 }
 
 Window::Window(Window&& rhs) :
@@ -100,7 +97,7 @@ Window::~Window()
         }
     }
 
-    if (m_handle != NULL) {
+    if (m_handle != NULL && m_isHandleOwner) {
         ::delwin(m_handle);
     }
 }
@@ -136,28 +133,28 @@ Size Window::size() const
 string Window::getline(int n)
 {
     char* cstr = nullptr;
-    wgetnstr(m_handle, cstr, n);
+    _onError ( ::wgetnstr(m_handle, cstr, n) );
     return string {cstr};
 }
 
 string Window::getlineFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    ::mvwgetnstr(m_handle, point.y, point.x, cstr, n);
+    _onError (::mvwgetnstr(m_handle, point.y, point.x, cstr, n) );
     return string {cstr};
 }
 
 string Window::extractString(int n)
 {
     char* cstr = nullptr;
-    winnstr(m_handle, cstr, n);
+    _onError ( ::winnstr(m_handle, cstr, n) );
     return string {cstr};
 }
 
 string Window::extractStringFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    ::mvwinnstr(m_handle, point.y, point.x, cstr, n);
+    _onError ( ::mvwinnstr(m_handle, point.y, point.x, cstr, n) );
     return string {cstr};
 }
 

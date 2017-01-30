@@ -16,14 +16,16 @@ extern "C" {
 
 class Window;
 
+//TODO: Properly explain color pairs, setPalette, getColor and color types. Consider reworking so
+//      they are more expressive/idiomatic
+//TODO: Consider moving functions that return or set information about ALL windows to Application
 //TODO: Ensure that all ncurses functions that return ERR are properly wrapped with _onError
 //TODO: Describe decorator functions as helper functions
 //TODO: Normalize vocabulary in respect to row and col vs x and y
 //TODO: If move cosntructors do soemthing special, document as appropriate
-//TODO: make attribute a struct/class to use RAII to reset attron/attroff
+//TODO: Consider making attribute a struct/class to use RAII to reset attron/attroff
 //TODO: implement interface for all window functionality that needs to be
 //      exposed in Window class
-//
 //TODO: All functions that take an n param and have n=-1 as part of there sginature
 //      should change to use std::strings and not using the n param
 //TODO: Do we need this in the global namespace? In other words should we move it to
@@ -61,11 +63,15 @@ class Window {
      */
     Window();
 
-    //TODO: Should we take ownership of win?
     /**
-     * Construct a Window object off of a ncurses WINDOW handle
+     * Construct a Window object off of a ncurses WINDOW handle.
+     *
+     * @param win           ncurses WINDOW handle.
+     *                      If the Window object takes ownership of the ncurses handle,
+     *                      the win pointer is set to null.
+     * @param takeOnwership Should this Window object take ownerhsip of the ncurses handle
      */
-    Window(WINDOW* win);
+    Window(WINDOW*& win, bool takeOnwership = true);
 
     /**
      * Construct a new window
@@ -82,6 +88,11 @@ class Window {
             int x = 0
           );
 
+    /**
+     * Construct a new window
+     *
+     * @param rect rectangular geometry of the window
+     */
     Window(
             const Rect& rect
           );
@@ -89,12 +100,14 @@ class Window {
     /**
      * Construct a new window with a parent window
      *
-     * @param parent parent window of this window.
-     *               The window becomes a sub window of parent
-     * @param height height of the window
-     * @param width  width of the window
-     * @param y      y coordinate of the window origin
-     * @param x      x coordinate of the window origin
+     * @param parent   parent window of this window.
+     *                 The window becomes a sub window of parent
+     * @param height   height of the window
+     * @param width    width of the window
+     * @param y        y coordinate of the window origin
+     * @param x        x coordinate of the window origin
+     * @param relative If true, the origin is set relative to the parent window.
+     *                 Otherwise the position is absolute and set relative to stdscr
      */
     Window( Window& parent,
             int height,
@@ -104,11 +117,25 @@ class Window {
             bool derived = false
           );
 
+    /**
+     * Construct a new window with a parent window
+     *
+     * @param parent   parent window of this window.
+     *                 The window becomes a sub window of parent
+     * @param rect     rectangular geometry of the window
+     * @param relative If true, the origin is set relative to the parent window.
+     *                 Otherwise the position is absolute and set relative to stdscr
+     */
+    Window(Window& parent,
+           const Rect& rect,
+           bool derived = false
+          );
 
-    /*
-     * TODO: Is it better to not allow copying at all or
-     *       proceed with copying but clone the ncurses WINDOWs
-     *       esentially having new ones in the copied object.
+    /**
+     * Copy constructor.
+     *
+     * The ncurses WINDOW handle is never copied over. Instead
+     * the window is replicated with a new WINDOW handle.
      */
     Window(const Window& rhs) = delete;
 
@@ -122,9 +149,6 @@ class Window {
      */
     Window& operator=(Window&& rhs);
 
-    //TODO; If we used the ncurses window handle constructor
-    //      and we do not take ownership we should not delete
-    //      the handle
     /**
      * Window destructor
      */
@@ -133,7 +157,6 @@ class Window {
     //TODO: int            tabsize() const { initialize(); return TABSIZE; }
     // Size of a tab on terminal, *not* window
 
-    // Number of available colors
     /**
      * Returns tha amount of available colors for all windows
      *
@@ -148,23 +171,34 @@ class Window {
      */
     int colors() const { return colorCount(); }
 
-    // -------------------------------------------------------------------------
-    // window status
-    // -------------------------------------------------------------------------
+    /**
+     * Actual color pair
+     *
+     * @return the effective color pair for this window
+     */
+    colorPairID getColor() const;
 
-    //TODO: Return color struct
-    /*colorPairID getcolor() const;
-    // Actual color pair
+    /**
+     * Actual foreground color
+     *
+     * @return the effective foreground color for this window.
+     */
+    colorType foreground() const { return getColor(0); }
 
-    NCURSES_COLOR_T foreground() const { return getcolor(0); }
-    // Actual foreground color
+    /**
+     * Actual background color
+     *
+     * @return the effective background color for this window.
+     */
+    colorType background() const { return getColor(1); }
 
-    NCURSES_COLOR_T background() const { return getcolor(1); }
-    // Actual background color*/
 
-
+    /**
+     * Set color palette entry
+     *
+     * @param pair the color pair values to set for the current pair
+     */
     void setPalette(colorPair color);
-    // Set color palette entry
 
     /**
      * Set actually used palette entry.
@@ -172,14 +206,6 @@ class Window {
      * @param pair Color pair id to use
      */
     void setColor(colorPairID pair);
-
-    // -------------------------------------------------------------------------
-    // window positioning
-    // -------------------------------------------------------------------------
-    // TODO: Do we need this if we are mergin panel with window and using move_panel?
-    /*int Move(int begin_y, int begin_x) {
-      return ::mvwin(m_handle, begin_y, begin_x); }*/
-    // Move window to new position with the new position as top left corner.
 
     /**
      * Move the cursor to the given point.
@@ -349,7 +375,7 @@ class Window {
     // as described above.
     //}*/
 
-    //TODO: This should also be variadic
+    //TODO: This should also be variadic if posible
     /**
      * Do a formatted print to the window.
      */
@@ -386,7 +412,10 @@ class Window {
      */
     ncCharType getChrAtPos(const Point& point) { return mvwinch(m_handle, point.y, point.x); }
 
-    //TODO: Think about this since we have std::string types
+    //TODO: These are not normal strings but rather ncurses wide character type strings.
+    //      These also hold attributes. Consider extractString and similiar and work to ensure
+    //      it is udnerstood which one should be used in which circumstances. Additionally,
+    //      we cannot simply return a string object.
     int getStr(ncCharType* str, int n=-1) {
         return ::winchnstr(m_handle, str, n);
     }
@@ -1146,7 +1175,10 @@ class Window {
 
     static void redrawAll();
 
+    colorType getColor(int getBack) const;
     static bool s_isInitialized;
+
+    bool m_isHandleOwner = true;
 };
 
 #endif
