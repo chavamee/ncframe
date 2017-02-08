@@ -12,63 +12,61 @@ Application* Application::getApplication()
     return m_instance;
 }
 
-Application::Application()
+Application::Application(bool enableColors) :
+    m_hasColors(enableColors)
 {
     ::setlocale(LC_ALL, "");
     ::initscr();
-
-    ::start_color();
 
     ::cbreak();
     ::noecho();
     ::keypad(stdscr, true);
     ::meta(stdscr, true);
     ::curs_set(0);
+
     m_rootWindow = new Window(::stdscr);
 
-    m_rootWindow->setColor(1);
-    m_rootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
-    m_rootWindow->setColor(2);
-    m_rootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
-    m_rootWindow->setColor(3);
-    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
-    m_rootWindow->setColor(4);
-    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
-    m_rootWindow->setColor(5);
-    m_rootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
-    m_rootWindow->setColor(6);
-    m_rootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
+    if (::has_colors()) {
+        ::start_color();
+
+        m_rootWindow->setColor(1);
+        m_rootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
+        m_rootWindow->setColor(2);
+        m_rootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
+        m_rootWindow->setColor(3);
+        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
+        m_rootWindow->setColor(4);
+        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
+        m_rootWindow->setColor(5);
+        m_rootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
+        m_rootWindow->setColor(6);
+        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
+    }
 
     m_instance = this;
 }
 
-Application::Application(bool enableColors) :
-    m_hasColors(enableColors)
-{
-}
-
 //TODO: Refactor construction
-Application::Application(int argc, char *argv[], bool enableColors) :
-    Application()
+Application::Application(Arguments args, bool enableColors) :
+    Application(enableColors)
 {
     m_hasColors = enableColors;
     //TODO:Parse command line options
-    (void)argc;
-    (void)argv;
+    (void)args;
 }
 
 Application::~Application()
 {
     delete m_rootWindow;
-    endwin();
+    ::endwin();
 }
 
 void Application::start()
 {
     int ch;
 
-    update_panels();
-    doupdate();
+    ::update_panels();
+    ::doupdate();
 
     vector<Widget*>& widgetList = Widget::WidgetList;
     if (not m_currWdgtWithFocus) {

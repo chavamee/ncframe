@@ -8,7 +8,7 @@ OBJS_DIR  := $(BUILD_DIR)/objs
 INC_DIR    = ../../inc
 
 TARGET    := $(LIB_DIR)/libncframe.so
-CFLAGS    := -std=c++14 -Wall -Wextra -pg -O0 -fPIC
+CFLAGS    := -std=c++14 -Wall -Wextra -pg -O0 -fPIC -Weffc++
 LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp
 
 INCLUDES  := -I$(INC_DIR)

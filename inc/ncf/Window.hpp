@@ -488,7 +488,7 @@ class Window {
     /**
      * Set the window attributes.
      */
-     void setAttribute(ncCharType attr) { _onError ( wattrset(m_handle, static_cast<int>(attr)) ); }
+     void setAttribute(ncCharType attr) { _onError ( ::wattrset(m_handle, static_cast<int>(attr)) ); }
 
     // TODO: Change to struct or other representation
     /**

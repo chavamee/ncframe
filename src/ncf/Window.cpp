@@ -14,7 +14,9 @@ Window::Window(WINDOW*& win, bool takeOnwership) :
     m_isHandleOwner(takeOnwership)
 {
     m_handle = win ? win : ::stdscr;
-    m_panel = ::new_panel(m_handle);
+    if (m_handle != ::stdscr) {
+        m_panel = ::new_panel(m_handle);
+    }
 
     if (takeOnwership) {
         win = NULL;
@@ -208,8 +210,8 @@ void Window::setColor(colorPairID pair)
         throw NCException("Can't set color pair");
     }
 
-    attroff(A_COLOR);
-    attrset(COLOR_PAIR(pair));
+    attributeOff(A_COLOR);
+    setAttribute(COLOR_PAIR(pair));
 }
 
 bool Window::isDescendant(Window& win)

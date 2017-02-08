@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         user
     };
 
-    Application app(argc, argv);
+    Application app {argc, argv};
 
     Column body        {};
     Row    top         {};
@@ -42,15 +42,18 @@ int main(int argc, char *argv[])
     prev.canFocus = false;
 
     vector<MenuItem*> ctgItems;
-    map<string, string> ctgs = server.Categories();
-    for (auto& ctg : ctgs) {
-        ctgItems.push_back(new MenuItem(ctg.first, ctg.second));
-    }
-
     vector<MenuItem*> entryItems;
-    vector<Feedly::Entry> entries = server.Entries("All");
-    for (auto& entry : entries) {
-        entryItems.push_back(new EntryItem(entry));
+    try {
+        map<string, string> ctgs = server.Categories();
+        for (auto& ctg : ctgs) {
+            ctgItems.push_back(new MenuItem(ctg.first, ctg.second));
+        }
+
+        vector<Feedly::Entry> entries = server.Entries("All");
+        for (auto& entry : entries) {
+            entryItems.push_back(new EntryItem(entry));
+        }
+    } catch (std::exception& e) {
     }
 
     ctgMenu.setItems(ctgItems);

@@ -84,6 +84,13 @@ void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         setFormat({.height = window->height() - 2, .width = 1});
         setMark(m_itemMark ? m_itemMark : "*");
 
+        Application* app = Application::getApplication();
+        if (app) {
+            ::set_menu_fore(m_handle, app->foregrounds());
+            ::set_menu_back(m_handle, app->backgrounds());
+            ::set_menu_grey(m_handle, app->inactives());
+        }
+
         post();
         window->refresh();
 
@@ -192,12 +199,12 @@ ITEM** Menu::_unpackItems(vector<MenuItem*>& items)
 
 void Menu::setDefaultAttributes()
 {
-  Application* app = Application::getApplication();
-  if (app) {
-    ::set_menu_fore(m_handle, app->foregrounds());
-    ::set_menu_back(m_handle, app->backgrounds());
-    ::set_menu_grey(m_handle, app->inactives());
-  }
+    Application* app = Application::getApplication();
+    if (app) {
+        ::set_menu_fore(m_handle, app->foregrounds());
+        ::set_menu_back(m_handle, app->backgrounds());
+        ::set_menu_grey(m_handle, app->inactives());
+    }
 }
 
 // Set the current item
