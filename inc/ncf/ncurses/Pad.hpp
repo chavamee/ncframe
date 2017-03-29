@@ -1,7 +1,10 @@
-#ifndef NCF_NCURSES_PAD_H_
-#define NCF_NCURSES_PAD_H_
+#ifndef NCF_NCURSES_PAD_H
+#define NCF_NCURSES_PAD_H
 
-#include "ncf/Window.hpp"
+#include "ncf/ncurses/Window.hpp"
+
+namespace ncf {
+namespace ncurses {
 
 // -------------------------------------------------------------------------
 // Pad Support. We allow an association of a pad with a "real" window
@@ -33,7 +36,7 @@ class Pad : public Window {
 
         virtual ~Pad() {}
 
-        int echochar(const chtype ch) { return ::pechochar(m_handle, ch); }
+        int echochar(const chtype ch) { return ::pechochar(m_window, ch); }
         // Put the attributed character onto the pad and immediately do a
         // prefresh().
 
@@ -44,7 +47,7 @@ class Pad : public Window {
         int refresh(int pminrow, int pmincol,
                 int sminrow, int smincol,
                 int smaxrow, int smaxcol) {
-            return ::prefresh(m_handle, pminrow, pmincol,
+            return ::prefresh(m_window, pminrow, pmincol,
                     sminrow, smincol, smaxrow, smaxcol);
         }
         // The coordinates sminrow,smincol,smaxrow,smaxcol describe a rectangle
@@ -58,7 +61,7 @@ class Pad : public Window {
         void routrefresh(int pminrow, int pmincol,
                 int sminrow, int smincol,
                 int smaxrow, int smaxcol) {
-            _onError ( ::pnoutrefresh(m_handle, pminrow, pmincol,
+            _onError ( ::pnoutrefresh(m_window, pminrow, pmincol,
                     sminrow, smincol, smaxrow, smaxcol) );
         }
         // Does the same as refresh() but without calling doupdate().
@@ -120,4 +123,6 @@ class Pad : public Window {
 
 };
 
+}
+}
 #endif

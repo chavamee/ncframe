@@ -51,6 +51,8 @@ class Widget : public Component {
             return m_rect.origin.x;
         }
 
+        void setController(std::unique_ptr<Controller> controller);
+
         void setGeometry(const Rect& rect)
         {
             m_rect = rect;
@@ -93,8 +95,8 @@ class Widget : public Component {
     private:
         Rect m_rect;
 
-        std::unique_ptr<Window> m_window;
-        std::unique_ptr<Window> m_subWindow;
+        std::unique_ptr<ncf::ncurses::Window> m_window;
+        std::unique_ptr<ncf::ncurses::Window> m_subWindow;
 };
 
 #endif

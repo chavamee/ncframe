@@ -10,6 +10,8 @@
 #include <cassert>
 #include <vector>
 
+//TODO: Create a pointer/unique_ptr/object to stdscr window that is const and unmovable.
+
 struct Colors {
     colorPair colorPair1;
     colorPair colorPair2;
@@ -56,6 +58,8 @@ class Application {
             assert(widget != NULL);
             m_currWdgtWithFocus = widget;
         }
+
+        void setController(std::unique_ptr<Controller> controller);
 
         void setKillKey(char key)
         {

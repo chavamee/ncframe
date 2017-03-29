@@ -1,14 +1,17 @@
-#include "ncf/Pad.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/ncurses/Pad.hpp"
+#include "ncf/ncurses/NCException.hpp"
 #include <cassert>
 
 using namespace std;
 
+namespace ncf {
+namespace ncurses {
+
 Pad::Pad(int height, int width) :
     Window()
 {
-    m_handle = ::newpad(height, width);
-    if (static_cast<WINDOW*>(0) == m_handle) {
+    m_window = ::newpad(height, width);
+    if (static_cast<WINDOW*>(0) == m_window) {
         throw NCException("Cannot construct window");
     }
 }
@@ -62,4 +65,7 @@ void Pad::setSubWindow(Window* sub)
     }
 
     m_viewSub = sub;
+}
+
+}
 }

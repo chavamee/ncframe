@@ -19,9 +19,12 @@
 //TODO: Set items should have a limit
 //TODO: Replace Menu_Options with concrete struct
 
+namespace ncf {
+namespace ncurses {
+
 class MenuItem;
 
-class Menu : public Widget {
+class Menu {
     public:
         Menu();
 
@@ -33,18 +36,18 @@ class Menu : public Widget {
 
         void setItems(std::vector<MenuItem*>& items);
 
+        void setWindow(Window& win);
+
+        void setSubWindow(Window& win);
+
+        void setWindow(std::unique_ptr<$`Window`> window);
+
+        void seSubtWindow(std::unique_ptr<$`Window`> window);
+
         inline MENU* getHandle() const
         {
             return m_handle;
         }
-
-        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
-
-        void onMouseEvent (int ch) override;
-
-        int onKeyEvent(int ch) override;
-
-        bool onEvent(int ch) override;
 
         void optionsOff(Menu_Options opts)
         {
@@ -272,7 +275,7 @@ class Menu : public Widget {
         }
 
     private:
-        MENU* m_handle = NULL;
+        MENU* m_menu = NULL;
 
         const char* m_itemMark = "*";
 
@@ -282,8 +285,13 @@ class Menu : public Widget {
 
         std::vector<MenuItem*> m_items;
 
+        std::unique_ptr<Window> m_window;
+        std::unique_ptr<Window> m_subWindow;
+
         ITEM** _unpackItems(std::vector<MenuItem*>& items);
         bool _invokeAction(MenuItem& item);
 };
 
+}
+}
 #endif
