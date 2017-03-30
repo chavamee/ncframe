@@ -25,6 +25,10 @@ Panel::Panel(int height,
     }
 }
 
+Panel::~Panel()
+{
+}
+
 Panel& Panel::operator=(const Panel& rhs)
 {
     if (this != &rhs) {

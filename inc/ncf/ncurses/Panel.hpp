@@ -116,7 +116,9 @@ class Panel : public Window {
         virtual void centerText(int y, const std::string& label);
 
     private:
-        static void _onError(int err);
+        static void _onError(int err)
+        {
+        }
 
         /**
          * NCurses PANEL handle

@@ -15,19 +15,22 @@
 #include <algorithm>
 
 using namespace std;
+using namespace ncf;
+using namespace ncf::ncurses;
 
 int main(int argc, char *argv[])
 {
     Feedly::User user{
-        "0f558b72-8e00-48b4-9f4a-7f97d8621968",
-        "Az8RkrRAn5dR0MpoZUmSaYr55MsrclittquxiHIPiHgOU1hpkzCiH881WYeIMqKzo3fy5ZKzqjgMCjml9OYxTwkRXjAmycKeXoBh4ddQVwAr6Efb5kJy4_iR1q8-0OkOw2ZXiZC1m_x88lmUwp04ByckJq2ErTL0G8AhTlNfmWtvbVjF7Cqju3_x_WJTnsbCzPRSR6zg5kxLhVgzoIxgEtlgSQNmFw:feedlydev"
+        "9c68ac32-267d-4e67-9362-3d074bc11c34",
+        "AzwoKrfxyb_kDf_-HmNittc3_EoKVXw8FL5_OX9c4Okhtmoj-Ep9h2-aZ1CSvlqU1xRbfA31giJGi1oYCm1if4PZmji-qE3wJqKpZp7l-bT7NiLvYHRlm83U_MFThMaBiLWFSLIagum2n3G2EAhG7_JcrlFjrli-kaqJ6w4RkYVl60C9Sjf5NYnaZIfm28ltcAzeUNU3h5EB2Q7CXDxxDIq6xo5ZAe-T:feedlydev"
     };
 
     Feedly server {
         user
     };
 
-    Application app {argc, argv};
+    //Application app {argc, argv};
+    Application app {};
 
     Column body        {};
     Row    top         {};
@@ -41,12 +44,12 @@ int main(int argc, char *argv[])
 
     prev.canFocus = false;
 
-    vector<MenuItem*> ctgItems;
-    vector<MenuItem*> entryItems;
-    try {
+    vector<ncurses::Menu::MenuItem*> ctgItems;
+    vector<ncurses::Menu::MenuItem*> entryItems;
+    /*try {
         map<string, string> ctgs = server.Categories();
         for (auto& ctg : ctgs) {
-            ctgItems.push_back(new MenuItem(ctg.first, ctg.second));
+            ctgItems.push_back(new ncurses::Menu::MenuItem(ctg.first, ctg.second));
         }
 
         vector<Feedly::Entry> entries = server.Entries("All");
@@ -54,8 +57,11 @@ int main(int argc, char *argv[])
             entryItems.push_back(new EntryItem(entry));
         }
     } catch (std::exception& e) {
-    }
+    }*/
 
+    ctgItems.push_back(new ncurses::Menu::MenuItem("Test", "Test"));
+    Feedly::Entry entry {"Test", "Test", "Test", "Test", "Test"};
+    entryItems.push_back(new EntryItem(entry));
     ctgMenu.setItems(ctgItems);
     entriesMenu.setItems(entryItems);
 

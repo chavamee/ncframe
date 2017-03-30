@@ -1,7 +1,7 @@
 #ifndef NCURSES_APPLICATION_BINDINGS_H_
 #define NCURSES_APPLICATION_BINDINGS_H_
 
-#include "ncf/Window.hpp"
+#include "ncf/ncurses/Window.hpp"
 #include "ncf/Widget.hpp"
 #include "ncf/Component.hpp"
 #include "common/Arguments.hpp"
@@ -12,13 +12,15 @@
 
 //TODO: Create a pointer/unique_ptr/object to stdscr window that is const and unmovable.
 
+namespace ncf {
+
 struct Colors {
-    colorPair colorPair1;
-    colorPair colorPair2;
-    colorPair colorPair3;
-    colorPair colorPair4;
-    colorPair colorPair5;
-    colorPair colorPair6;
+    ncurses::colorPair colorPair1;
+    ncurses::colorPair colorPair2;
+    ncurses::colorPair colorPair3;
+    ncurses::colorPair colorPair4;
+    ncurses::colorPair colorPair5;
+    ncurses::colorPair colorPair6;
 };
 
 struct Attributes {
@@ -59,7 +61,7 @@ class Application {
             m_currWdgtWithFocus = widget;
         }
 
-        void setController(std::unique_ptr<Controller> controller);
+        //void setController(std::unique_ptr<Controller> controller);
 
         void setKillKey(char key)
         {
@@ -77,8 +79,8 @@ class Application {
          *
          * @return default foreground attributes
          */
-        virtual ncCharType foregrounds() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(1)) : A_BOLD;
+        virtual ncurses::ncCharType foregrounds() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(1)) : A_BOLD;
         }
 
         /**
@@ -86,8 +88,8 @@ class Application {
          *
          * @return default background attributes
          */
-        virtual ncCharType backgrounds() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(2)) : A_NORMAL;
+        virtual ncurses::ncCharType backgrounds() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(2)) : A_NORMAL;
         }
 
         /**
@@ -95,8 +97,8 @@ class Application {
          *
          * @return default inactive attributes
          */
-        virtual ncCharType inactives() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(3)|A_DIM) : A_DIM;
+        virtual ncurses::ncCharType inactives() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(3)|A_DIM) : A_DIM;
         }
 
         /**
@@ -104,8 +106,8 @@ class Application {
          *
          * @return default label attributes
          */
-        virtual ncCharType labels() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
+        virtual ncurses::ncCharType labels() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         /**
@@ -113,8 +115,8 @@ class Application {
          *
          * @return default form backgrounds
          */
-        virtual ncCharType dialogBackgrounds() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
+        virtual ncurses::ncCharType dialogBackgrounds() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         /**
@@ -122,8 +124,8 @@ class Application {
          *
          * @return default window backgrounds
          */
-        virtual ncCharType windowBackgrounds() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(5)) : A_NORMAL;
+        virtual ncurses::ncCharType windowBackgrounds() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(5)) : A_NORMAL;
         }
 
         /**
@@ -131,8 +133,8 @@ class Application {
          *
          * @return default title window attributes
          */
-        virtual ncCharType screenTitles() const {
-            return m_hasColors ? static_cast<ncCharType>(COLOR_PAIR(6)) : A_BOLD;
+        virtual ncurses::ncCharType screenTitles() const {
+            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(6)) : A_BOLD;
         }
 
         /**
@@ -151,11 +153,12 @@ class Application {
         /**
          * Window object for ncurses stdscr
          */
-        Window* m_rootWindow = new Window(::stdscr);
+        ncurses::Window* m_rootWindow = nullptr;
 
         Widget* m_currWdgtWithFocus = nullptr;
         bool m_hasColors = true;
         char m_killKey = 'q';
 };
 
+}
 #endif

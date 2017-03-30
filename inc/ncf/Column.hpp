@@ -4,6 +4,8 @@
 #include "ncf/Widget.hpp"
 #include <algorithm>
 
+namespace ncf {
+
 class Column : public Widget {
     public:
         Column();
@@ -12,7 +14,7 @@ class Column : public Widget {
 
         ~Column();
 
-        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override;
 
         void add(Component* component, unsigned int pos = 0) override;
 
@@ -29,4 +31,5 @@ class Column : public Widget {
         std::vector<Component*> m_components;
 };
 
+}
 #endif

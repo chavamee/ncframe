@@ -8,26 +8,23 @@
 #include <fstream>
 
 
-class EntriesMenu : public Menu {
+class EntriesMenu : public ncf::Menu {
     public:
-        EntriesMenu()
+        EntriesMenu() :
+            Menu()
         {
         }
 
-        EntriesMenu(TextView* view) :
+        EntriesMenu(ncf::TextView* view) :
+            Menu(),
             m_previewTextView(view)
         {
         }
 
-        EntriesMenu(const Rect& rect) :
-            Menu(rect)
-        {
-        }
-
-        void onItemSelected(MenuItem* item) override
+        /*void onItemSelected(ncf::ncurses::Menu::MenuItem* item) override
         {
             (void)item;
-        }
+        }*/
 
         void ShowPreview(const std::string& preview)
         {
@@ -58,10 +55,10 @@ class EntriesMenu : public Menu {
         }
 
     private:
-        TextView* m_previewTextView = nullptr;
+        ncf::TextView* m_previewTextView = nullptr;
 };
 
-class EntryItem : public MenuItem {
+class EntryItem : public ncf::ncurses::Menu::MenuItem {
     public:
         EntryItem(Feedly::Entry& entry) : MenuItem(entry.title, entry.id), m_entry{entry}
         {
@@ -69,7 +66,7 @@ class EntryItem : public MenuItem {
 
         bool action() override
         {
-            static_cast<EntriesMenu*>(menu())->ShowPreview(m_entry.content);
+            //static_cast<EntriesMenu*>(menu())->ShowPreview(m_entry.content);
             return true;
         }
 

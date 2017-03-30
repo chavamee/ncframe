@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ncf {
+
 Column::Column()
 {
 }
@@ -15,14 +17,14 @@ Column::~Column()
 {
 }
 
-void Column::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void Column::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
 {
     size_t numCmps = childCount();
     int cmpHeight = maxHeight / numCmps;
     int currentY = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        child(i)->draw(make_unique<Window>(cmpHeight, maxWidth, currentY, 0));
+        child(i)->draw(make_unique<ncurses::Window>(cmpHeight, maxWidth, currentY, 0));
         currentY += cmpHeight;
     }
 }
@@ -47,3 +49,4 @@ std::size_t Column::childCount()
     return m_components.size();
 }
 
+}

@@ -5,6 +5,8 @@
 
 using namespace std;
 
+namespace ncf {
+
 Application* Application::m_instance = nullptr;
 
 Application* Application::getApplication()
@@ -24,7 +26,7 @@ Application::Application(bool enableColors) :
     ::meta(stdscr, true);
     ::curs_set(0);
 
-    m_rootWindow = new Window(::stdscr);
+    m_rootWindow = new ncurses::Window(::stdscr);
 
     if (::has_colors()) {
         ::start_color();
@@ -107,4 +109,6 @@ void Application::start()
         ::update_panels();
         ::doupdate();
     }
+}
+
 }

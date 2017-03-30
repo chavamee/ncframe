@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+namespace ncf {
+
 //TODO: Check for inlinening opportunities
 
 class Widget : public Component {
@@ -51,7 +53,7 @@ class Widget : public Component {
             return m_rect.origin.x;
         }
 
-        void setController(std::unique_ptr<Controller> controller);
+        //void setController(std::unique_ptr<Controller> controller);
 
         void setGeometry(const Rect& rect)
         {
@@ -64,22 +66,22 @@ class Widget : public Component {
             return m_rect;
         }
 
-        void setWindow(std::unique_ptr<Window> window)
+        void setWindow(std::unique_ptr<ncurses::Window> window)
         {
             m_window = std::move(window);
         }
 
-        void setSubWindow(std::unique_ptr<Window> window)
+        void setSubWindow(std::unique_ptr<ncurses::Window> window)
         {
             m_subWindow = std::move(window);
         }
 
-        Window* getWindow() const
+        ncurses::Window* getWindow() const
         {
             return m_window.get();
         }
 
-        Window* getSubWindow() const
+        ncurses::Window* getSubWindow() const
         {
             return m_subWindow.get();
         }
@@ -99,4 +101,5 @@ class Widget : public Component {
         std::unique_ptr<ncf::ncurses::Window> m_subWindow;
 };
 
+}
 #endif

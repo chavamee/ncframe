@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ncf {
+
 Row::Row()
 {
 }
@@ -15,7 +17,7 @@ Row::~Row()
 {
 }
 
-void Row::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void Row::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
 {
     if (window) {
         maxHeight = window->height();
@@ -25,7 +27,7 @@ void Row::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
     int currentX = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        child(i)->draw(make_unique<Window>(maxHeight, cmpWidth, 0, currentX));
+        child(i)->draw(make_unique<ncurses::Window>(maxHeight, cmpWidth, 0, currentX));
         currentX += cmpWidth;
     }
 
@@ -52,4 +54,6 @@ Component* Row::child(std::size_t pos)
 std::size_t Row::childCount()
 {
     return m_components.size();
+}
+
 }

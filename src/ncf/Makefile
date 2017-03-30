@@ -1,8 +1,6 @@
 CC        := clang++
 LD    	  := clang++
 
-MODULES   := ncurses ncf
-
 BUILD_DIR := ../build
 BIN_DIR    = $(BUILD_DIR)/bin
 LIB_DIR   := $(BUILD_DIR)/lib
@@ -16,8 +14,8 @@ LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp
 INCLUDES  := -I$(INC_DIR)
 LDFLAGS   := -L$(BUILD_DIR) -shared
 
-SOURCES   := $(foreach sdir,$(MODULES),$(wildcard $(sdir)/*.cpp))
-OBJECTS   := $(patsubst %.cpp,$(OBJS_DIR)/%.o,$(SOURCES))
+SOURCES   := $(wildcard *.cpp)
+OBJECTS   := $(SOURCES:%.cpp=$(OBJS_DIR)/%.o)
 
 
 .PHONEY: clean

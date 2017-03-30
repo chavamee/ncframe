@@ -20,10 +20,10 @@ namespace ncf {
 namespace ncurses {
 
 class Menu {
+    public:
     class MenuItem {
         friend Menu;
-
-    public:
+        public:
         MenuItem();
 
         MenuItem(
@@ -115,13 +115,16 @@ class Menu {
     public:
         Menu();
 
-        Menu(const Rect& rect);
-
-        Menu(const Rect& rect, std::vector<MenuItem*>& items);
+        Menu(std::vector<MenuItem*>& items);
 
         virtual ~Menu();
 
         void setItems(std::vector<MenuItem*>& items);
+
+        int drive(int cmd)
+        {
+            return ::menu_driver(m_menu, cmd);
+        }
 
         void setWindow(Window& win);
 
@@ -165,11 +168,6 @@ class Menu {
         }
 
         virtual void onItemDeselected(MenuItem* item)
-        {
-            NCF_UNUSED(item);
-        }
-
-        virtual void onItemAction(MenuItem* item)
         {
             NCF_UNUSED(item);
         }
@@ -247,7 +245,9 @@ class Menu {
 
         // set the default attributes for the menu
         // i.e. set fore, back and grey attribute
-        virtual void setDefaultAttributes();
+        virtual void setDefaultAttributes()
+        {
+        }
 
         //TODO: Should return more concrete type
         // Get the menus background attributes
@@ -376,7 +376,6 @@ class Menu {
         std::unique_ptr<Window> m_subWindow;
 
         ITEM** _unpackItems(std::vector<MenuItem*>& items);
-        bool _invokeAction(MenuItem& item);
 };
 
 }

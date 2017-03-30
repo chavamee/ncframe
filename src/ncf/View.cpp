@@ -1,29 +1,31 @@
 #include "ncf/View.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/ncurses/NCException.hpp"
 
 using namespace std;
+
+namespace ncf {
 
 View::View(const Rect& rect) :
     Widget{ rect }
 {
 }
 
-void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void View::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
 {
     if (!window) {
         if (getWindow()) {
             // TODO: Use this window
         } else {
             //TODO: Make default window
-            window = make_unique<Window>(getGeometry());
+            window = make_unique<ncurses::Window>(getGeometry());
         }
     }
 
     if (!subWindow) {
-        subWindow = make_unique<Window>(
+        subWindow = make_unique<ncurses::Window>(
                 *window, window->height()-2, window->width()-2, 1, 1, false
                 );
-        m_pad = make_unique<Pad>(window->height(), window->width());
+        m_pad = make_unique<ncurses::Pad>(window->height(), window->width());
 
         m_pad->setWindow(window.get());
         m_pad->setSubWindow(subWindow.get());
@@ -36,5 +38,7 @@ void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         setSubWindow(std::move(subWindow));
 
     }
+
+}
 
 }

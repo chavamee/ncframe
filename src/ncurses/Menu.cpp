@@ -65,20 +65,22 @@ Menu::Menu() :
     m_itemMark(nullptr),
     m_items()
 {
+    m_menu = new_menu(nullptr);
+    if (m_menu == nullptr) {
+        onError(E_SYSTEM_ERROR);
+    }
 }
 
-Menu::Menu(const Rect& rect) :
-    m_menu(nullptr),
-    m_itemMark(nullptr),
-    m_items()
-{
-}
-
-Menu::Menu(const Rect& rect, vector<MenuItem*>& items) :
+Menu::Menu(vector<MenuItem*>& items) :
     m_menu(nullptr),
     m_itemMark(nullptr),
     m_items(items)
 {
+    m_menu = new_menu(nullptr);
+    if (m_menu == nullptr) {
+        onError(E_SYSTEM_ERROR);
+    }
+    setItems(items);
 }
 
 Menu::~Menu()
@@ -108,23 +110,24 @@ void Menu::setItems(vector<MenuItem*>& items)
         item->m_menu = this;
     }
 
-    if (m_isDrawn) {
+    if (m_items.empty()) {
+        set_menu_items(m_menu, nullptr);
+    } else {
+        set_menu_items(m_menu, _unpackItems(m_items));
+    }
+
+    /*if (m_isDrawn) {
         ITEM** oldItems = menu_items(m_menu);
 
         if (m_isPosted) {
             unpost();
-        }
-        if (m_items.empty()) {
-            set_menu_items(m_menu, nullptr);
-        } else {
-            set_menu_items(m_menu, _unpackItems(m_items));
         }
         if (!m_isPosted) {
             post();
         }
 
         delete[] oldItems;
-    }
+    }*/
 }
 
 void Menu::setWindow(Window& win)
@@ -147,20 +150,6 @@ void Menu::setSubWindow(unique_ptr<Window> win)
 {
     m_subWindow = std::move(win);
     setSubWindow(*m_subWindow);
-}
-
-bool Menu::_invokeAction(MenuItem& item)
-{
-    if (static_cast<int>(item.options()) & O_SELECTABLE)
-    {
-        item.action();
-        onItemAction(&item);
-        refresh();
-    } else {
-        //On_Not_Selectable(c);
-    }
-
-    return true;
 }
 
 ITEM** Menu::_unpackItems(vector<MenuItem*>& items)

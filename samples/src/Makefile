@@ -12,7 +12,7 @@ CFLAGS    := -std=c++14 -Wall -Wextra -pg -g -O0
 LIBS      := -lncurses++w -lncursesw -lmenu -lpanel -lform -lcurl -ljsoncpp -lncframe
 
 INCLUDES  := -I$(INC_DIR) -I../inc
-LDFLAGS   := -L$(LIB_DIR)
+LDFLAGS   := -L$(LIB_DIR) -L$(LIB_DIR)/ncurses
 
 SOURCES   := $(wildcard *.cpp)
 OBJECTS   := $(SOURCES:%.cpp=$(OBJS_DIR)/%.o)

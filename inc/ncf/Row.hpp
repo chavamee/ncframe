@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+namespace ncf {
+
 class Row : public Widget {
     public:
         Row();
@@ -13,7 +15,7 @@ class Row : public Widget {
 
         ~Row();
 
-        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override;
 
         void add(Component* component, unsigned int pos = 0) override;
 
@@ -30,4 +32,5 @@ class Row : public Widget {
         std::vector<Component*> m_components;
 };
 
+}
 #endif

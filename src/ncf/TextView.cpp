@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ncf {
+
 TextView::TextView()
 {
 }
@@ -11,7 +13,7 @@ TextView::TextView(const Rect& rect) :
 {
 }
 
-void TextView::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+void TextView::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
 {
     View::draw(std::move(window), std::move(subWindow));
 }
@@ -33,4 +35,6 @@ bool TextView::onEvent(int ch)
 {
     (void)ch;
     return false;
+}
+
 }

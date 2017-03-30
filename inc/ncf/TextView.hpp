@@ -2,9 +2,11 @@
 #define NCURSES_TEXTVIEW_COMPONENT value
 
 #include "ncf/Component.hpp"
-#include "ncf/Window.hpp"
+#include "ncf/ncurses/Window.hpp"
 #include "ncf/View.hpp"
 #include <string>
+
+namespace ncf {
 
 //Should probably be widget
 class TextView : public View {
@@ -17,7 +19,7 @@ class TextView : public View {
         {
         }
 
-        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
+        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override;
 
         int onKeyEvent(int ch) override;
 
@@ -29,4 +31,5 @@ class TextView : public View {
         std::string m_content;
 };
 
+}
 #endif /* ifndef NCURSES_TEXTVIEW_COMPONENT */
