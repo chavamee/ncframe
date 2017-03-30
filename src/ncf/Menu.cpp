@@ -70,7 +70,7 @@ void Menu::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> 
         //TODO: These should be treated as defaults. Maybe do at construction
         // to ensure that after construction if the user needs to change the
         // format this will not conflict.
-        //m_menu->setFormat({.height = window->height() - 2, .width = 1});
+        m_menu->setFormat({.height = window->height() - 2, .width = 1});
         m_menu->setMark("*");
 
         Application* app = Application::getApplication();

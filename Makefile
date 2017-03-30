@@ -10,8 +10,8 @@ uninstall:
 	make -C ./src uninstall
 clean:
 	make -C ./src clean
-	#make -C ./unit_test clean
-	#make -C ./samples clean
+	make -C ./unit_test clean
+	make -C ./samples clean
 test:
 	make -C ./unit_test all
 sample_test:

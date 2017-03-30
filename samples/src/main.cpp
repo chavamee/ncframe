@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     vector<ncurses::Menu::MenuItem*> ctgItems;
     vector<ncurses::Menu::MenuItem*> entryItems;
-    /*try {
+    try {
         map<string, string> ctgs = server.Categories();
         for (auto& ctg : ctgs) {
             ctgItems.push_back(new ncurses::Menu::MenuItem(ctg.first, ctg.second));
@@ -57,11 +57,8 @@ int main(int argc, char *argv[])
             entryItems.push_back(new EntryItem(entry));
         }
     } catch (std::exception& e) {
-    }*/
+    }
 
-    ctgItems.push_back(new ncurses::Menu::MenuItem("Test", "Test"));
-    Feedly::Entry entry {"Test", "Test", "Test", "Test", "Test"};
-    entryItems.push_back(new EntryItem(entry));
     ctgMenu.setItems(ctgItems);
     entriesMenu.setItems(entryItems);
 

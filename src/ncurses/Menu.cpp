@@ -116,7 +116,7 @@ void Menu::setItems(vector<MenuItem*>& items)
         set_menu_items(m_menu, _unpackItems(m_items));
     }
 
-    /*if (m_isDrawn) {
+    if (m_isDrawn) {
         ITEM** oldItems = menu_items(m_menu);
 
         if (m_isPosted) {
@@ -127,7 +127,7 @@ void Menu::setItems(vector<MenuItem*>& items)
         }
 
         delete[] oldItems;
-    }*/
+    }
 }
 
 void Menu::setWindow(Window& win)
