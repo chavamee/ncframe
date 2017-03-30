@@ -1,5 +1,4 @@
 #include "ncf/ncurses/Menu.hpp"
-#include "ncf/Application.hpp"
 
 #include <menu.h>
 #include <cassert>
@@ -15,6 +14,52 @@ using namespace std;
 namespace ncf {
 namespace ncurses {
 
+Menu::MenuItem::MenuItem()
+{
+}
+
+Menu::MenuItem::MenuItem(
+        const std::string& name,
+        const std::string& description
+        ) :
+    m_name(name),
+    m_description(description)
+{
+    m_item = new_item(m_name.c_str(), m_description.c_str());
+    if (m_item == NULL) {
+        onError(E_SYSTEM_ERROR);
+    }
+}
+
+Menu::MenuItem::MenuItem(const MenuItem& item) :
+    m_name(item.m_name),
+    m_description(item.m_description)
+{
+    m_item = new_item(m_name.c_str(), m_description.c_str());
+    if (m_item == NULL) {
+        throw std::runtime_error("menu item failed");
+    }
+}
+
+Menu::MenuItem::~MenuItem()
+{
+    free_item(m_item);
+}
+
+Menu::MenuItem& Menu::MenuItem::operator=(const Menu::MenuItem& other)
+{
+    if (this != &other) {
+        m_name = other.m_name;
+        m_description = other.m_description;
+        m_item = new_item(m_name.c_str(), m_description.c_str());
+        if (m_item == NULL) {
+            throw NCMenuException("Menu item failed: ", E_SYSTEM_ERROR);
+        }
+    }
+    return *this;
+}
+
+
 Menu::Menu() :
     m_menu(nullptr),
     m_itemMark(nullptr),
@@ -23,7 +68,6 @@ Menu::Menu() :
 }
 
 Menu::Menu(const Rect& rect) :
-    Widget {rect},
     m_menu(nullptr),
     m_itemMark(nullptr),
     m_items()
@@ -31,7 +75,6 @@ Menu::Menu(const Rect& rect) :
 }
 
 Menu::Menu(const Rect& rect, vector<MenuItem*>& items) :
-    Widget {rect},
     m_menu(nullptr),
     m_itemMark(nullptr),
     m_items(items)
@@ -86,12 +129,12 @@ void Menu::setItems(vector<MenuItem*>& items)
 
 void Menu::setWindow(Window& win)
 {
-    _onError( set_menu_win(m_menu, win.getHandle()`) );
+    onError( ::set_menu_win(m_menu, win.getHandle()) );
 }
 
 void Menu::setSubWindow(Window& win)
 {
-    _onError( set_menu_sub(m_menu, win.getHandle() );
+    onError( ::set_menu_sub(m_menu, win.getHandle()) );
 }
 
 void Menu::setWindow(unique_ptr<Window> win)
@@ -126,8 +169,8 @@ ITEM** Menu::_unpackItems(vector<MenuItem*>& items)
 
     unsigned int i = 0;
     for (auto& item : items) {
-        assert(item->m_menu != nullptr);
-        rawItems[i] = item->m_menu;
+        assert(item->m_item != nullptr);
+        rawItems[i] = item->m_item;
         i++;
     }
     // make sure the last item is nullptr
@@ -136,19 +179,9 @@ ITEM** Menu::_unpackItems(vector<MenuItem*>& items)
     return rawItems;
 }
 
-void Menu::setDefaultAttributes()
-{
-    Application* app = Application::getApplication();
-    if (app) {
-        ::set_menu_fore(m_menu, app->foregrounds());
-        ::set_menu_back(m_menu, app->backgrounds());
-        ::set_menu_grey(m_menu, app->inactives());
-    }
-}
-
 // Set the current item
 void Menu::setCurrentItem(MenuItem& item) {
-    onError (::set_current_item(m_menu, item.m_menu));
+    onError (::set_current_item(m_menu, item.m_item));
 }
 
 }

@@ -14,17 +14,20 @@ extern "C" {
 #include <stdexcept>
 #include <string>
 
+namespace ncf {
+namespace ncurses {
+
 class NCException : public std::exception {
     public:
         std::string message;
         int errorno;
 
-        NCException (const char* msg, int err)
-            : message(msg), errorno (err)
-        {};
-
         NCException (const char* msg)
             : message(msg), errorno (E_SYSTEM_ERROR)
+        {};
+
+        NCException (const char* msg, int err)
+            : message(msg), errorno (err)
         {};
 
         NCException& operator=(const NCException& rhs)
@@ -48,4 +51,6 @@ class NCException : public std::exception {
         }
 };
 
+}
+}
 #endif

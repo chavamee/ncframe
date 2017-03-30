@@ -4,10 +4,10 @@
 
 using namespace std;
 
-bool Window::s_isInitialized = false;
-
 namespace ncf {
 namespace ncurses {
+
+bool Window::s_isInitialized = false;
 
 Window::Window()
 {
@@ -130,7 +130,7 @@ string Window::getline(int n)
 string Window::getlineFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    _onError (::mvwgetnstr(m_window, point.y, point.x, cstr, n) );
+    _onError ( mvwgetnstr(m_window, point.y, point.x, cstr, n) );
     return string {cstr};
 }
 
@@ -144,7 +144,7 @@ string Window::extractString(int n)
 string Window::extractStringFromPos(const Point& point, int n)
 {
     char* cstr = nullptr;
-    _onError ( ::mvwinnstr(m_window, point.y, point.x, cstr, n) );
+    _onError ( mvwinnstr(m_window, point.y, point.x, cstr, n) );
     return string {cstr};
 }
 

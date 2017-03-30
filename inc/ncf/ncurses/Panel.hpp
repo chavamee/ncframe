@@ -20,7 +20,7 @@ class Panel : public Window {
 
         Panel& operator=(const Panel& rhs);
 
-        Panel(const Panel& rhs);
+        Panel(const Panel& rhs) = delete;
 
         virtual ~Panel();
 
@@ -116,7 +116,7 @@ class Panel : public Window {
         virtual void centerText(int y, const std::string& label);
 
     private:
-        static _onError(int err);
+        static void _onError(int err);
 
         /**
          * NCurses PANEL handle

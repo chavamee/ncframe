@@ -1,19 +1,25 @@
-#ifndef NCF_NCURSES_MENUEXCEPTION_H_
-#define NCF_NCURSES_MENUEXCEPTION_H_
+#ifndef NCF_NCURSES_MENU_EXCEPTION_H
+#define NCF_NCURSES_MENU_EXCEPTION_H
 
-#include "ncf/Menu.hpp"
-#include "ncf/NCException.hpp"
+#include "ncf/ncurses/Menu.hpp"
+#include "ncf/ncurses/NCException.hpp"
+
+namespace ncf {
+namespace ncurses {
 
 class NCMenuException : public NCException
 {
     public:
-        NCMenuException (const char *msg, int err) :
-            NCException (msg, err)
+        NCMenuException (const char* msg) :
+            NCException(msg)
         {};
-
 
         NCMenuException (int err) :
             NCException ("Menu error: ", err)
+        {};
+
+        NCMenuException (const char *msg, int err) :
+            NCException (msg, err)
         {};
 
         NCMenuException& operator=(const NCMenuException& rhs)
@@ -34,4 +40,6 @@ class NCMenuException : public NCException
         }
 };
 
+}
+}
 #endif

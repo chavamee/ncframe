@@ -36,7 +36,7 @@ class Pad : public Window {
 
         virtual ~Pad() {}
 
-        int echochar(const chtype ch) { return ::pechochar(m_window, ch); }
+        int echoChar(const chtype ch) { return ::pechochar(m_window, ch); }
         // Put the attributed character onto the pad and immediately do a
         // prefresh().
 

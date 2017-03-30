@@ -1,11 +1,9 @@
 #ifndef NCURSES_MENU_BINDINGS_H_
 #define NCURSES_MENU_BINDINGS_H_
 
-#include "ncf/Window.hpp"
-#include "ncf/Component.hpp"
-#include "ncf/Widget.hpp"
-#include "ncf/NCMenuException.hpp"
-#include "ncf/MenuItem.hpp"
+#include "ncf/ncurses/Window.hpp"
+#include "ncf/ncurses/NCMenuException.hpp"
+#include "common/platform.h"
 
 #include <menu.h>
 
@@ -18,13 +16,102 @@
 
 //TODO: Set items should have a limit
 //TODO: Replace Menu_Options with concrete struct
-
 namespace ncf {
 namespace ncurses {
 
-class MenuItem;
-
 class Menu {
+    class MenuItem {
+        friend Menu;
+
+    public:
+        MenuItem();
+
+        MenuItem(
+                const std::string& name,
+                const std::string& description
+                );
+
+        /**
+         * Copy Constructor
+         */
+        MenuItem(const MenuItem& item);
+
+        virtual ~MenuItem();
+
+        MenuItem& operator=(const MenuItem& other);
+
+        inline std::string name() const {
+            return m_name;
+        }
+
+        inline std::string description () const {
+            return m_description;
+        }
+
+        inline int index() const {
+            return item_index(m_item);
+        }
+
+
+        inline void setValue (bool value) {
+            onError (::set_item_value(m_item, value));
+        }
+
+
+        inline bool value () const {
+            return ::item_value(m_item);
+        }
+
+        inline bool visible () const {
+            return ::item_visible(m_item);
+        }
+
+        inline Menu* menu() const
+        {
+            return m_menu;
+        }
+
+        inline bool hasMenu() const
+        {
+            return m_menu ? true : false;
+        }
+
+        virtual bool action()
+        {
+            return false;
+        }
+
+        inline Item_Options options()
+        {
+            return ::item_opts(m_item);
+        }
+
+        inline void setOptions (Item_Options opts)
+        {
+            onError( set_item_opts(m_item, opts) );
+        }
+
+        inline void onError (int err) {
+            if (err != E_OK) {
+                throw NCMenuException(err);
+            }
+        }
+
+    private:
+        ITEM* m_item = NULL;
+
+        /*
+         * TODO: Clean up explanation
+         * ncurses does not copy the name or description buffers and only
+         * keeps pointers to them. The strings are managed internally to
+         * avoid invalid memory derefrence by ncurses and managing their lifetime.
+         */
+        std::string m_name = "";
+        std::string m_description = "";
+
+        Menu* m_menu = nullptr;
+    };
+
     public:
         Menu();
 
@@ -40,28 +127,28 @@ class Menu {
 
         void setSubWindow(Window& win);
 
-        void setWindow(std::unique_ptr<$`Window`> window);
+        void setWindow(std::unique_ptr<Window> win);
 
-        void seSubtWindow(std::unique_ptr<$`Window`> window);
+        void setSubWindow(std::unique_ptr<Window> win);
 
         inline MENU* getHandle() const
         {
-            return m_handle;
+            return m_menu;
         }
 
         void optionsOff(Menu_Options opts)
         {
-            onError( ::menu_opts_off(m_handle, opts) );
+            onError( ::menu_opts_off(m_menu, opts) );
         }
 
         void optionsOn(Menu_Options opts)
         {
-            onError ( ::menu_opts_on(m_handle, opts) );
+            onError ( ::menu_opts_on(m_menu, opts) );
         }
 
         MenuItem& currentItem()
         {
-            return *(m_items.at( item_index(current_item(m_handle)) ));
+            return *(m_items.at( item_index(current_item(m_menu)) ));
         }
 
         virtual void onMenuPosted()
@@ -91,7 +178,7 @@ class Menu {
         {
             int height = 0;
             int width = 0;
-            onError (::scale_menu (m_handle, &height, &width));
+            onError (::scale_menu (m_menu, &height, &width));
             return {.height = height, .width = width};
         }
 
@@ -102,26 +189,26 @@ class Menu {
 
         // Remove the menu from the screen
         inline void unpost (void) {
-            onError (::unpost_menu (m_handle));
+            onError (::unpost_menu (m_menu));
             m_isPosted = false;
         }
 
         // Post the menu to the screen if flag is true, unpost it otherwise
         inline void post() {
-            onError (::post_menu(m_handle));
+            onError (::post_menu(m_menu));
             m_isPosted = true;
         }
 
         // Set the format of this menu
         inline void setFormat(const Size& size) {
-            onError (::set_menu_format(m_handle, (int)size.height, (int)size.width));
+            onError (::set_menu_format(m_menu, (int)size.height, (int)size.width));
         }
 
         // Get the format of this menu
         Size format() {
             int height = 0;
             int width = 0;
-            ::menu_format(m_handle, &height, &width);
+            ::menu_format(m_menu, &height, &width);
             return {.height = height, .width = width};
         }
 
@@ -132,17 +219,17 @@ class Menu {
 
         // Get the number of items in this menu
         inline int count() const {
-            return ::item_count(m_handle);
+            return ::item_count(m_menu);
         }
 
         // Get the marker string
         inline const char* mark() const {
-            return ::menu_mark(m_handle);
+            return ::menu_mark(m_menu);
         }
 
         // Set the marker string
         inline void setMark(const char* marker) {
-            onError (::set_menu_mark (m_handle, marker));
+            onError (::set_menu_mark (m_menu, marker));
         }
 
         // Get the name of the request code c
@@ -152,7 +239,7 @@ class Menu {
 
         // Get the current pattern
         inline char* pattern() const {
-            return ::menu_pattern(m_handle);
+            return ::menu_pattern(m_menu);
         }
 
         // true if there is a pattern match, false otherwise.
@@ -165,65 +252,65 @@ class Menu {
         //TODO: Should return more concrete type
         // Get the menus background attributes
         inline chtype background() const {
-            return ::menu_back(m_handle);
+            return ::menu_back(m_menu);
         }
 
         // Get the menus foreground attributes
         inline chtype foreground() const {
-            return ::menu_fore(m_handle);
+            return ::menu_fore(m_menu);
         }
 
         // Get the menus grey attributes (used for unselectable items)
         inline chtype grey() const {
-            return ::menu_grey(m_handle);
+            return ::menu_grey(m_menu);
         }
 
         // Set the menus background attributes
         inline chtype setBackground(chtype a) {
-            return ::set_menu_back(m_handle,a);
+            return ::set_menu_back(m_menu,a);
         }
 
         // Set the menus foreground attributes
         inline chtype setForeground(chtype a) {
-            return ::set_menu_fore(m_handle,a);
+            return ::set_menu_fore(m_menu,a);
         }
 
         // Set the menus grey attributes (used for unselectable items)
         inline chtype setGrey(chtype a) {
-            return ::set_menu_grey(m_handle,a);
+            return ::set_menu_grey(m_menu,a);
         }
 
         inline Menu_Options options() const {
-            return ::menu_opts(m_handle);
+            return ::menu_opts(m_menu);
         }
 
         inline void setOptions (Menu_Options opts) {
-            onError (::set_menu_opts (m_handle,opts));
+            onError (::set_menu_opts (m_menu,opts));
         }
 
         inline int padding() const {
-            return ::menu_pad(m_handle);
+            return ::menu_pad(m_menu);
         }
 
         inline void setPadding (int padch) {
-            onError (::set_menu_pad (m_handle, padch));
+            onError (::set_menu_pad (m_menu, padch));
         }
 
         // Position the cursor to the current item
         inline void positionCursor () const {
-            onError (::pos_menu_cursor (m_handle));
+            onError (::pos_menu_cursor (m_menu));
         }
 
         inline void setCurrentItem(MenuItem& item);
 
         // Get the current top row of the menu
         inline int topRow (void) const {
-            return ::top_row (m_handle);
+            return ::top_row (m_menu);
         }
 
         // Set the current top row of the menu
         inline void setTopRow (int row) {
-            onError (::set_top_row (m_handle, row));
+            onError (::set_top_row (m_menu, row));
         }
 
         // spacing control
@@ -231,7 +318,7 @@ class Menu {
         inline void setSpacing(int spc_description,
                 int spc_rows,
                 int spc_columns) {
-            onError(::set_menu_spacing(m_handle,
+            onError(::set_menu_spacing(m_menu,
                         spc_description,
                         spc_rows,
                         spc_columns));
@@ -241,7 +328,7 @@ class Menu {
         inline void spacing(int& spc_description,
                 int& spc_rows,
                 int& spc_columns) const {
-            onError(::menu_spacing(m_handle,
+            onError(::menu_spacing(m_menu,
                         &spc_description,
                         &spc_rows,
                         &spc_columns));

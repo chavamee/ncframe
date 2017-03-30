@@ -215,7 +215,7 @@ class Window {
      *
      * @param point point to place the cursor at
      */
-    void moveCursor(const Point& point) { return _onError (::wmove(m_window, point.y, point.x)); }
+    void moveCursor(const Point& point) { return _onError (wmove(m_window, point.y, point.x)); }
 
     /**
      * Get the current position of the cursor
@@ -245,7 +245,7 @@ class Window {
      * @param newPoint  new position of cursor
      */
     void moveCursorImmediately(const Point& prevPoint, const Point& newPoint) {
-        _onError ( ::mvcur(prevPoint.y, prevPoint.x, newPoint.y, newPoint.x) );
+        _onError ( mvcur(prevPoint.y, prevPoint.x, newPoint.y, newPoint.x) );
     }
 
     //TODO: Return of GetKeyStroke should probably have alias/user type
@@ -255,7 +255,7 @@ class Window {
      *
      * @return the key stroke read from the window
      */
-    int getKeystroke() { return ::wgetch(m_window); }
+    int getKeystroke() { return wgetch(m_window); }
 
     /**
      * Move the cursor and get a keystore from the window
@@ -325,7 +325,7 @@ class Window {
     /**
      * Put attributed character to the window.
      */
-    int putChr(const ncCharType ch) { return ::waddch(m_window, ch); }
+    int putChr(const ncCharType ch) { return waddch(m_window, ch); }
 
     //TODO
     /**
@@ -338,7 +338,7 @@ class Window {
     /**
      * Put attributed character to the window and refresh it immediately.
      */
-    virtual int echoChar(const ncCharType ch) { return ::wechochar(m_window, ch); }
+    virtual int echoChar(const ncCharType ch) { return wechochar(m_window, ch); }
 
     /**
      * Write a string to the window.
@@ -349,7 +349,7 @@ class Window {
      * @param n   number of characters to write up to
      */
     void writeString(const std::string& str, int n=-1) {
-        _onError ( ::waddnstr(m_window, str.c_str(), n) );
+        _onError ( waddnstr(m_window, str.c_str(), n) );
     }
 
     /**
@@ -365,12 +365,12 @@ class Window {
     //TODO:
     //namspace lowlevel {
     /*int            addchstr(const ncCharType* str, int n=-1) {
-      return ::waddchnstr(m_window, str, n); }
+      return waddchnstr(m_window, str, n); }
     // Write the string str to the window, stop writing if the terminating
     // NUL or the limit n is reached. If n is negative, it is ignored.
 
     int            addchstr(int y, int x, const ncCharType * str, int n=-1) {
-    return ::mvwaddchnstr(m_window, y, x, str, n); }
+    return mvwaddchnstr(m_window, y, x, str, n); }
     // Move the cursor to the requested position and then perform the addchstr
     // as described above.
     //}*/
@@ -401,7 +401,7 @@ class Window {
      *
      * @return the attributed character under the cursor
      */
-    ncCharType getChrOnCursor() const { return ::winch(m_window); }
+    ncCharType getChrOnCursor() const { return winch(m_window); }
 
     /**
      * Move cursor to requested position and then retrieve attributed character
@@ -417,7 +417,7 @@ class Window {
     //      it is udnerstood which one should be used in which circumstances. Additionally,
     //      we cannot simply return a string object.
     int getStr(ncCharType* str, int n=-1) {
-        return ::winchnstr(m_window, str, n);
+        return winchnstr(m_window, str, n);
     }
     // Read the string str from the window, stop reading if the terminating
     // NUL or the limit n is reached. If n is negative, it is ignored.
@@ -431,7 +431,7 @@ class Window {
      *
      * @param ch the character to insert
      */
-    void insertChar(ncCharType ch) { _onError ( ::winsch(m_window, ch) ); }
+    void insertChar(ncCharType ch) { _onError ( winsch(m_window, ch) ); }
 
     /**
      * Move cursor to requested position and then insert the attributed
@@ -446,12 +446,12 @@ class Window {
 
     //TODO: Docs
     int insertLine(int n=1) {
-        return n > 0 ? ::winsdelln(m_window, n) : 0;
+        return n > 0 ? winsdelln(m_window, n) : 0;
     }
 
     //TODO: Docs
     int deleteLine(int n=-1) {
-        return n < 0 ? ::winsdelln(m_window, n) : 0;
+        return n < 0 ? winsdelln(m_window, n) : 0;
     }
 
     /**
@@ -460,7 +460,7 @@ class Window {
      * @param str string to insert
      */
     void insertStr(const std::string& str) {
-        _onError ( ::winsnstr(m_window, str.c_str(), str.size()) );
+        _onError ( winsnstr(m_window, str.c_str(), str.size()) );
     }
 
     /**
@@ -470,25 +470,25 @@ class Window {
      * @param str string to insert
      */
     void insertStrAtPos(const Point& pos, const std::string& str) {
-        _onError ( ::mvwinsnstr(m_window, pos.y, pos.x, str.c_str(), str.size() ));
+        _onError ( mvwinsnstr(m_window, pos.y, pos.x, str.c_str(), str.size() ));
     }
 
     /**
      * Switch on the window attributes;
      */
-    void attributeOn (ncCharType attr) { _onError ( ::wattron (m_window, attr) ); }
+    void attributeOn (ncCharType attr) { _onError ( wattron (m_window, attr) ); }
 
     /**
      * Switch off the window attributes;
      */
-    void attributeOff(ncCharType attr) { _onError ( ::wattroff(m_window, static_cast<int>(attr)) ); }
+    void attributeOff(ncCharType attr) { _onError ( wattroff(m_window, static_cast<int>(attr)) ); }
 
 
     // TODO: Make custom type for methods that manipulate attributes
     /**
      * Set the window attributes.
      */
-     void setAttribute(ncCharType attr) { _onError ( ::wattrset(m_window, static_cast<int>(attr)) ); }
+     void setAttribute(ncCharType attr) { _onError ( wattrset(m_window, static_cast<int>(attr)) ); }
 
     // TODO: Change to struct or other representation
     /**
@@ -499,7 +499,7 @@ class Window {
     ncCharType getAttributes() { return getattrs(m_window); }
 
     void charAttribute(int n, attr_t attr, colorPairID color, const void *opts=nullptr) {
-        _onError ( ::wchgat(m_window, n, attr, color, opts) );
+        _onError ( wchgat(m_window, n, attr, color, opts) );
     }
     // Change the attributes of the next n characters in the current line. If
     // n is negative or greater than the number of remaining characters in the
@@ -523,7 +523,7 @@ class Window {
      void setBackgroundAttributes(const ncCharType ch) { _onError ( wbkgd(m_window, ch) ); }
 
     // TODO: This is for stdcr and should be defined in the globals
-    //void bkgdset(ncCharType ch) { ::wbkgdset(m_window, ch); }
+    //void bkgdset(ncCharType ch) { wbkgdset(m_window, ch); }
     // Set the background property.
 
     /**
@@ -535,7 +535,7 @@ class Window {
      * @param hor  the character that makes up the horizontal borders
      */
     void box(ncCharType vert=0, ncCharType hor=0) {
-        _onError ( ::wborder(m_window, vert, vert, hor, hor, 0, 0, 0, 0) );
+        _onError ( wborder(m_window, vert, vert, hor, hor, 0, 0, 0, 0) );
     }
 
 
@@ -548,8 +548,8 @@ class Window {
      *
      * @param border the border specification to use
      */
-    void border(borderType border = {}) {
-        _onError ( ::wborder(m_window,
+    void drawBorder(borderType border = {}) {
+        _onError ( wborder(m_window,
                 border.left,        border.right,
                 border.top,         border.bottom,
                 border.top_left,    border.top_right,
@@ -564,7 +564,7 @@ class Window {
      * @param len length of the line
      * @param ch  the character that makes up the line
      */
-    void horizontalLine(int len, ncCharType ch=0) { _onError ( ::whline(m_window, ch, len) ); }
+    void horizontalLine(int len, ncCharType ch=0) { _onError ( whline(m_window, ch, len) ); }
 
     /**
      * Move the cursor to the requested position and then draw a horizontal line.
@@ -584,7 +584,7 @@ class Window {
      * @param len length of the line
      * @param ch  the character that makes up the line
      */
-    int verticalLine(int len, ncCharType ch=0) { return ::wvline(m_window, ch, len); }
+    int verticalLine(int len, ncCharType ch=0) { return wvline(m_window, ch, len); }
 
     /**
      * Move the cursor to the requested position and then draw a vertical line.
@@ -600,24 +600,24 @@ class Window {
     /**
      * Erase the window.
      */
-    void erase() { _onError ( ::werase(m_window) ); }
+    void erase() { _onError ( werase(m_window) ); }
 
     /**
      * Clear the window.
      */
-    void clear() { _onError ( ::wclear(m_window) ); }
+    void clear() { _onError ( wclear(m_window) ); }
 
     /**
      * Set/Reset the clear flag.
      *
      * @param bf If set to true, the next refresh will clear the screen.
      */
-    void setClearOkFlag(bool bf) { _onError ( ::clearok(m_window, bf) ); }
+    void setClearOkFlag(bool bf) { _onError ( clearok(m_window, bf) ); }
 
     /**
      * Clear to the end of the window.
      */
-    void clearBottom() { _onError ( ::wclrtobot(m_window) ); }
+    void clearBottom() { _onError ( wclrtobot(m_window) ); }
 
     /**
      * Clear to the end of the line.
@@ -625,22 +625,22 @@ class Window {
      * Erases the current line to the right of the cursor, inclusive, to
      * the end of the current line.
      */
-    void clearToEndOfLine() { _onError ( ::wclrtoeol(m_window) ); }
+    void clearToEndOfLine() { _onError ( wclrtoeol(m_window) ); }
 
     /**
      * Delete character under the cursor.
      */
-    void deleteCharUnderCursor() { _onError ( ::wdelch(m_window) ); }
+    void deleteCharUnderCursor() { _onError ( wdelch(m_window) ); }
 
     /**
      * Move cursor to requested position and delete the character under the cursor.
      */
-    void deleteCharAtPos(const Point& pos) { _onError ( ::mvwdelch(m_window, pos.y, pos.x) ); }
+    void deleteCharAtPos(const Point& pos) { _onError ( mvwdelch(m_window, pos.y, pos.x) ); }
 
     /**
      * Delete the current line.
      */
-    void deleteCurrentLine() { _onError ( ::winsdelln(m_window, -1) ); }
+    void deleteCurrentLine() { _onError ( winsdelln(m_window, -1) ); }
 
     /**
      * Scroll an amount lines.
@@ -649,7 +649,7 @@ class Window {
      *
      * @param amount the amount of lines to scroll
      */
-    void scroll(int amount=1) { _onError ( ::wscrl(m_window, amount) ); }
+    void doScroll(int amount=1) { _onError ( wscrl(m_window, amount) ); }
 
     /**
      * Set the scrollok flag.
@@ -660,7 +660,7 @@ class Window {
      *
      * @param bf value to set the flag to
      */
-    void setScrollOkFlag(bool bf) { _onError ( ::scrollok(m_window, bf) ); }
+    void setScrollOkFlag(bool bf) { _onError ( scrollok(m_window, bf) ); }
 
     /**
      * Define a soft scrolling region.
@@ -669,7 +669,7 @@ class Window {
      * @param to   the line number of the bottom margin
      */
     void setSoftScrollingRegion(int from, int to) {
-        _onError ( ::wsetscrreg(m_window, from, to) );
+        _onError ( wsetscrreg(m_window, from, to) );
     }
 
     /**
@@ -680,7 +680,7 @@ class Window {
      *
      * @param bf value to set the flag to
      */
-    void setLineModefyMode(bool bf) { _onError ( ::idlok(m_window, bf) ); }
+    void setLineModefyMode(bool bf) { _onError ( idlok(m_window, bf) ); }
 
     /**
      * Set the idcok flag.
@@ -690,7 +690,7 @@ class Window {
      *
      * @param bf value to set the flag to
      */
-    void setCharacterModifyMode(bool bf) { ::idcok(m_window, bf); }
+    void setCharacterModifyMode(bool bf) { idcok(m_window, bf); }
 
     //TODO: this is for standard screen. Have a static function that retunrs a handle
     //      to a Window object of stdscr instead and call it from there
@@ -700,17 +700,17 @@ class Window {
      * @param start the line to start from
      * @param count the number of lines to touch after start
      */
-    void touchLine(int start, int count) { _onError ( ::touchline(m_window, start, count) ); }
+    void touchLine(int start, int count) { _onError ( touchline(m_window, start, count) ); }
 
     /**
      * Mark the whole window as modified.
      */
-    void touch() { _onError ( ::wtouchln(m_window, 0, height(), 1) ); }
+    void touch() { _onError ( wtouchln(m_window, 0, height(), 1) ); }
 
     /**
      * Mark the whole window as unmodified.
      */
-    void untouch() { _onError ( ::wtouchln(m_window, 0, height(), 0) ); }
+    void untouch() { _onError ( wtouchln(m_window, 0, height(), 0) ); }
 
     /**
      * Mark the given lines as modified.
@@ -720,7 +720,7 @@ class Window {
      * @param changed marked as changed if true, otherwise mark as unchanged
      */
     int touchLine(int s, int cnt, bool changed=true) {
-        return ::wtouchln(m_window, s, cnt, static_cast<int>(changed ? 1 : 0));
+        return wtouchln(m_window, s, cnt, static_cast<int>(changed ? 1 : 0));
     }
 
     /**
@@ -729,7 +729,7 @@ class Window {
      * @return true if line is marked as changed, false otherwise
      */
     bool isLineTouched(int line) const {
-        return (::is_linetouched(m_window, line) ? true:false);
+        return (is_linetouched(m_window, line) ? true:false);
     }
 
     /**
@@ -738,7 +738,7 @@ class Window {
      *@return true if window is marked as changed, false otherwise
      */
     bool isTouched() const {
-        return (::is_wintouched(m_window) ? true:false);
+        return (is_wintouched(m_window) ? true:false);
     }
 
     /**
@@ -747,7 +747,7 @@ class Window {
      * @param bf if true, curses will leave the cursor after an update whereever
      *           it is after the update.
      */
-    void setLeaveCursor(bool bf) { _onError ( ::leaveok(m_window, bf) ); }
+    void setLeaveCursor(bool bf) { _onError ( leaveok(m_window, bf) ); }
 
     /**
      * Redraw lines.
@@ -755,46 +755,46 @@ class Window {
      * @param from the lien to start from
      * @param n    the number of lines to redraw after start
      */
-    int  redrawLines(int from, int n) { return ::wredrawln(m_window, from, n); }
+    int  redrawLines(int from, int n) { return wredrawln(m_window, from, n); }
 
     /**
      * Redraw the whole window
      */
-    void redraw() { _onError ( ::wredrawln(m_window, 0, height()) ); }
+    void redraw() { _onError ( wredrawln(m_window, 0, height()) ); }
 
     /**
      * Do all outputs to make the physical screen looking like the virtual one
      */
-    void doupdate()  { _onError ( ::doupdate() ); }
+    void doUpdate()  { _onError ( ::doupdate() ); }
 
     /**
      * Propagate the changes down to all descendant windows
      */
-    void syncDown()  { ::wsyncdown(m_window); }
+    void syncDown()  { wsyncdown(m_window); }
 
     /**
      * Propagate the changes up in the hierarchy
      */
-    void syncUp()    { ::wsyncup(m_window); }
+    void syncUp()    { wsyncup(m_window); }
 
     /**
      * Position the cursor in all ancestor windows corresponding to our setting
      */
-    void syncCursorUp() { ::wcursyncup(m_window); }
+    void syncCursorUp() { wcursyncup(m_window); }
 
     /**
      * Set syncok flag.
      *
      * @param bf if true syncup() is called whenever the window is changed
      */
-    void enableSync(bool bf) { _onError ( ::syncok(m_window, bf) ); }
+    void enableSync(bool bf) { _onError ( syncok(m_window, bf) ); }
 
     /**
      * Set immedok flag.
      *
      * @param bf if true any change in the window will cause an automatic immediate refresh()
      */
-    void enableImmediate(bool bf) { ::immedok(m_window, bf); }
+    void enableImmediate(bool bf) { immedok(m_window, bf); }
 
     /**
      * Toggle intrflush.
@@ -805,7 +805,7 @@ class Window {
      *
      * @param bf if true intrflush will be enabled
      */
-    void intrflush(bool bf) { _onError ( ::intrflush(m_window, bf) ); }
+    void intrFlush(bool bf) { _onError ( intrflush(m_window, bf) ); }
 
     /**
      * Toggle keypad.
@@ -816,7 +816,7 @@ class Window {
      *
      * @param bf if true the application will interpret function keys.
      */
-    void enableKeypad(bool bf) { _onError ( ::keypad(m_window, bf) ); }
+    void enableKeypad(bool bf) { _onError ( keypad(m_window, bf) ); }
 
     /**
      * Toggle nodelay mode.
@@ -825,7 +825,7 @@ class Window {
      *
      * @param bf if true, enable nodelay mode
      */
-    void enableNoDelay(bool bf) { _onError ( ::nodelay(m_window, bf) ); }
+    void enableNoDelay(bool bf) { _onError ( nodelay(m_window, bf) ); }
 
     /**
      * Enforce 7 or 8-bit inputs
@@ -833,17 +833,17 @@ class Window {
      * @param bf If true, keys may generate 8-Bit characters.
      *           Otherwise 7-Bit characters are generated.
      */
-    void enableMeta(bool bf) { _onError ( ::meta(m_window, bf) ); }
+    void enableMeta(bool bf) { _onError ( meta(m_window, bf) ); }
 
     /**
      * Enable "standout" attributes
      */
-    void enableStandout() { _onError ( ::wstandout(m_window) ); }
+    void enableStandout() { _onError ( wstandout(m_window) ); }
 
     /**
      * Disable "standout" attributes
      */
-    void disableStandout() { _onError ( ::wstandend(m_window) ); }
+    void disableStandout() { _onError ( wstandend(m_window) ); }
 
     /**
      * Toggle "standout" attirbues
@@ -855,12 +855,12 @@ class Window {
     /**
      * Propagate the changes in this window to the virtual screen and call doupdate().
      */
-    virtual void refresh() { _onError ( ::wrefresh(m_window) ); }
+    virtual void refresh() { _onError ( wrefresh(m_window) ); }
 
     /**
      * Propagate the changes in this window to the virtual screen.
      */
-    virtual void noutrefresh() { _onError ( ::wnoutrefresh(m_window) ); }
+    virtual void noutrefresh() { _onError ( wnoutrefresh(m_window) ); }
 
     /**
      * Overlay this window over another window.
@@ -890,7 +890,7 @@ class Window {
             int sminrow, int smincol,
             int dminrow, int dmincol,
             int dmaxrow, int dmaxcol, bool overlaywin=TRUE) {
-        _onError (::copywin(m_window, win.m_window, sminrow, smincol, dminrow, dmincol,
+        _onError (copywin(m_window, win.m_window, sminrow, smincol, dminrow, dmincol,
                 dmaxrow, dmaxcol, static_cast<int>(overlaywin ? 1 : 0)) );
     }
 
@@ -904,7 +904,7 @@ class Window {
      */
 #if defined(NCURSES_EXT_FUNCS) && (NCURSES_EXT_FUNCS != 0)
     void resize(const Size& size) {
-        _onError ( ::wresize(m_window, size.height, size.width) );
+        _onError ( wresize(m_window, size.height, size.width) );
     }
 #endif
 
@@ -960,7 +960,7 @@ class Window {
      */
     Point origin() const {
         Point point {};
-        ::getbegyx(m_window, point.y, point.x);
+        getbegyx(m_window, point.y, point.x);
         return point;
     }
 
@@ -985,7 +985,7 @@ class Window {
      */
     Point cursorPos() const {
         Point point {};
-        ::getyx(m_window, point.y, point.x);
+        getyx(m_window, point.y, point.x);
         return point;
     }
 
@@ -1033,7 +1033,7 @@ class Window {
     Point getParentPoint() const {
         int x = 0;
         int y = 0;
-        ::getparyx(m_window, y, x);
+        getparyx(m_window, y, x);
         return Point{x, y};
     }
 

@@ -1,7 +1,7 @@
 CC        := clang++
 LD    	  := clang++
 
-MODULES   := ncurses widgets
+MODULES   := ncurses
 
 BUILD_DIR := ../build
 BIN_DIR    = $(BUILD_DIR)/bin

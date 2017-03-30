@@ -1,4 +1,5 @@
 #include "ncf/ncurses/Panel.hpp"
+#include "ncf/ncurses/NCPanelException.hpp"
 
 namespace ncf {
 namespace ncurses {
@@ -8,19 +9,19 @@ Panel::Panel() :
 {
     m_panel = ::new_panel(m_window);
     if (not m_panel) {
-        throw NCursesPanelException("Failed to create panel");
+        throw NCPanelException("Failed to create panel");
     }
 }
 
 Panel::Panel(int height,
-      int width,
-      int y = 0,
-      int x = 0) :
+             int width,
+             int y,
+             int x) :
     Window(height, width, y, x)
 {
     m_panel = ::new_panel(m_window);
     if (not m_panel) {
-        throw NCursesPanelException("Failed to create panel");
+        throw NCPanelException("Failed to create panel");
     }
 }
 
@@ -32,13 +33,6 @@ Panel& Panel::operator=(const Panel& rhs)
     }
 
     return *this;
-}
-
-//TODO: This is wrong
-Panel::Panel(const Panel& rhs) :
-    Window(rhs),
-    m_panel(rhs.m_panel)
-{
 }
 
 void Panel::top()
@@ -70,7 +64,6 @@ void Panel::refresh()
 void Panel::noutrefresh()
 {
     ::update_panels();
-    return OK;
 }
 
 void Panel::frame(const std::string& title,const std::string& btitle)
