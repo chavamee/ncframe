@@ -1,5 +1,5 @@
-#ifndef NCURSES_MENU_BINDINGS_H_
-#define NCURSES_MENU_BINDINGS_H_
+#ifndef NCF_NCURSES_MENU_H
+#define NCF_NCURSES_MENU_H
 
 #include "ncf/ncurses/Window.hpp"
 #include "ncf/ncurses/NCMenuException.hpp"

@@ -29,16 +29,6 @@ Panel::~Panel()
 {
 }
 
-Panel& Panel::operator=(const Panel& rhs)
-{
-    if (this != &rhs) {
-        *this = rhs;
-        Panel::operator=(rhs);
-    }
-
-    return *this;
-}
-
 void Panel::top()
 {
     ::top_panel(m_panel);
@@ -54,9 +44,9 @@ void Panel::show()
     ::show_panel(m_panel);
 }
 
-void Panel::move(const Point& point)
+void Panel::move(const Point& pos)
 {
-    _onError( ::move_panel(m_panel, point.x, point.y) );
+    _onError( ::move_panel(m_panel, pos.x, pos.y) );
 }
 
 void Panel::refresh()
@@ -81,6 +71,13 @@ void Panel::redrawAll()
     }
     ::update_panels();
     ::doupdate();
+}
+
+void Panel::_onError(int err)
+{
+    if (err != E_OK) {
+        throw NCPanelException("Panel error", err);
+    }
 }
 
 }

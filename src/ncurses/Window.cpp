@@ -165,14 +165,6 @@ string Window::extractStringFromPos(const Point& point, int n)
     return string {cstr};
 }
 
-int Window::getStrAtPos(Point& pos, chtype* str, int n)
-{
-    chtype* cstr = nullptr;
-    int count = mvwinchnstr(m_window, pos.y, pos.x, cstr, n);
-    str = cstr;
-    return count;
-}
-
 short Window::getPair() const
 {
     return static_cast<short>(PAIR_NUMBER(getattrs(m_window)));

@@ -14,43 +14,74 @@ namespace ncurses {
 
 class Panel : public Window {
     public:
+        /**
+         * Default panel constructor
+         */
         Panel();
 
+        /**
+         * Construct a Panel with the given dimensions
+         *
+         * @param height panel height
+         * @param width  panel width
+         * @param y      panel y position
+         * @param x      panel x position
+         */
         Panel(int height, int width, int y = 0, int x = 0);
 
-        Panel& operator=(const Panel& rhs);
+        /**
+         * Construct a Panel with the given geometry
+         *
+         * @param rect panel rectangular geometry
+         */
+        Panel(const Rect& rect);
 
+        /**
+         * Copying is not allowed.
+         *
+         * Use clone instead.
+         */
+        Panel& operator=(const Panel& rhs) = delete;
+
+        /**
+         * Copying is not allowed.
+         *
+         * Use clone instead.
+         */
         Panel(const Panel& rhs) = delete;
 
+        /**
+         * Destructor
+         */
         virtual ~Panel();
 
         /**
-         * Make this window the top window in the stack.
+         * Make this panel the top panel in the stack.
          */
         void top();
 
         /**
-         * Make this window the bottom window in the stack.
+         * Make this panel the bottom panel in the stack.
          *
-         * N.B.: The panel associated with ::stdscr is always on the bottom. So
+         * NOTE: The panel associated with ::stdscr is always on the bottom. So
          * actually bottom() makes the panel the first above ::stdscr.
          */
         void bottom();
 
         /**
-         * Show the window, i.e. make it visible.
+         * Show the panel, i.e. make it visible.
          */
         void show();
 
         /**
-         * Hide the window.
+         * Hide the panel.
          *
-         * It stays in the stack but becomes invisible.
+         * Theh panel will stays in the stack but becomes invisible.
          */
         void hide();
 
         /**
-         * Check if the window is hidden.
+         * Check if the panel is hidden.
          *
          * @return true if the panel is hidden, false otherwise.
          */
@@ -60,11 +91,11 @@ class Panel : public Window {
         }
 
         /**
-         * Move the window.
+         * Move the panel.
          *
-         * @param point move the window origin to the given point
+         * @param pos move the panel origin to the given position
          */
-        void move(const Point& point);
+        void move(const Point& pos);
 
         /**
          * Propagate all panel changes to the virtual screen and update the
@@ -83,9 +114,7 @@ class Panel : public Window {
         static void redrawAll();
 
     private:
-        static void _onError(int err)
-        {
-        }
+        static void _onError(int err);
 
         /**
          * NCurses PANEL handle

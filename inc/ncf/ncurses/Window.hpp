@@ -337,13 +337,6 @@ class Window {
         return winchnstr(m_window, str, n);
     }
 
-    //TODO: Links
-    /**
-     * Move the cursor to the requested position and then perform the inchstr
-     * as described in getStr.
-     */
-    int getStrAtPos(Point& pos, NCCharType* str, int n=-1);
-
     /**
      * Insert attributed character into the window before current cursor position.
      *
