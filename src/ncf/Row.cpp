@@ -1,4 +1,5 @@
 #include "ncf/Row.hpp"
+#include "ncf/ncurses/Panel.hpp"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ void Row::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> s
     int currentX = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        child(i)->draw(make_unique<ncurses::Window>(maxHeight, cmpWidth, 0, currentX));
+        child(i)->draw(make_unique<ncurses::Panel>(maxHeight, cmpWidth, 0, currentX));
         currentX += cmpWidth;
     }
 

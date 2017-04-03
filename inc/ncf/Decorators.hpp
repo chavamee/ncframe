@@ -29,7 +29,7 @@ class Border : public Decorator {
         }
         void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override
         {
-            //window->frame();
+            window->drawBorder();
             Decorator::draw(std::move(window), std::move(subWindow));
         }
 };
