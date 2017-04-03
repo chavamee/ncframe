@@ -117,6 +117,10 @@ class Menu {
 
         Menu(std::vector<MenuItem*>& items);
 
+        Menu(const Menu& menu) = delete;
+
+        Menu& operator=(Menu& rhs) = delete;
+
         virtual ~Menu();
 
         void setItems(std::vector<MenuItem*>& items);

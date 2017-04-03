@@ -1,13 +1,8 @@
 #ifndef NCF_NCURSES_WINDOW_H
 #define NCF_NCURSES_WINDOW_H
 
-extern "C" {
-#include <curses.h>
-#include <panel.h>
-}
-
+#include "ncf/ncurses/ncurses.hpp"
 #include "ncf/Geometry.hpp"
-//#include "common/defcurs.h"
 
 #include <functional>
 #include <memory>
@@ -16,50 +11,14 @@ extern "C" {
 namespace ncf {
 namespace ncurses {
 
-class Window;
-
-//TODO: Properly explain color pairs, setPalette, getColor and color types. Consider reworking so
-//      they are more expressive/idiomatic
-//TODO: Consider moving functions that return or set information about ALL windows to Application
-//TODO: Ensure that all ncurses functions that return ERR are properly wrapped with _onError
-//TODO: Describe decorator functions as helper functions
-//TODO: Normalize vocabulary in respect to row and col vs x and y
-//TODO: If move cosntructors do soemthing special, document as appropriate
-//TODO: Consider making attribute a struct/class to use RAII to reset attron/attroff
-//TODO: implement interface for all window functionality that needs to be
-//      exposed in Window class
-//TODO: All functions that take an n param and have n=-1 as part of there sginature
-//      should change to use std::strings and not using the n param
-//TODO: Do we need this in the global namespace? In other words should we move it to
-//      another header?
-//TODO: Find a better way to define attribute types
-
 /**
- * NCurses char type alias.
- *
- * This type encompases normal and wide characters.
+ * Wrapper to an ncurses WINDOW object
  */
-using ncCharType = chtype;
-using colorPairID = short;
-using colorType = short;
-using colorPair = std::pair<colorType, colorType>;
-
-struct borderType {
-    ncCharType left         = 0;
-    ncCharType right        = 0;
-    ncCharType top          = 0;
-    ncCharType bottom       = 0;
-    ncCharType top_left     = 0;
-    ncCharType top_right    = 0;
-    ncCharType bottom_left  = 0;
-    ncCharType bottom_right = 0;
-};
-
 class Window {
     public:
 
     /**
-     * Defualt constructor
+     * Default Window constructor
      */
     Window();
 
@@ -69,7 +28,7 @@ class Window {
      * @param win           ncurses WINDOW handle.
      *                      If the Window object takes ownership of the ncurses handle,
      *                      the win pointer is set to null.
-     * @param takeOnwership Should this Window object take ownerhsip of the ncurses handle
+     * @param takeOnwership Should this Window object take ownership of the ncurses handle?
      */
     Window(WINDOW*& win, bool takeOnwership = true);
 
@@ -100,7 +59,7 @@ class Window {
     /**
      * Construct a new window with a parent window
      *
-     * @param parent   parent window of this window.
+     * @param parent   parent window for this window.
      *                 The window becomes a sub window of parent
      * @param height   height of the window
      * @param width    width of the window
@@ -137,7 +96,7 @@ class Window {
      * The ncurses WINDOW handle is never copied over. Instead
      * the window is replicated with a new WINDOW handle.
      */
-    Window(const Window& rhs) = delete;
+    Window(const Window& window) = delete;
 
     /**
      * Move constructor
@@ -145,7 +104,15 @@ class Window {
     Window(Window&& rhs);
 
     /**
-     * Move assignemnt operator
+     * Copy assignment operator.
+     *
+     * The ncurses WINDOW handle is never copied over. Instead
+     * the window is replicated with a new WINDOW handle.
+     */
+    Window& operator=(Window& rhs) = delete;
+
+    /**
+     * Move assignment operator
      */
     Window& operator=(Window&& rhs);
 
@@ -158,39 +125,39 @@ class Window {
     // Size of a tab on terminal, *not* window
 
     /**
-     * Returns tha amount of available colors for all windows
+     * Returns the amount of available colors for all windows
      *
      * @return number of available colors
      */
     static int colorCount();
 
     /**
-     * Returns the number of available for this window
+     * Returns the number of available colors for this window
      *
-     * @return the number of colors
+     * @return number of colors available
      */
     int colors() const { return colorCount(); }
 
     /**
-     * Actual color pair
+     * Get actual color pair
      *
      * @return the effective color pair for this window
      */
-    colorPairID getColor() const;
+    ColorPairID getColor() const;
 
     /**
-     * Actual foreground color
+     * Get actual foreground color
      *
      * @return the effective foreground color for this window.
      */
-    colorType foreground() const { return getColor(0); }
+    ColorType foreground() const { return getColor(0); }
 
     /**
-     * Actual background color
+     * Get actual background color
      *
      * @return the effective background color for this window.
      */
-    colorType background() const { return getColor(1); }
+    ColorType background() const { return getColor(1); }
 
 
     /**
@@ -198,14 +165,14 @@ class Window {
      *
      * @param pair the color pair values to set for the current pair
      */
-    void setPalette(colorPair color);
+    void setPalette(ColorPair color);
 
     /**
      * Set actually used palette entry.
      *
      * @param pair Color pair id to use
      */
-    void setColor(colorPairID pair);
+    void setColor(ColorPairID pair);
 
     /**
      * Move the cursor to the given point.
@@ -225,11 +192,11 @@ class Window {
     Point getCursorPosition() const;
 
     /**
-     * Get the beginnging point of the window
+     * Get the beginning point of the window
      *
      * @return point of origin for this window
      */
-    Point getOriginPoint() const;
+    Point getOrigin() const;
 
     /**
      * Get the size of the window
@@ -239,7 +206,7 @@ class Window {
     Size size() const;
 
     /**
-     * Perform lowlevel cursor motion that takes effect immediately.
+     * Perform low-level cursor motion that takes effect immediately.
      *
      * @param prevPoint previous position of cursor
      * @param newPoint  new position of cursor
@@ -314,31 +281,31 @@ class Window {
     /**
      * Perform a scanw operation on the window
      */
-    void scanw(const char* fmt, ...);
+    void scan(const char* fmt, ...);
 
     /**
      * Move the cursor and perform a scanw operation on the window
      */
-    void scanw(const Point& pos, const char* fmt, ...);
+    void scan(const Point& pos, const char* fmt, ...);
 
     //TODO: Change ncCharType to something more expressive
     /**
      * Put attributed character to the window.
      */
-    int putChr(const ncCharType ch) { return waddch(m_window, ch); }
+    int putChr(const NCCharType ch) { return waddch(m_window, ch); }
 
     //TODO
     /**
      * Move the cursor and put attributed character to the window.
      */
-    int putChrAtPos(int y, int x, const ncCharType ch) {
-        return mvwaddch(m_window, y, x, ch);
+    int putChrAtPos(Point& pos, const NCCharType ch) {
+        return mvwaddch(m_window, pos.y, pos.x, ch);
     }
 
     /**
      * Put attributed character to the window and refresh it immediately.
      */
-    virtual int echoChar(const ncCharType ch) { return wechochar(m_window, ch); }
+    virtual int echoChar(const NCCharType ch) { return wechochar(m_window, ch); }
 
     /**
      * Write a string to the window.
@@ -353,7 +320,7 @@ class Window {
     }
 
     /**
-     * Move the cursor and then wrte a string to the window
+     * Move the cursor and then write a string to the window
      *
      * @param pos the position to move the cursor to
      * @param str the string to write
@@ -401,7 +368,7 @@ class Window {
      *
      * @return the attributed character under the cursor
      */
-    ncCharType getChrOnCursor() const { return winch(m_window); }
+    NCCharType getCharUnderCursor() const { return winch(m_window); }
 
     /**
      * Move cursor to requested position and then retrieve attributed character
@@ -410,28 +377,33 @@ class Window {
      * @param point point to move the cursor to
      * @return the attributed character under the cursor
      */
-    ncCharType getChrAtPos(const Point& point) { return mvwinch(m_window, point.y, point.x); }
+    NCCharType getCharAtPos(const Point& point) { return mvwinch(m_window, point.y, point.x); }
 
     //TODO: These are not normal strings but rather ncurses wide character type strings.
     //      These also hold attributes. Consider extractString and similiar and work to ensure
     //      it is udnerstood which one should be used in which circumstances. Additionally,
     //      we cannot simply return a string object.
-    int getStr(ncCharType* str, int n=-1) {
+    /**
+     * Read the string str from the window, stop reading if the terminating
+     * null or the limit n is reached. If n is negative, it is ignored.
+     */
+    int getStr(NCCharType* str, int n=-1) {
         return winchnstr(m_window, str, n);
     }
-    // Read the string str from the window, stop reading if the terminating
-    // NUL or the limit n is reached. If n is negative, it is ignored.
 
-    int getStrAtPos(int y, int x, ncCharType* str, int n=-1);
-    // Move the cursor to the requested position and then perform the inchstr
-    // as described above.
+    //TODO: Links
+    /**
+     * Move the cursor to the requested position and then perform the inchstr
+     * as described in getStr.
+     */
+    int getStrAtPos(Point& pos, NCCharType* str, int n=-1);
 
     /**
      * Insert attributed character into the window before current cursor position.
      *
      * @param ch the character to insert
      */
-    void insertChar(ncCharType ch) { _onError ( winsch(m_window, ch) ); }
+    void insertChar(NCCharType ch) { _onError ( winsch(m_window, ch) ); }
 
     /**
      * Move cursor to requested position and then insert the attributed
@@ -440,8 +412,8 @@ class Window {
      * @param point point to move the cursor to
      * @param ch    the character to insert
      */
-    int insertCharAtPos(const Point& point, ncCharType ch) {
-        return mvwinsch(m_window, point.y, point.x, ch);
+    int insertCharAtPos(const Point& pos, NCCharType ch) {
+        return mvwinsch(m_window, pos.y, pos.x, ch);
     }
 
     //TODO: Docs
@@ -476,19 +448,19 @@ class Window {
     /**
      * Switch on the window attributes;
      */
-    void attributeOn (ncCharType attr) { _onError ( wattron (m_window, attr) ); }
+    void attributeOn (NCCharType attr) { _onError ( wattron (m_window, attr) ); }
 
     /**
      * Switch off the window attributes;
      */
-    void attributeOff(ncCharType attr) { _onError ( wattroff(m_window, static_cast<int>(attr)) ); }
+    void attributeOff(NCCharType attr) { _onError ( wattroff(m_window, static_cast<int>(attr)) ); }
 
 
     // TODO: Make custom type for methods that manipulate attributes
     /**
      * Set the window attributes.
      */
-     void setAttribute(ncCharType attr) { _onError ( wattrset(m_window, static_cast<int>(attr)) ); }
+     void setAttribute(NCCharType attr) { _onError ( wattrset(m_window, static_cast<int>(attr)) ); }
 
     // TODO: Change to struct or other representation
     /**
@@ -496,23 +468,23 @@ class Window {
      *
      * @return  //TODO
      */
-    ncCharType getAttributes() { return getattrs(m_window); }
+    NCCharType getAttributes() { return getattrs(m_window); }
 
-    void charAttribute(int n, attr_t attr, colorPairID color, const void *opts=nullptr) {
+    void charAttribute(int n, attr_t attr, ColorPairID color, const void *opts=nullptr) {
         _onError ( wchgat(m_window, n, attr, color, opts) );
     }
     // Change the attributes of the next n characters in the current line. If
     // n is negative or greater than the number of remaining characters in the
     // line, the attributes will be changed up to the end of the line.
 
-    void charAttributeAtPos(int y, int x,
-            int n, attr_t attr, colorPairID color, const void *opts=nullptr) {
-        _onError ( mvwchgat(m_window, y, x, n, attr, color, opts) );
+    void charAttributeAtPos(Point& pos,
+            int n, attr_t attr, ColorPairID color, const void *opts=nullptr) {
+        _onError ( mvwchgat(m_window, pos.y, pos.x, n, attr, color, opts) );
     }
     // Move the cursor to the requested position and then perform chgat() as
     // described above.
 
-    ncCharType getBackgroundAttributes() const { return getbkgd(m_window); }
+    NCCharType getBackgroundAttributes() const { return getbkgd(m_window); }
     // Get current background setting.
 
     /**
@@ -520,25 +492,11 @@ class Window {
      *
      * @param ch background property
      */
-     void setBackgroundAttributes(const ncCharType ch) { _onError ( wbkgd(m_window, ch) ); }
+     void setBackgroundAttributes(const NCCharType ch) { _onError ( wbkgd(m_window, ch) ); }
 
     // TODO: This is for stdcr and should be defined in the globals
     //void bkgdset(ncCharType ch) { wbkgdset(m_window, ch); }
     // Set the background property.
-
-    /**
-     * Draw a box around the window with the given vertical and horizontal drawing characters.
-     *
-     * If you specify a zero as character, curses will try to find a "nice" character.
-     *
-     * @param vert the character that makes up the vertical borders
-     * @param hor  the character that makes up the horizontal borders
-     */
-    void box(ncCharType vert=0, ncCharType hor=0) {
-        _onError ( wborder(m_window, vert, vert, hor, hor, 0, 0, 0, 0) );
-    }
-
-
 
     //TODO Docs and clean up
     /**
@@ -548,7 +506,7 @@ class Window {
      *
      * @param border the border specification to use
      */
-    void drawBorder(borderType border = {}) {
+    void drawBorder(Border border = {}) {
         _onError ( wborder(m_window,
                 border.left,        border.right,
                 border.top,         border.bottom,
@@ -564,7 +522,7 @@ class Window {
      * @param len length of the line
      * @param ch  the character that makes up the line
      */
-    void horizontalLine(int len, ncCharType ch=0) { _onError ( whline(m_window, ch, len) ); }
+    void horizontalLine(int len, NCCharType ch=0) { _onError ( whline(m_window, ch, len) ); }
 
     /**
      * Move the cursor to the requested position and then draw a horizontal line.
@@ -573,8 +531,8 @@ class Window {
      * @param len   length of the line
      * @param ch    the character that makes up the line
      */
-    void horizontalLineAt(const Point& point, int len, ncCharType ch=0) {
-        _onError ( mvwhline(m_window, point.y, point.x, ch, len) );
+    void horizontalLineAt(const Point& pos, int len, NCCharType ch=0) {
+        _onError ( mvwhline(m_window, pos.y, pos.x, ch, len) );
     }
 
     /**
@@ -584,7 +542,7 @@ class Window {
      * @param len length of the line
      * @param ch  the character that makes up the line
      */
-    int verticalLine(int len, ncCharType ch=0) { return wvline(m_window, ch, len); }
+    int verticalLine(int len, NCCharType ch=0) { return wvline(m_window, ch, len); }
 
     /**
      * Move the cursor to the requested position and then draw a vertical line.
@@ -593,7 +551,7 @@ class Window {
      * @param len   length of the line
      * @param ch    the character that makes up the line
      */
-    int verticalLineAt(const Point& point, int len, ncCharType ch=0) {
+    int verticalLineAt(const Point& point, int len, NCCharType ch=0) {
         return mvwvline(m_window, point.y, point.x, ch, len);
     }
 
@@ -1092,17 +1050,17 @@ class Window {
     /**
      * Next subwindow of the parent
      */
-    Window* m_sib = nullptr;   // next subwindow of parent
+    Window* m_sib = nullptr;   // next subWindow of parent
 
     private:
 
     //TODO: Docs
     void _killSubwindows();
-    static void setPalette(const colorPair& color, colorPairID pair);
+    static void setPalette(const ColorPair& color, ColorPairID pair);
     short getPair() const;
     static void _onError(int err);
 
-    colorType getColor(int getBack) const;
+    ColorType getColor(int getBack) const;
     static bool s_isInitialized;
 
     bool m_isHandleOwner = true;

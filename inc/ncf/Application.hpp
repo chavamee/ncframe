@@ -15,12 +15,12 @@
 namespace ncf {
 
 struct Colors {
-    ncurses::colorPair colorPair1;
-    ncurses::colorPair colorPair2;
-    ncurses::colorPair colorPair3;
-    ncurses::colorPair colorPair4;
-    ncurses::colorPair colorPair5;
-    ncurses::colorPair colorPair6;
+    ncurses::ColorPair ColorPair1;
+    ncurses::ColorPair ColorPair2;
+    ncurses::ColorPair ColorPair3;
+    ncurses::ColorPair ColorPair4;
+    ncurses::ColorPair ColorPair5;
+    ncurses::ColorPair ColorPair6;
 };
 
 struct Attributes {
@@ -79,8 +79,8 @@ class Application {
          *
          * @return default foreground attributes
          */
-        virtual ncurses::ncCharType foregrounds() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(1)) : A_BOLD;
+        virtual ncurses::NCCharType foregrounds() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(1)) : A_BOLD;
         }
 
         /**
@@ -88,8 +88,8 @@ class Application {
          *
          * @return default background attributes
          */
-        virtual ncurses::ncCharType backgrounds() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(2)) : A_NORMAL;
+        virtual ncurses::NCCharType backgrounds() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(2)) : A_NORMAL;
         }
 
         /**
@@ -97,8 +97,8 @@ class Application {
          *
          * @return default inactive attributes
          */
-        virtual ncurses::ncCharType inactives() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(3)|A_DIM) : A_DIM;
+        virtual ncurses::NCCharType inactives() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(3)|A_DIM) : A_DIM;
         }
 
         /**
@@ -106,8 +106,8 @@ class Application {
          *
          * @return default label attributes
          */
-        virtual ncurses::ncCharType labels() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
+        virtual ncurses::NCCharType labels() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         /**
@@ -115,8 +115,8 @@ class Application {
          *
          * @return default form backgrounds
          */
-        virtual ncurses::ncCharType dialogBackgrounds() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(4)) : A_NORMAL;
+        virtual ncurses::NCCharType dialogBackgrounds() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(4)) : A_NORMAL;
         }
 
         /**
@@ -124,8 +124,8 @@ class Application {
          *
          * @return default window backgrounds
          */
-        virtual ncurses::ncCharType windowBackgrounds() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(5)) : A_NORMAL;
+        virtual ncurses::NCCharType windowBackgrounds() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(5)) : A_NORMAL;
         }
 
         /**
@@ -133,8 +133,8 @@ class Application {
          *
          * @return default title window attributes
          */
-        virtual ncurses::ncCharType screenTitles() const {
-            return m_hasColors ? static_cast<ncurses::ncCharType>(COLOR_PAIR(6)) : A_BOLD;
+        virtual ncurses::NCCharType screenTitles() const {
+            return m_hasColors ? static_cast<ncurses::NCCharType>(COLOR_PAIR(6)) : A_BOLD;
         }
 
         /**

@@ -6,33 +6,16 @@
 namespace ncf {
 namespace ncurses {
 
-// -------------------------------------------------------------------------
-// Pad Support. We allow an association of a pad with a "real" window
-// through which the pad may be viewed.
-// -------------------------------------------------------------------------
 class Pad : public Window {
     public:
+        /**
+         * Create a pad with the given size
+         */
         Pad(int height, int width);
-        // create a pad with the given size
 
-        Pad& operator=(const Pad& rhs)
-        {
-            if (this != &rhs) {
-                *this = rhs;
-            }
-            return *this;
-        }
+        Pad& operator=(const Pad& rhs) = delete;
 
-        Pad(const Pad& rhs) :
-            //TODO
-            //m_viewWin(rhs.m_viewWin),
-            //m_viewSub(rhs.m_viewSub),
-            m_minRow(rhs.m_minRow),
-            m_minCol(rhs.m_minCol),
-            m_horizGridsize(rhs.m_horizGridsize),
-            m_vertGridsize(rhs.m_vertGridsize)
-        {
-        }
+        Pad(const Pad& rhs) = delete;
 
         virtual ~Pad() {}
 

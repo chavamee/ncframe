@@ -62,11 +62,11 @@ int main(int argc, char *argv[])
     ctgMenu.setItems(ctgItems);
     entriesMenu.setItems(entryItems);
 
-    top.add(new Border(&entriesMenu));
-    top.add(new Border(&ctgMenu));
+    top.add(new ncf::Border(&entriesMenu));
+    top.add(new ncf::Border(&ctgMenu));
 
     body.add(&top, 0);
-    body.add(new Border(&prev), 1);
+    body.add(new ncf::Border(&prev), 1);
 
     prev.setContent("Hello, World!");
 

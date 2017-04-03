@@ -70,35 +70,6 @@ void Panel::noutrefresh()
     ::update_panels();
 }
 
-void Panel::frame(const std::string& title,const std::string& btitle)
-{
-    box();
-    if (not title.empty() && not btitle.empty()) {
-        label(title, btitle);
-    }
-}
-
-void Panel::centerText(int y, const std::string& label)
-{
-    if (not label.empty()) {
-        int x = (maxX() - label.size()) / 2;
-        if (x<0) {
-            x=0;
-        }
-        writeStringAtPos({y, x}, label.c_str());
-    }
-}
-
-void Panel::label(const std::string& topLabel, const std::string& bottomLabel)
-{
-    if (not topLabel.empty()) {
-        centerText(0, topLabel);
-    }
-    if (not bottomLabel.empty()) {
-        centerText(maxY(), bottomLabel);
-    }
-}
-
 void Panel::redrawAll()
 {
     PANEL *pan;

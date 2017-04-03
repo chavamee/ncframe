@@ -1,0 +1,5 @@
+project(feedlr)
+include_directories("inc")
+set(srcs src/Feedly.cpp src/Request.cpp src/Response.cpp src/main.cpp)
+add_executable(feedlr ${srcs})
+target_link_libraries(feedlr ncf_ncurses ncf jsoncpp curl curses menu panel)

@@ -82,39 +82,6 @@ class Panel : public Window {
          */
         static void redrawAll();
 
-        /**
-         * Put a frame around the panel and put the title centered in the top line
-         * and a bottom title in the bottom line.
-         *
-         * @param title      top title
-         * @param btmm_title bottom title
-         */
-        virtual void frame(const std::string& title = "", const std::string& bttm_title = "");
-
-        /* TODO
-         * virtual void boldframe(const char* title=NULL,
-                const char* btitle=NULL);
-        // Same as frame(), but use highlighted attributes.
-        */
-
-        /**
-         * Put the title centered in the top line and btitle in the bottom line.
-         *
-         * @param topLablel   top line title
-         * @param bottomLabel bottom lien ttile
-         *
-         */
-        virtual void label(const std::string& topLabel,
-                const std::string& bottomLabel);
-
-        /**
-         * Put the label text centered in the specified row.
-         *
-         * @param y     the y position to center the text to
-         * @param label the label to center
-         */
-        virtual void centerText(int y, const std::string& label);
-
     private:
         static void _onError(int err)
         {

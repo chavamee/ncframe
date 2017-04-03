@@ -1,5 +1,11 @@
-#ifndef NCF_NCURSES_DEFCURS_H_
-#define NCF_NCURSES_DEFCURS_H_
+#ifndef NCF_COMMON_DEFCURS_H
+#define NCF_COMMON_DEFCURS_H
+
+#include <etip.h>
+
+extern "C" {
+#  include   <curses.h>
+}
 
 /* SCO 3.2v4 curses.h includes term.h, which defines lines as a macro.
    Undefine it here, because NCursesWindow uses lines as a method.  */

@@ -63,7 +63,9 @@ Menu::MenuItem& Menu::MenuItem::operator=(const Menu::MenuItem& other)
 Menu::Menu() :
     m_menu(nullptr),
     m_itemMark(nullptr),
-    m_items()
+    m_items(),
+    m_window(),
+    m_subWindow()
 {
     m_menu = new_menu(nullptr);
     if (m_menu == nullptr) {
@@ -74,7 +76,9 @@ Menu::Menu() :
 Menu::Menu(vector<MenuItem*>& items) :
     m_menu(nullptr),
     m_itemMark(nullptr),
-    m_items(items)
+    m_items(items),
+    m_window(),
+    m_subWindow()
 {
     m_menu = new_menu(nullptr);
     if (m_menu == nullptr) {

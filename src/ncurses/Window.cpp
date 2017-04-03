@@ -106,7 +106,7 @@ Point Window::getCursorPosition() const
     return pt;
 }
 
-Point Window::getOriginPoint() const
+Point Window::getOrigin() const
 {
     Point pt;
     getbegyx(m_window, pt.y, pt.x);
@@ -148,10 +148,10 @@ string Window::extractStringFromPos(const Point& point, int n)
     return string {cstr};
 }
 
-int Window::getStrAtPos(int y, int x, chtype* str, int n)
+int Window::getStrAtPos(Point& pos, chtype* str, int n)
 {
     chtype* cstr = nullptr;
-    int count = mvwinchnstr(m_window, y, x, cstr, n);
+    int count = mvwinchnstr(m_window, pos.y, pos.x, cstr, n);
     str = cstr;
     return count;
 }
@@ -161,17 +161,17 @@ short Window::getPair() const
     return static_cast<short>(PAIR_NUMBER(getattrs(m_window)));
 }
 
-void Window::setPalette(const colorPair& color, colorPairID pair)
+void Window::setPalette(const ColorPair& Color, ColorPairID pair)
 {
-    _onError ( ::init_pair(pair, color.first, color.second) );
+    _onError ( ::init_pair(pair, Color.first, Color.second) );
 }
 
-void Window::setPalette(colorPair color)
+void Window::setPalette(ColorPair Color)
 {
-    setPalette(color, getPair());
+    setPalette(Color, getPair());
 }
 
-void Window::setColor(colorPairID pair)
+void Window::setColor(ColorPairID pair)
 {
 
     if ((pair < 1) || (pair > COLOR_PAIRS)) {
