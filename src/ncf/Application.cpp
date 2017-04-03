@@ -17,6 +17,7 @@ Application* Application::getApplication()
 Application::Application(bool enableColors) :
     m_hasColors(enableColors)
 {
+    using namespace ncurses;
     ::setlocale(LC_ALL, "");
     ::initscr();
 
@@ -26,23 +27,21 @@ Application::Application(bool enableColors) :
     ::meta(stdscr, true);
     ::curs_set(0);
 
-    m_rootWindow = new ncurses::Window(::stdscr);
-
     if (::has_colors()) {
         ::start_color();
 
-        m_rootWindow->setColor(1);
-        m_rootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
-        m_rootWindow->setColor(2);
-        m_rootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
-        m_rootWindow->setColor(3);
-        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
-        m_rootWindow->setColor(4);
-        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
-        m_rootWindow->setColor(5);
-        m_rootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
-        m_rootWindow->setColor(6);
-        m_rootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
+        Window::RootWindow->setColor(1);
+        Window::RootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
+        Window::RootWindow->setColor(2);
+        Window::RootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
+        Window::RootWindow->setColor(3);
+        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
+        Window::RootWindow->setColor(4);
+        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
+        Window::RootWindow->setColor(5);
+        Window::RootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
+        Window::RootWindow->setColor(6);
+        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
     }
 
     m_instance = this;
@@ -59,7 +58,6 @@ Application::Application(Arguments args, bool enableColors) :
 
 Application::~Application()
 {
-    delete m_rootWindow;
     ::endwin();
 }
 

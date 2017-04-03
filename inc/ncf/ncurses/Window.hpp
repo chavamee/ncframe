@@ -17,6 +17,7 @@ namespace ncurses {
 class Window {
     public:
 
+    static const std::unique_ptr<Window> RootWindow;
     /**
      * Default Window constructor
      */
@@ -68,12 +69,12 @@ class Window {
      * @param relative If true, the origin is set relative to the parent window.
      *                 Otherwise the position is absolute and set relative to stdscr
      */
-    Window( Window& parent,
-            int height,
-            int width,
-            int y = 0,
-            int x = 0,
-            bool derived = false
+    Window(Window& parent,
+           int height,
+           int width,
+           int y = 0,
+           int x = 0,
+           bool derived = false
           );
 
     /**
@@ -91,25 +92,23 @@ class Window {
           );
 
     /**
-     * Copy constructor.
+     * Copying Window objects is not allowed.
      *
-     * The ncurses WINDOW handle is never copied over. Instead
-     * the window is replicated with a new WINDOW handle.
+     * Use clone instead.
      */
     Window(const Window& window) = delete;
+
+    /**
+     * Copying Window objects is not allowed.
+     *
+     * Use clone instead.
+     */
+    Window& operator=(Window& rhs) = delete;
 
     /**
      * Move constructor
      */
     Window(Window&& rhs);
-
-    /**
-     * Copy assignment operator.
-     *
-     * The ncurses WINDOW handle is never copied over. Instead
-     * the window is replicated with a new WINDOW handle.
-     */
-    Window& operator=(Window& rhs) = delete;
 
     /**
      * Move assignment operator
@@ -120,23 +119,6 @@ class Window {
      * Window destructor
      */
     virtual ~Window();
-
-    //TODO: int            tabsize() const { initialize(); return TABSIZE; }
-    // Size of a tab on terminal, *not* window
-
-    /**
-     * Returns the amount of available colors for all windows
-     *
-     * @return number of available colors
-     */
-    static int colorCount();
-
-    /**
-     * Returns the number of available colors for this window
-     *
-     * @return number of colors available
-     */
-    int colors() const { return colorCount(); }
 
     /**
      * Get actual color pair
@@ -211,18 +193,16 @@ class Window {
      * @param prevPoint previous position of cursor
      * @param newPoint  new position of cursor
      */
-    void moveCursorImmediately(const Point& prevPoint, const Point& newPoint) {
-        _onError ( mvcur(prevPoint.y, prevPoint.x, newPoint.y, newPoint.x) );
+    void moveCursorImmediately(const Point& oldPos, const Point& newPos) {
+        _onError ( mvcur(oldPos.y, oldPos.x, newPos.y, newPos.x) );
     }
 
-    //TODO: Return of GetKeyStroke should probably have alias/user type
-    //TODO: This can return ERR, check for it and throw appropriatetly
     /**
      * Get a keystroke from the window
      *
      * @return the key stroke read from the window
      */
-    int getKeystroke() { return wgetch(m_window); }
+    int getKeystroke();
 
     /**
      * Move the cursor and get a keystore from the window
@@ -231,9 +211,8 @@ class Window {
      */
     int  getKeyStrokeFromPos(const Point& pos) { return mvwgetch(m_window, pos.y, pos.x); }
 
-    //TODO: getline functions and extractString functions should throw on error
     /**
-     * Read a series of characters until a newline or carriage return is received.
+     * Read a series of characters from the keyboard until a newline or carriage return is received.
      *
      * @param n read at most n characters. If n is negative, the limit is ignored.
      *
@@ -275,26 +254,11 @@ class Window {
      */
     std::string extractStringFromPos(const Point& pos, int n=-1);
 
-    //TODO: Should throw on error ERR
-    //TODO: Make these into variadic template functions
-    //TODO: Docs for variants after variadic template function implementation
-    /**
-     * Perform a scanw operation on the window
-     */
-    void scan(const char* fmt, ...);
-
-    /**
-     * Move the cursor and perform a scanw operation on the window
-     */
-    void scan(const Point& pos, const char* fmt, ...);
-
-    //TODO: Change ncCharType to something more expressive
     /**
      * Put attributed character to the window.
      */
-    int putChr(const NCCharType ch) { return waddch(m_window, ch); }
+    int putChar(const NCCharType ch) { return waddch(m_window, ch); }
 
-    //TODO
     /**
      * Move the cursor and put attributed character to the window.
      */
@@ -329,20 +293,6 @@ class Window {
         _onError ( mvwaddnstr(m_window, pos.y, pos.x, str.c_str(), str.size()) );
     }
 
-    //TODO:
-    //namspace lowlevel {
-    /*int            addchstr(const ncCharType* str, int n=-1) {
-      return waddchnstr(m_window, str, n); }
-    // Write the string str to the window, stop writing if the terminating
-    // NUL or the limit n is reached. If n is negative, it is ignored.
-
-    int            addchstr(int y, int x, const ncCharType * str, int n=-1) {
-    return mvwaddchnstr(m_window, y, x, str, n); }
-    // Move the cursor to the requested position and then perform the addchstr
-    // as described above.
-    //}*/
-
-    //TODO: This should also be variadic if posible
     /**
      * Do a formatted print to the window.
      */
@@ -379,10 +329,6 @@ class Window {
      */
     NCCharType getCharAtPos(const Point& point) { return mvwinch(m_window, point.y, point.x); }
 
-    //TODO: These are not normal strings but rather ncurses wide character type strings.
-    //      These also hold attributes. Consider extractString and similiar and work to ensure
-    //      it is udnerstood which one should be used in which circumstances. Additionally,
-    //      we cannot simply return a string object.
     /**
      * Read the string str from the window, stop reading if the terminating
      * null or the limit n is reached. If n is negative, it is ignored.
@@ -416,14 +362,28 @@ class Window {
         return mvwinsch(m_window, pos.y, pos.x, ch);
     }
 
-    //TODO: Docs
-    int insertLine(int n=1) {
+    /**
+     * Insert or delete an n number of lines.
+     *
+     * @param n If n>0 , n number of lines are inserted above the current line.
+     *          Else n<0, n number of lines are deleted below the current line.
+     */
+    int modifyLine(int n=1) {
         return n > 0 ? winsdelln(m_window, n) : 0;
     }
 
-    //TODO: Docs
-    int deleteLine(int n=-1) {
-        return n < 0 ? winsdelln(m_window, n) : 0;
+    /**
+     * Insert a line above the current line.
+     */
+    void insertLine() {
+        _onError( winsertln(m_window) );
+    }
+
+    /**
+     * Delete a line below the current line.
+     */
+    void deleteLine() {
+        _onError( wdeleteln(m_window) );
     }
 
     /**
@@ -456,13 +416,11 @@ class Window {
     void attributeOff(NCCharType attr) { _onError ( wattroff(m_window, static_cast<int>(attr)) ); }
 
 
-    // TODO: Make custom type for methods that manipulate attributes
     /**
      * Set the window attributes.
      */
      void setAttribute(NCCharType attr) { _onError ( wattrset(m_window, static_cast<int>(attr)) ); }
 
-    // TODO: Change to struct or other representation
     /**
      * Get the window attributes;
      *
@@ -494,11 +452,6 @@ class Window {
      */
      void setBackgroundAttributes(const NCCharType ch) { _onError ( wbkgd(m_window, ch) ); }
 
-    // TODO: This is for stdcr and should be defined in the globals
-    //void bkgdset(ncCharType ch) { wbkgdset(m_window, ch); }
-    // Set the background property.
-
-    //TODO Docs and clean up
     /**
      * Draw a border around the window with the given borderType for
      * various parts of the border. If you pass zero for a character, curses
@@ -650,8 +603,6 @@ class Window {
      */
     void setCharacterModifyMode(bool bf) { idcok(m_window, bf); }
 
-    //TODO: this is for standard screen. Have a static function that retunrs a handle
-    //      to a Window object of stdscr instead and call it from there
     /**
      * Mark the given lines as modified.
      *
@@ -852,7 +803,6 @@ class Window {
                 dmaxrow, dmaxcol, static_cast<int>(overlaywin ? 1 : 0)) );
     }
 
-    //TODO: Docs
     /**
      * Resize the window.
      *
@@ -872,16 +822,6 @@ class Window {
      * @return Return true if terminal supports a mouse, false otherwise
      */
     bool hasMouse() const;
-
-    //TODO: Should these be static?
-    //int lines() const { return LINES; }
-    // Number of lines on terminal, *not* window
-
-    //int cols() const { initialize(); return COLS; }
-    // Number of cols  on terminal, *not* window
-
-    //int tabsize() const { initialize(); return TABSIZE; }
-    // Size of a tab on terminal, *not* window
 
     /**
      * Height of this window.
@@ -988,7 +928,7 @@ class Window {
      *
      * @return coordinate pair of parent's origin
      */
-    Point getParentPoint() const {
+    Point getParentOrigin() const {
         int x = 0;
         int y = 0;
         getparyx(m_window, y, x);
@@ -1054,7 +994,6 @@ class Window {
 
     private:
 
-    //TODO: Docs
     void _killSubwindows();
     static void setPalette(const ColorPair& color, ColorPairID pair);
     short getPair() const;

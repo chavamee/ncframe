@@ -7,15 +7,19 @@ using namespace std;
 namespace ncf {
 namespace ncurses {
 
+const unique_ptr<Window> Window::RootWindow = make_unique<Window>(::stdscr);
+
 bool Window::s_isInitialized = false;
 
 Window::Window()
 {
+    initialize();
 }
 
 Window::Window(WINDOW*& win, bool takeOnwership) :
     m_isHandleOwner(takeOnwership)
 {
+    initialize();
     m_window = win ? win : ::stdscr;
     if (takeOnwership) {
         win = nullptr;
@@ -24,6 +28,7 @@ Window::Window(WINDOW*& win, bool takeOnwership) :
 
 Window::Window(int height, int width, int y, int x)
 {
+    initialize();
     m_window = ::newwin(height, width, y, x);
     if (m_window == nullptr) {
         throw NCException {"Could not create window"};
@@ -42,6 +47,7 @@ Window::Window(Window& parent, int height, int width, int y, int x, bool derived
         x -= parent.originX();
     }
 
+    initialize();
     m_window = ::derwin(parent.getHandle(), height, width, y, x);
     if (m_window == nullptr) {
         throw NCException("window error");
@@ -118,6 +124,17 @@ Size Window::size() const
     Size size {};
     getmaxyx(m_window, size.height, size.width);
     return size;
+}
+
+int Window::getKeystroke()
+{
+    int resp = wgetch(m_window);
+    if (resp != ERR) {
+        return resp;
+    }
+
+    _onError(ERR);
+    return -1;
 }
 
 string Window::getline(int n)

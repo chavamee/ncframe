@@ -150,11 +150,6 @@ class Application {
          */
         static Application* m_instance;
 
-        /**
-         * Window object for ncurses stdscr
-         */
-        ncurses::Window* m_rootWindow = nullptr;
-
         Widget* m_currWdgtWithFocus = nullptr;
         bool m_hasColors = true;
         char m_killKey = 'q';
