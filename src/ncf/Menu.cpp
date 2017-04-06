@@ -1,3 +1,4 @@
+#include "ncf/ncurses/Panel.hpp"
 #include "ncf/Menu.hpp"
 #include "ncf/Application.hpp"
 
@@ -25,10 +26,10 @@ int Menu::onKeyEvent(int ch)
 
         case CTRL('T')     : return m_menu->drive(REQ_TOGGLE_ITEM);
 
-                             /*
-                              * Depending on the terminal, the Enter/Send key will return one of
-                              * the following:
-                              */
+        /*
+         * Depending on the terminal, the Enter/Send key will return one of
+         * the following:
+         */
         case '\r'          :
         case '\n'          :
         case KEY_ENTER     : _invokeAction(m_menu->currentItem()); return 1;
@@ -52,8 +53,8 @@ void Menu::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> 
 {
     if (window.get() != nullptr) {
 
-        keypad(window->getHandle(), true);
-        meta(window->getHandle(), true);
+        window->enableKeypad(true);
+        window->enableMeta(true);
 
         //TODO: initializeItems()
 
@@ -72,6 +73,9 @@ void Menu::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> 
         // format this will not conflict.
         m_menu->setFormat({.height = window->height() - 2, .width = 1});
         m_menu->setMark("*");
+
+        subWindow->enableKeypad(true);
+        subWindow->enableMeta(true);
 
         Application* app = Application::getApplication();
         if (app) {

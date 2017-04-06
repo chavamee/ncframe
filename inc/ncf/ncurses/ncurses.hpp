@@ -87,7 +87,6 @@ inline int colorCount()
     return (has_colors() ? COLORS : 1);
 }
 
-
 }
 }
 
