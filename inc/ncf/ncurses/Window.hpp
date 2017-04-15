@@ -17,7 +17,6 @@ namespace ncurses {
 class Window {
     public:
 
-    static const std::unique_ptr<Window> RootWindow;
     /**
      * Default Window constructor
      */
@@ -997,6 +996,8 @@ class Window {
 
     bool m_isHandleOwner = true;
 };
+
+const std::unique_ptr<Window> StdScr = std::make_unique<Window>(::stdscr);
 
 } // namespace ncurses
 } // namespace ncf

@@ -7,8 +7,6 @@ using namespace std;
 namespace ncf {
 namespace ncurses {
 
-const unique_ptr<Window> Window::RootWindow = make_unique<Window>(::stdscr);
-
 bool Window::s_isInitialized = false;
 
 Window::Window()

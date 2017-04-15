@@ -19,29 +19,27 @@ Application::Application(bool enableColors) :
 {
     using namespace ncurses;
     ::setlocale(LC_ALL, "");
-    ::initscr();
+    ncurses::initialize();
 
-    ::cbreak();
-    ::noecho();
-    ::keypad(stdscr, true);
-    ::meta(stdscr, true);
+    ncurses::StdScr->enableKeypad(true);
+    ncurses::StdScr->enableMeta(true);
     ::curs_set(0);
 
     if (::has_colors()) {
         ::start_color();
 
-        Window::RootWindow->setColor(1);
-        Window::RootWindow->setPalette({COLOR_YELLOW, COLOR_BLUE});
-        Window::RootWindow->setColor(2);
-        Window::RootWindow->setPalette({COLOR_CYAN,   COLOR_BLUE});
-        Window::RootWindow->setColor(3);
-        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_BLUE});
-        Window::RootWindow->setColor(4);
-        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_CYAN});
-        Window::RootWindow->setColor(5);
-        Window::RootWindow->setPalette({COLOR_BLUE,   COLOR_YELLOW});
-        Window::RootWindow->setColor(6);
-        Window::RootWindow->setPalette({COLOR_BLACK,  COLOR_GREEN});
+        ncurses::StdScr->setColor(1);
+        ncurses::StdScr->setPalette({COLOR_YELLOW, COLOR_BLUE});
+        ncurses::StdScr->setColor(2);
+        ncurses::StdScr->setPalette({COLOR_CYAN,   COLOR_BLUE});
+        ncurses::StdScr->setColor(3);
+        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_BLUE});
+        ncurses::StdScr->setColor(4);
+        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_CYAN});
+        ncurses::StdScr->setColor(5);
+        ncurses::StdScr->setPalette({COLOR_BLUE,   COLOR_YELLOW});
+        ncurses::StdScr->setColor(6);
+        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_GREEN});
     }
 
     m_instance = this;
