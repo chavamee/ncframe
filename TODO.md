@@ -25,6 +25,7 @@ ncurses::Window
 Ideas
 =====
 Idea for WebView
+Menu should have willSelectItem, willDeselectItem
 
 modelFromFile
 modelFromURL
