@@ -1,5 +1,5 @@
-#include "api/Request.hpp"
-#include "api/Response.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
 #include <stdexcept>
 #include <cassert>
 #include <stdio.h>

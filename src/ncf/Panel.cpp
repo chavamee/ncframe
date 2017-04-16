@@ -1,8 +1,7 @@
-#include "ncf/ncurses/Panel.hpp"
-#include "ncf/ncurses/NCPanelException.hpp"
+#include "ncf/Panel.hpp"
+#include "ncf/NCPanelException.hpp"
 
 namespace ncf {
-namespace ncurses {
 
 Panel::Panel() :
     Window(::stdscr)
@@ -80,5 +79,4 @@ void Panel::_onError(int err)
     }
 }
 
-}
 }

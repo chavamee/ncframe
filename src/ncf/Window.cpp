@@ -1,11 +1,10 @@
-#include "ncf/ncurses/Window.hpp"
-#include "ncf/ncurses/NCWindowException.hpp"
+#include "ncf/Window.hpp"
+#include "ncf/NCWindowException.hpp"
 //TODO: Destructors
 
 using namespace std;
 
 namespace ncf {
-namespace ncurses {
 
 bool Window::s_isInitialized = false;
 
@@ -224,5 +223,4 @@ void Window::_onError(int err)
     }
 }
 
-}
-}
+} // namespace ncf

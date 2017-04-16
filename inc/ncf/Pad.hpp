@@ -1,10 +1,9 @@
 #ifndef NCF_NCURSES_PAD_H
 #define NCF_NCURSES_PAD_H
 
-#include "ncf/ncurses/Window.hpp"
+#include "ncf/Window.hpp"
 
 namespace ncf {
-namespace ncurses {
 
 class Pad : public Window {
     public:
@@ -106,6 +105,5 @@ class Pad : public Window {
 
 };
 
-}
-}
+} // namespace ncf
 #endif

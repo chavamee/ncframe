@@ -1,5 +1,5 @@
 #ifndef NCURSES_DECORATORS_H_
-#define NCURSES_DECORATORS_H_ value
+#define NCURSES_DECORATORS_H_
 
 #include "ncf/Component.hpp"
 
@@ -12,7 +12,7 @@ class Decorator : public Component {
         {
         }
 
-        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
         {
             m_component->draw(std::move(window), std::move(subWindow));
         }
@@ -27,7 +27,7 @@ class Border : public Decorator {
             Decorator(component)
         {
         }
-        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override
         {
             window->drawBorder();
             Decorator::draw(std::move(window), std::move(subWindow));

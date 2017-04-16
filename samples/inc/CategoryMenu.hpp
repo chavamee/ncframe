@@ -2,8 +2,8 @@
 #define APPLICATION_CTG_MENU_H_
 
 #include "ncf/Menu.hpp"
-#include "app/EntriesMenu.hpp"
-#include "api/Feedly.hpp"
+#include "EntriesMenu.hpp"
+#include "Feedly.hpp"
 
 class CategoryMenu : public ncf::Menu {
     public:
@@ -23,25 +23,25 @@ class CategoryMenu : public ncf::Menu {
         {
         }
 
-        void onItemAction(ncf::ncurses::Menu::MenuItem* item) override
+        void onItemAction(ncf::Menu::Item* item) override
         {
-            /*std::vector<Feedly::Entry> entries = m_server->Entries(item->description(), false, 100);
+            std::vector<Feedly::Entry> entries = m_server->Entries(item->description(), false, 100);
             if (not entries.empty()) {
                 lastReadEntryId = entries.front().id;
             }
 
-            std::vector<ncf::ncurses::Menu::MenuItem*> items;
+            std::vector<ncf::Menu::Item*> items;
             for (auto& entry : entries) {
                 items.push_back(new EntryItem(entry));
             }
-            m_entriesMenu->setItems(items);*/
+            m_entriesMenu->setItems(items);
         }
 
         void markCategoryRead()
         {
             m_server->MarkCategoryWithAction(currentItem().description(), READ, lastReadEntryId);
             std::vector<Feedly::Entry> entries = m_server->Entries(currentItem().description());
-            std::vector<ncf::ncurses::Menu::MenuItem*> items;
+            std::vector<ncf::Menu::Item*> items;
             for (auto& entry : entries) {
                 items.push_back(new EntryItem{entry});
             }

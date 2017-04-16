@@ -1,13 +1,13 @@
-#include "api/Feedly.hpp"
-
 #include "ncf/Decorators.hpp"
 #include "ncf/TextView.hpp"
 #include "ncf/Application.hpp"
 #include "ncf/Row.hpp"
 #include "ncf/Column.hpp"
 
-#include "app/CategoryMenu.hpp"
-#include "app/EntriesMenu.hpp"
+#include "Feedly.hpp"
+
+#include "CategoryMenu.hpp"
+#include "EntriesMenu.hpp"
 
 #include <string>
 #include <iostream>
@@ -16,7 +16,6 @@
 
 using namespace std;
 using namespace ncf;
-using namespace ncf::ncurses;
 
 int main(int argc, char *argv[])
 {
@@ -44,12 +43,12 @@ int main(int argc, char *argv[])
 
     prev.canFocus = false;
 
-    vector<ncurses::Menu::MenuItem*> ctgItems;
-    vector<ncurses::Menu::MenuItem*> entryItems;
+    vector<Menu::Item*> ctgItems;
+    vector<Menu::Item*> entryItems;
     try {
         map<string, string> ctgs = server.Categories();
         for (auto& ctg : ctgs) {
-            ctgItems.push_back(new ncurses::Menu::MenuItem(ctg.first, ctg.second));
+            ctgItems.push_back(new Menu::Item(ctg.first, ctg.second));
         }
 
         vector<Feedly::Entry> entries = server.Entries("All");

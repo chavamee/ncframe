@@ -1,8 +1,8 @@
-#include "api/Feedly.hpp"
+#include "Feedly.hpp"
 // TODO: Merge Response and Request into a single headers
 // and a single namespace
-#include "api/Response.hpp"
-#include "api/Request.hpp"
+#include "Response.hpp"
+#include "Request.hpp"
 #include <json/json.h>
 #include <fstream>
 #include <cassert>

@@ -1,11 +1,10 @@
-#include "ncf/ncurses/Pad.hpp"
-#include "ncf/ncurses/NCException.hpp"
+#include "ncf/Pad.hpp"
+#include "ncf/NCException.hpp"
 #include <cassert>
 
 using namespace std;
 
 namespace ncf {
-namespace ncurses {
 
 Pad::Pad(int height, int width) :
     Window()
@@ -67,5 +66,4 @@ void Pad::setSubWindow(Window* sub)
     m_viewSub = sub;
 }
 
-}
 }

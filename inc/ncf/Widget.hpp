@@ -66,22 +66,22 @@ class Widget : public Component {
             return m_rect;
         }
 
-        void setWindow(std::unique_ptr<ncurses::Window> window)
+        void setWindow(std::unique_ptr<Window> window)
         {
             m_window = std::move(window);
         }
 
-        void setSubWindow(std::unique_ptr<ncurses::Window> window)
+        void setSubWindow(std::unique_ptr<Window> window)
         {
             m_subWindow = std::move(window);
         }
 
-        ncurses::Window* getWindow() const
+        Window* getWindow() const
         {
             return m_window.get();
         }
 
-        ncurses::Window* getSubWindow() const
+        Window* getSubWindow() const
         {
             return m_subWindow.get();
         }
@@ -97,8 +97,8 @@ class Widget : public Component {
     private:
         Rect m_rect;
 
-        std::unique_ptr<ncf::ncurses::Window> m_window;
-        std::unique_ptr<ncf::ncurses::Window> m_subWindow;
+        std::unique_ptr<ncf::Window> m_window;
+        std::unique_ptr<ncf::Window> m_subWindow;
 };
 
 }

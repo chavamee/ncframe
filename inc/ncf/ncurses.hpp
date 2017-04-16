@@ -8,7 +8,6 @@ extern "C" {
 #include <utility>
 
 namespace ncf {
-namespace ncurses {
 
 /**
  * NCurses char type alias.
@@ -25,17 +24,6 @@ using ColorType = short;
 using ColorPair = std::pair<ColorType, ColorType>;
 
 struct Color {
-};
-
-struct Border {
-    NCCharType left         = 0;
-    NCCharType right        = 0;
-    NCCharType top          = 0;
-    NCCharType bottom       = 0;
-    NCCharType top_left     = 0;
-    NCCharType top_right    = 0;
-    NCCharType bottom_left  = 0;
-    NCCharType bottom_right = 0;
 };
 
 struct Attribute {
@@ -87,7 +75,6 @@ inline int colorCount()
     return (has_colors() ? COLORS : 1);
 }
 
-}
 }
 
 #endif

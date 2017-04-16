@@ -2,7 +2,7 @@
 #define NCURSES_COMPONENT_BINDIGNS_H_
 
 #include "common/platform.h"
-#include "ncf/ncurses/Window.hpp"
+#include "ncf/Window.hpp"
 #include "ncf/Geometry.hpp"
 #include <vector>
 #include <memory>
@@ -34,7 +34,7 @@ class Component {
             NCF_UNUSED(point);
         }
 
-        virtual void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) = 0;
+        virtual void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) = 0;
 
         virtual void add(Component* component, unsigned int pos = 0)
         {

@@ -15,7 +15,6 @@ extern "C" {
 #include <string>
 
 namespace ncf {
-namespace ncurses {
 
 class NCException : public std::exception {
     public:
@@ -51,6 +50,5 @@ class NCException : public std::exception {
         }
 };
 
-}
-}
+} // namespace ncf
 #endif

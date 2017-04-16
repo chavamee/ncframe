@@ -1,11 +1,10 @@
 #ifndef NCF_NCURSES_WINDOWEXCEPTION_H_
 #define NCF_NCURSES_WINDOWEXCEPTION_H_
 
-#include "ncf/ncurses/Window.hpp"
-#include "ncf/ncurses/NCException.hpp"
+#include "ncf/Window.hpp"
+#include "ncf/NCException.hpp"
 
 namespace ncf {
-namespace ncurses {
 
 class NCWindowException : public NCException
 {
@@ -40,6 +39,5 @@ class NCWindowException : public NCException
         }
 };
 
-}
-}
+} // namespace ncf
 #endif

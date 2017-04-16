@@ -17,29 +17,28 @@ Application* Application::getApplication()
 Application::Application(bool enableColors) :
     m_hasColors(enableColors)
 {
-    using namespace ncurses;
     ::setlocale(LC_ALL, "");
-    ncurses::initialize();
+    initialize();
 
-    ncurses::StdScr->enableKeypad(true);
-    ncurses::StdScr->enableMeta(true);
+    StdScr->enableKeypad(true);
+    StdScr->enableMeta(true);
     ::curs_set(0);
 
     if (::has_colors()) {
         ::start_color();
 
-        ncurses::StdScr->setColor(1);
-        ncurses::StdScr->setPalette({COLOR_YELLOW, COLOR_BLUE});
-        ncurses::StdScr->setColor(2);
-        ncurses::StdScr->setPalette({COLOR_CYAN,   COLOR_BLUE});
-        ncurses::StdScr->setColor(3);
-        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_BLUE});
-        ncurses::StdScr->setColor(4);
-        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_CYAN});
-        ncurses::StdScr->setColor(5);
-        ncurses::StdScr->setPalette({COLOR_BLUE,   COLOR_YELLOW});
-        ncurses::StdScr->setColor(6);
-        ncurses::StdScr->setPalette({COLOR_BLACK,  COLOR_GREEN});
+        StdScr->setColor(1);
+        StdScr->setPalette({COLOR_YELLOW, COLOR_BLUE});
+        StdScr->setColor(2);
+        StdScr->setPalette({COLOR_CYAN,   COLOR_BLUE});
+        StdScr->setColor(3);
+        StdScr->setPalette({COLOR_BLACK,  COLOR_BLUE});
+        StdScr->setColor(4);
+        StdScr->setPalette({COLOR_BLACK,  COLOR_CYAN});
+        StdScr->setColor(5);
+        StdScr->setPalette({COLOR_BLUE,   COLOR_YELLOW});
+        StdScr->setColor(6);
+        StdScr->setPalette({COLOR_BLACK,  COLOR_GREEN});
     }
 
     m_instance = this;

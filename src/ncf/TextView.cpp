@@ -13,7 +13,7 @@ TextView::TextView(const Rect& rect) :
 {
 }
 
-void TextView::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
+void TextView::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     View::draw(std::move(window), std::move(subWindow));
 }

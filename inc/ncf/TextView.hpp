@@ -1,8 +1,8 @@
 #ifndef NCURSES_TEXTVIEW_COMPONENT
-#define NCURSES_TEXTVIEW_COMPONENT value
+#define NCURSES_TEXTVIEW_COMPONENT
 
 #include "ncf/Component.hpp"
-#include "ncf/ncurses/Window.hpp"
+#include "ncf/Window.hpp"
 #include "ncf/View.hpp"
 #include <string>
 
@@ -19,7 +19,7 @@ class TextView : public View {
         {
         }
 
-        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         int onKeyEvent(int ch) override;
 

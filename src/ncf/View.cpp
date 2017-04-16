@@ -1,5 +1,5 @@
 #include "ncf/View.hpp"
-#include "ncf/ncurses/NCException.hpp"
+#include "ncf/NCException.hpp"
 
 using namespace std;
 
@@ -10,22 +10,22 @@ View::View(const Rect& rect) :
 {
 }
 
-void View::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
+void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     if (!window) {
         if (getWindow()) {
             // TODO: Use this window
         } else {
             //TODO: Make default window
-            window = make_unique<ncurses::Window>(getGeometry());
+            window = make_unique<Window>(getGeometry());
         }
     }
 
     if (!subWindow) {
-        subWindow = make_unique<ncurses::Window>(
+        subWindow = make_unique<Window>(
                 *window, window->height()-2, window->width()-2, 1, 1, false
                 );
-        m_pad = make_unique<ncurses::Pad>(window->height(), window->width());
+        m_pad = make_unique<Pad>(window->height(), window->width());
 
         m_pad->setWindow(window.get());
         m_pad->setSubWindow(subWindow.get());

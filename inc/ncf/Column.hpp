@@ -14,7 +14,7 @@ class Column : public Widget {
 
         ~Column();
 
-        void draw(std::unique_ptr<ncurses::Window> window = {}, std::unique_ptr<ncurses::Window> subWindow = {}) override;
+        void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
         void add(Component* component, unsigned int pos = 0) override;
 

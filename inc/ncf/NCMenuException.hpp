@@ -1,11 +1,10 @@
 #ifndef NCF_NCURSES_MENU_EXCEPTION_H
 #define NCF_NCURSES_MENU_EXCEPTION_H
 
-#include "ncf/ncurses/Menu.hpp"
-#include "ncf/ncurses/NCException.hpp"
+#include "ncf/Menu.hpp"
+#include "ncf/NCException.hpp"
 
 namespace ncf {
-namespace ncurses {
 
 class NCMenuException : public NCException
 {
@@ -40,6 +39,5 @@ class NCMenuException : public NCException
         }
 };
 
-}
 }
 #endif

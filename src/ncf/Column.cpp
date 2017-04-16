@@ -1,5 +1,5 @@
 #include "ncf/Column.hpp"
-#include "ncf/ncurses/Panel.hpp"
+#include "ncf/Panel.hpp"
 
 using namespace std;
 
@@ -18,14 +18,14 @@ Column::~Column()
 {
 }
 
-void Column::draw(unique_ptr<ncurses::Window> window, unique_ptr<ncurses::Window> subWindow)
+void Column::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     size_t numCmps = childCount();
     int cmpHeight = maxHeight / numCmps;
     int currentY = 0;
 
     for (size_t i = 0; i < numCmps; i++) {
-        child(i)->draw(make_unique<ncurses::Panel>(cmpHeight, maxWidth, currentY, 0));
+        child(i)->draw(make_unique<Panel>(cmpHeight, maxWidth, currentY, 0));
         currentY += cmpHeight;
     }
 }

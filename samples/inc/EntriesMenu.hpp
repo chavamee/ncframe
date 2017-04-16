@@ -3,7 +3,7 @@
 
 #include "ncf/Menu.hpp"
 #include "ncf/TextView.hpp"
-#include "api/Feedly.hpp"
+#include "Feedly.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -21,10 +21,10 @@ class EntriesMenu : public ncf::Menu {
         {
         }
 
-        /*void onItemSelected(ncf::ncurses::Menu::MenuItem* item) override
+        void onItemSelected(ncf::Menu::Item* item) override
         {
             (void)item;
-        }*/
+        }
 
         void ShowPreview(const std::string& preview)
         {
@@ -58,15 +58,15 @@ class EntriesMenu : public ncf::Menu {
         ncf::TextView* m_previewTextView = nullptr;
 };
 
-class EntryItem : public ncf::ncurses::Menu::MenuItem {
+class EntryItem : public ncf::Menu::Item {
     public:
-        EntryItem(Feedly::Entry& entry) : MenuItem(entry.title, entry.id), m_entry{entry}
+        EntryItem(Feedly::Entry& entry) : Item(entry.title, entry.id), m_entry{entry}
         {
         }
 
         bool action() override
         {
-            //static_cast<EntriesMenu*>(menu())->ShowPreview(m_entry.content);
+            static_cast<EntriesMenu*>(menu())->ShowPreview(m_entry.content);
             return true;
         }
 

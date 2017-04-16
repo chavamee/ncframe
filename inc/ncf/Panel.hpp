@@ -10,7 +10,6 @@ extern "C" {
 #include "Window.hpp"
 
 namespace ncf {
-namespace ncurses {
 
 class Panel : public Window {
     public:
@@ -124,6 +123,5 @@ class Panel : public Window {
 };
 
 } // namespace ncf
-} // namespace ncurses
 
 #endif

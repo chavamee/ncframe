@@ -1,7 +1,7 @@
 #ifndef NCF_NCURSES_WINDOW_H
 #define NCF_NCURSES_WINDOW_H
 
-#include "ncf/ncurses/ncurses.hpp"
+#include "ncf/ncurses.hpp"
 #include "ncf/Geometry.hpp"
 
 #include <functional>
@@ -9,13 +9,26 @@
 #include <iostream>
 
 namespace ncf {
-namespace ncurses {
 
 /**
  * Wrapper to an ncurses WINDOW object
  */
 class Window {
     public:
+        struct Border {
+            Border()
+            {
+            }
+
+            NCCharType left         = 0;
+            NCCharType right        = 0;
+            NCCharType top          = 0;
+            NCCharType bottom       = 0;
+            NCCharType top_left     = 0;
+            NCCharType top_right    = 0;
+            NCCharType bottom_left  = 0;
+            NCCharType bottom_right = 0;
+        };
 
     /**
      * Default Window constructor
@@ -451,7 +464,7 @@ class Window {
      *
      * @param border the border specification to use
      */
-    void drawBorder(Border border = {}) {
+    void drawBorder(Window::Border border = {}) {
         _onError ( wborder(m_window,
                 border.left,        border.right,
                 border.top,         border.bottom,
@@ -999,7 +1012,6 @@ class Window {
 
 const std::unique_ptr<Window> StdScr = std::make_unique<Window>(::stdscr);
 
-} // namespace ncurses
 } // namespace ncf
 
 #endif
