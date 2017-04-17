@@ -20,8 +20,8 @@ using namespace ncf;
 int main(int argc, char *argv[])
 {
     Feedly::User user{
-        "9c68ac32-267d-4e67-9362-3d074bc11c34",
-        "AzwoKrfxyb_kDf_-HmNittc3_EoKVXw8FL5_OX9c4Okhtmoj-Ep9h2-aZ1CSvlqU1xRbfA31giJGi1oYCm1if4PZmji-qE3wJqKpZp7l-bT7NiLvYHRlm83U_MFThMaBiLWFSLIagum2n3G2EAhG7_JcrlFjrli-kaqJ6w4RkYVl60C9Sjf5NYnaZIfm28ltcAzeUNU3h5EB2Q7CXDxxDIq6xo5ZAe-T:feedlydev"
+        "0f558b72-8e00-48b4-9f4a-7f97d8621968",
+        "AxjaorhxtZDMv15jMMCr57KzxGf4-A1YLIxGwaGdlSQMU1xKqhBJfjEK2e9f-uWT_dwpOdPkKfECU6zjOBW-ZwnIiWe8YnaWB-jUmYahTYNnU-Cl_VXh2zRBfQsm6JpAT6NM_TCBHMc73pKTtifnVNrtWZ3A9McgePJ4mWgUeXBuPeEZYKE-nEF3SY_pyEOi04miSdXtOKUaJVChGaO8gKCfAe_4wA:feedlydev"
     };
 
     Feedly server {

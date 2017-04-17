@@ -35,6 +35,14 @@ class Panel : public Window {
          */
         Panel(const Rect& rect);
 
+        Panel(Window& parent,
+              int height,
+              int width,
+              int y = 0,
+              int x = 0,
+              bool derived = false
+              );
+
         /**
          * Copying is not allowed.
          *

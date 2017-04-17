@@ -24,6 +24,25 @@ Panel::Panel(int height,
     }
 }
 
+Panel::Panel(const Rect& rect) :
+    Panel(rect.size.height, rect.size.height, rect.origin.y, rect.origin.x)
+{
+}
+
+Panel::Panel(Window& parent,
+        int height,
+        int width,
+        int y,
+        int x,
+        bool derived) :
+    Window(parent, height, width, y, x, derived)
+{
+    m_panel = ::new_panel(m_window);
+    if (not m_panel) {
+        throw NCPanelException("Failed to create panel");
+    }
+}
+
 Panel::~Panel()
 {
 }

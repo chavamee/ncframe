@@ -516,12 +516,12 @@ class Window {
     /**
      * Erase the window.
      */
-    void erase() { _onError ( werase(m_window) ); }
+    void erase() { _onError ( ::werase(m_window) ); }
 
     /**
      * Clear the window.
      */
-    void clear() { _onError ( wclear(m_window) ); }
+    void clear() { _onError ( ::wclear(m_window) ); }
 
     /**
      * Set/Reset the clear flag.

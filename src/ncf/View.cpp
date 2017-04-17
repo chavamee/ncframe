@@ -1,4 +1,5 @@
 #include "ncf/View.hpp"
+#include "ncf/Panel.hpp"
 #include "ncf/NCException.hpp"
 
 using namespace std;
@@ -17,12 +18,12 @@ void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
             // TODO: Use this window
         } else {
             //TODO: Make default window
-            window = make_unique<Window>(getGeometry());
+            window = make_unique<Panel>(getGeometry());
         }
     }
 
     if (!subWindow) {
-        subWindow = make_unique<Window>(
+        subWindow = make_unique<Panel>(
                 *window, window->height()-2, window->width()-2, 1, 1, false
                 );
         m_pad = make_unique<Pad>(window->height(), window->width());
@@ -34,9 +35,8 @@ void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
             subWindow->writeString(m_content);
         }
 
-        setWindow(std::move(window));
-        setSubWindow(std::move(subWindow));
-
+        Widget::setWindow(std::move(window));
+        Widget::setSubWindow(std::move(subWindow));
     }
 
 }

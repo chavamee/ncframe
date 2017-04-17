@@ -64,6 +64,7 @@ void Application::start()
 
     ::update_panels();
     ::doupdate();
+    ::refresh();
 
     vector<Widget*>& widgetList = Widget::WidgetList;
     if (not m_currWdgtWithFocus) {
@@ -100,9 +101,9 @@ void Application::start()
             m_currWdgtWithFocus->onKeyEvent(ch);
         }
 
-        ::refresh();
         ::update_panels();
         ::doupdate();
+        ::refresh();
     }
 }
 

@@ -15,6 +15,10 @@ class View : public Widget {
 
         View(const Rect& rect);
 
+        virtual ~View()
+        {
+        }
+
         void setContent(const std::string& content)
         {
             m_content = content;
@@ -23,11 +27,6 @@ class View : public Widget {
                 getSubWindow()->writeString(m_content);
             }
         }
-
-        virtual ~View()
-        {
-        }
-
 
         void draw(std::unique_ptr<Window> window = {}, std::unique_ptr<Window> subWindow = {}) override;
 
