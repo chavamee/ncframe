@@ -1,28 +1,22 @@
 #include "Feedly.hpp"
-// TODO: Merge Response and Request into a single headers
-// and a single namespace
-#include "Response.hpp"
-#include "Request.hpp"
-#include <json/json.h>
+
+#include "json.hpp"
+#include <cpr/cpr.h>
+
 #include <fstream>
-#include <cassert>
 
 using namespace std;
+using json = nlohmann::json;
+
+const string FeedlyUrl = "https://feedly.com";
 
 inline string ActionToStr(Actions action)
 {
     switch (action) {
-        case READ:
+        case Actions::READ:
             return "markAsRead";
-            break;
-        case UNREAD:
+        case Actions::UNREAD:
             return "undoMarkAsRead";
-            break;
-        case SAVED:
-            return "markAsSaved";
-            break;
-        case UNSAVED:
-            return "markAsUnsaved";
     }
 
     return "";
@@ -35,10 +29,8 @@ Feedly::Feedly(User& user) :
 
 bool Feedly::IsAvailable()
 {
-    Request req("https://feedly.com");
-    auto resp = req.Get();
-
-    if (resp.StatusCode() == 200) {
+    auto r = cpr::Get(cpr::Url{FeedlyUrl});
+    if (r.status_code == 200) {
         return true;
     }
 
@@ -47,13 +39,10 @@ bool Feedly::IsAvailable()
 
 bool Feedly::Authenticate()
 {
-    Request req(m_rootUrl + "/profile");
+    auto r = cpr::Get(cpr::Url{m_rootUrl + "/profile"},
+                      cpr::Header{{"Authorization", "OAuth " + m_user.authToken}});
 
-    req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken}});
-
-    auto resp = req.Get();
-
-    if (resp.StatusCode() == 200) {
+    if (r.status_code == 200) {
         return true;
     }
 
@@ -63,195 +52,164 @@ bool Feedly::Authenticate()
 
 map<string, string> Feedly::Categories() const
 {
-    Request req(m_rootUrl + "/categories");
-    req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken}});
-    req.SetOutputFile("output.test");
+    auto r = cpr::Get(cpr::Url{m_rootUrl + "/categories"},
+                      cpr::Header{{"Authorization", "OAuth " + m_user.authToken}});
 
-    auto resp = req.Get();
 
-    if (resp.StatusCode() not_eq 200) {
-        string error = "Could not get categories " + to_string(resp.StatusCode());
+    if (r.status_code not_eq 200) {
+        string error = "Could not get categories: " + to_string(r.status_code);
         throw runtime_error(error.c_str());
     }
 
-    ifstream output("output.test", ifstream::binary);
-    Json::Value root;
-    Json::CharReaderBuilder rbuilder;
-    string errs;
+    auto jsonResp = json::parse(r.text);
 
-    if (not Json::parseFromStream(rbuilder, output, &root, &errs)) {
-        // Report error
+    map<string, string> categories;
+    for (auto& ctg : jsonResp) {
+        const string label = ctg["label"];
+        const string id = ctg["id"];
+        categories[label] = id;
     }
 
-    map<string, string> ctgs;
-
-    for (unsigned int i = 0; i < root.size(); i++) {
-        ctgs[root[i]["label"].asString()] = root[i]["id"].asString();
-    }
-
-    return ctgs;
+    return categories;
 }
 
 void Feedly::MarkEntriesWithAction(const vector<string>& entryIds, Actions action)
 {
     if (entryIds.size() > 0) {
 
-        Json::Value root;
-        Json::Value array;
-
-        root["type"] = "entries";
+        json j;
+        j["type"] = "entries";
 
         for (auto& id : entryIds) {
-            /*
-             * Append returns a reference to the just appended Json::Value
-             */
-            array.append("entryIds") = id;
+            j["entryIds"].push_back(id);
         }
 
-        root["entryIds"] = array;
-        root["action"] = ActionToStr(action);
+        j["action"] = ActionToStr(action);
 
-        Json::StreamWriterBuilder wbuilder;
-        string document = Json::writeString(wbuilder, root);
-
-        Request req(m_rootUrl + "/markers");
-
-        req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken},
-                        {"Content-Type", "application/json"}});
-        req.SetBody(document);
-
-        auto resp = req.Post();
-
-        if (resp.StatusCode() != 200) {
-            // Error msg
+        auto r = cpr::Post(cpr::Url{m_rootUrl + "/markers"},
+                           cpr::Body{j.dump()},
+                           cpr::Header{{"Authorization", "OAuth " + m_user.authToken},
+                                       {"Content-Type", "application/json"}});
+        if (r.status_code not_eq 200) {
+            string error = "Could not mark entires with " + ActionToStr(action) + ": " + to_string(r.status_code);
+            throw runtime_error(error.c_str());
         }
     }
 }
 
 void Feedly::MarkCategoryWithAction(const string& categoryId, Actions action, const string& lastReadEntryId)
 {
-    assert(not categoryId.empty());
-    //TODO: Probably better to just ignore
-    assert(action != SAVED || action != UNSAVED);
+    if (not categoryId.empty()) {
+        throw runtime_error("Category ID cannot be empty");
+    }
 
-    Json::Value root;
-    Json::Value array;
-
-    root["type"] = "categories";
-
-    array.append("categoryIds") = categoryId;
+    json j;
+    j["type"] = "categories";
+    j["categoryIds"] = {categoryId};
 
     if (not lastReadEntryId.empty()) {
-        root["lastReadEntryId"] = lastReadEntryId;
+        j["lastReadEntryId"] = lastReadEntryId;
     }
-    root["categoryIds"] = array;
-    root["action"] = ActionToStr(action);
-    root["type"] = "categories";
+    j["action"] = ActionToStr(action);
 
-    Json::StreamWriterBuilder wbuilder;
-    string document = Json::writeString(wbuilder, root);
+    auto r = cpr::Post(cpr::Url{m_rootUrl + "/markers"},
+                       cpr::Header{{"Authorization", "OAuth " + m_user.authToken},
+                                   {"Content-Type", "application/json"}},
+                       cpr::Body{j.dump()});
 
-    Request req(m_rootUrl + "/markers");
-    req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken},
-            {"Content-Type", "application/json"}});
-    req.SetBody(document);
-
-    auto resp = req.Post();
-
-    if (resp.StatusCode() != 200) {
-        // Error msg
+    if (r.status_code not_eq 200) {
+        string error = "Could not mark category with " + ActionToStr(action) + ": " + to_string(r.status_code);
+        throw runtime_error(error.c_str());
     }
 }
 
 void Feedly::AddSubscription(const string& feed, const string& title, const vector<string> *const categories)
 {
-    Json::Value root;
-    root["id"] = "feed/" + feed;
-    root["title"] = title;
+    json j;
+    j["id"] = "feed/" + feed;
+    j["title"] = title;
 
     if (categories && categories->size() > 0) {
         for (const auto& ctg : *categories) {
-            Json::Value idMember;
-            idMember["id"] = ctg;
-            root["categories"].append(idMember);
+            j["categories"].push_back({{"id", ctg}});
         }
     } else {
-        root["categories"] = Json::Value(Json::arrayValue);
+        j["categories"] = {};
     }
 
-    Json::StreamWriterBuilder wbuilder;
-    string document = Json::writeString(wbuilder, root);
+    auto r = cpr::Post(cpr::Url{m_rootUrl + "/subscription"},
+                       cpr::Header{{"Authorization", "OAuth " + m_user.authToken}},
+                       cpr::Body{j.dump()});
 
-    Request req(m_rootUrl + "/subscriptions");
-
-    req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken}});
-    req.SetBody(document);
-
-    auto resp = req.Post();
-
-    if (resp.StatusCode() != 200) {
-        // Error msg
+    if (r.status_code not_eq 200) {
+        string error = "Could not add subscription: " + to_string(r.status_code);
+        throw runtime_error(error.c_str());
     }
 }
 
-/*
- * TODO: Figure out what needs to be done to avoid problems when the amount of fetched entries
- * is really big.
- */
 vector<Feedly::Entry> Feedly::Entries(const string& categoryId, bool sortByOldest, unsigned int count, bool unreadOnly, string continuationId, unsigned long newerThan)
 {
-    Request req(m_rootUrl + "/streams/contents");
-    Response resp;
-
-    req.SetHeaders({{"Authorization", "OAuth " + m_user.authToken}});
-    req.SetOutputFile("test.output");
-    req.SetParameters({
+    auto params = cpr::Parameters({
             {"ranked",       sortByOldest ? "oldest" : "newest"},
             {"unreadOnly",   unreadOnly ? "true" : "false"},
             {"count",        to_string(count)}
             });
 
     if (not continuationId.empty()) {
-        req.SetParameters({{"continuation", continuationId}});
+        params.AddParameter(cpr::Parameter{"continuation", continuationId});
     }
 
     if (newerThan > 0) {
-        req.SetParameters({{"newerThan", to_string(newerThan)}});
+        params.AddParameter(cpr::Parameter{"newerThan", to_string(newerThan)});
     }
 
     if (categoryId == "All") {
-        req.SetParameters({{"streamId", "user/" + m_user.id + "/category/global.all"}});
+        params.AddParameter(cpr::Parameter{"streamId", "user/" + m_user.id + "/category/global.all"});
     } else if (categoryId == "Uncategorized") {
-        req.SetParameters({{"streamId", "user/" + m_user.id + "/category/global.uncategorized"}});
+        params.AddParameter(cpr::Parameter{"streamId", "user/" + m_user.id + "/category/global.uncategorized"});
     } else if (categoryId == "Saved") {
-        req.SetParameters({{"streamId", "user/" + m_user.id + "/tag/global.saved"}});
+        params.AddParameter(cpr::Parameter{"streamId", "user/" + m_user.id + "/tag/global.saved"});
     } else {
-        req.SetParameters({{"streamId", categoryId}});
+        params.AddParameter(cpr::Parameter{"streamId", categoryId});
     }
 
-    resp = req.Get();
+    auto r = cpr::Get(cpr::Url{m_rootUrl + "/streams/contents"},
+                      cpr::Header{{"Authorization", "OAuth " + m_user.authToken}},
+                      params);
 
-    ifstream output("test.output", ifstream::binary);
-    Json::Value root;
-    Json::CharReaderBuilder rbuilder;
-    string errs;
-    if (not Json::parseFromStream(rbuilder, output, &root, &errs)) {
-        // Report error
+    if (r.status_code not_eq 200) {
+        string error = "Could not get entries: " + to_string(r.status_code);
+        throw runtime_error(error.c_str());
     }
 
-    vector<Feedly::Entry> feeds;
+    auto j = json::parse(r.text);
 
-    for (auto& it : root["items"]) {
-        feeds.emplace_back(
-                it["summary"]["content"].asString(),
-                it["title"].asString(),
-                it["id"].asString(),
-                it["originId"].asString(),
-                it["origin"]["title"].asString()
-                );
+    vector<Feedly::Entry> entries;
+    for (auto& item : j["items"]) {
+        string title = item["title"];
+        string id = item["id"];
+        string originID = item["originId"];
+
+        string content;
+        if (item["summary"]["content"].is_string()) {
+            content = item["summary"]["content"];
+        }
+
+        string originTitle;
+        if (item["origin"]["title"].is_string()) {
+            originTitle = item["origin"]["title"];
+        }
+
+        entries.emplace_back(
+            content,
+            title,
+            id,
+            originID,
+            originTitle
+            );
     }
 
-    return feeds;
+    return entries;
 }
 
 /*

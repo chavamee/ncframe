@@ -11,15 +11,11 @@
 #include <vector>
 
 /**
- * Various actions that can be applied to entries and categories.
- *
- * Note that SAVED and UNSAVED are not available for categories
+ * Actions that can be applied to entries and categories.
  */
-enum Actions {
+enum class Actions {
     READ,
-    UNREAD,
-    SAVED,
-    UNSAVED
+    UNREAD
 };
 
 /**

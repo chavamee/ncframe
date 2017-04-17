@@ -28,26 +28,21 @@ class EntriesMenu : public ncf::Menu {
 
         void ShowPreview(const std::string& preview)
         {
-            std::ofstream sample("/home/chavamee/workspace/projects/active/ncframe/sample.html");
+            std::string contentDumpPath = "/tmp/termfeed.content.dump.html";
+            std::ofstream sample(contentDumpPath);
 
             sample << preview;
 
-            sample.close();
-
-            FILE* stream = popen(std::string("w3m -dump -cols " + std::to_string(COLS - 2) + " " + "/home/chavamee/workspace/projects/active/ncframe/sample.html").c_str(), "r");
+            std::string command = "w3m -dump -cols " + std::to_string(COLS - 2) + " " + contentDumpPath;
+            FILE* stream = popen(command.c_str(), "r");
 
             std::string content;
-
-            if (stream)
-            {
+            if (stream) {
                 char buffer[256];
-                while (not feof(stream))
-                {
-                    if (fgets(buffer, 256, stream) not_eq NULL)
-                    {
+                while (not feof(stream)) {
+                    if (fgets(buffer, 256, stream) not_eq NULL) {
                         content.append(buffer);
                     }
-
                 }
                 pclose(stream);
             }

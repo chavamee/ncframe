@@ -45,7 +45,6 @@ int main(int argc, char *argv[])
 
     vector<Menu::Item*> ctgItems;
     vector<Menu::Item*> entryItems;
-    try {
         map<string, string> ctgs = server.Categories();
         for (auto& ctg : ctgs) {
             ctgItems.push_back(new Menu::Item(ctg.first, ctg.second));
@@ -55,8 +54,6 @@ int main(int argc, char *argv[])
         for (auto& entry : entries) {
             entryItems.push_back(new EntryItem(entry));
         }
-    } catch (std::exception& e) {
-    }
 
     ctgMenu.setItems(ctgItems);
     entriesMenu.setItems(entryItems);

@@ -39,7 +39,7 @@ class CategoryMenu : public ncf::Menu {
 
         void markCategoryRead()
         {
-            m_server->MarkCategoryWithAction(currentItem().description(), READ, lastReadEntryId);
+            m_server->MarkCategoryWithAction(currentItem().description(), Actions::READ, lastReadEntryId);
             std::vector<Feedly::Entry> entries = m_server->Entries(currentItem().description());
             std::vector<ncf::Menu::Item*> items;
             for (auto& entry : entries) {
