@@ -1,5 +1,0 @@
-project(feedlr)
-include_directories("inc")
-set(srcs src/Feedly.cpp src/main.cpp)
-add_executable(feedlr ${srcs})
-target_link_libraries(feedlr ncf jsoncpp curl curses menu panel cpr)
