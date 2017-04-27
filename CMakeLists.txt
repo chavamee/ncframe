@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.8)
 
-# Allow use of project folders for IDEs like Visual Studio, so we
-# could organize projects into relevant folders: "cpr", "tests" & "external (libraries)".
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
 
@@ -36,7 +34,11 @@ else()
 endif()
 
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
-include_directories("${PROJECT_SOURCE_DIR}/ncf/inc")
+set(NCF_LIBRARIES ncf CACHE INTERNAL "")
+set(NCF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/ncf/inc CACHE INTERNAL "")
+
+include_directories(${NCF_INCLUDE_DIR})
 add_subdirectory(ncf/ncf)
