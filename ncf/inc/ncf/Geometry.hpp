@@ -1,5 +1,5 @@
-#ifndef NCF_NCURSES_GEOMETRY_H_
-#define NCF_NCURSES_GEOMETRY_H_
+#ifndef NCF_GEOMETRY_H
+#define NCF_GEOMETRY_H
 
 struct Point
 {

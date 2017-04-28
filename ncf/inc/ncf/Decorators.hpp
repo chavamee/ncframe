@@ -1,5 +1,5 @@
-#ifndef NCURSES_DECORATORS_H_
-#define NCURSES_DECORATORS_H_
+#ifndef NCF_DECORATORS_H
+#define NCF_DECORATORS_H
 
 #include "ncf/Component.hpp"
 
@@ -35,4 +35,5 @@ class Border : public Decorator {
 };
 
 }
+
 #endif /* ifndef NCURSES_DECORATORS_H_ */

@@ -1,5 +1,5 @@
-#ifndef NCURSES_COMPONENT_BINDIGNS_H_
-#define NCURSES_COMPONENT_BINDIGNS_H_
+#ifndef NCF_COMPONENT_H
+#define NCF_COMPONENT_H
 
 #include "common/platform.h"
 #include "ncf/Window.hpp"
@@ -63,4 +63,5 @@ class Component {
 };
 
 }
+
 #endif

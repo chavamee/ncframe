@@ -1,5 +1,5 @@
-#ifndef NCURSES_APPLICATION_BINDINGS_H_
-#define NCURSES_APPLICATION_BINDINGS_H_
+#ifndef NCF_APPLICATION_H
+#define NCF_APPLICATION_H
 
 #include "ncf/Window.hpp"
 #include "ncf/Widget.hpp"
@@ -156,4 +156,5 @@ class Application {
 };
 
 }
+
 #endif

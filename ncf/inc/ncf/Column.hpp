@@ -1,5 +1,5 @@
-#ifndef NCF_NCURSES_COLUMN_H_
-#define NCF_NCURSES_COLUMN_H_
+#ifndef NCF_COLUMN_H
+#define NCF_COLUMN_H
 
 #include "ncf/Widget.hpp"
 #include <algorithm>
@@ -32,4 +32,5 @@ class Column : public Widget {
 };
 
 }
+
 #endif

@@ -1,7 +1,6 @@
 #ifndef NCF_NCURSES_PANEL_H
 #define NCF_NCURSES_PANEL_H
 
-
 #include <cursesw.h>
 extern "C" {
 #  include <panel.h>

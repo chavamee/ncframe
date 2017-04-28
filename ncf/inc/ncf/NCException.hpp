@@ -1,5 +1,5 @@
-#ifndef NCFRAME_NCURSES_EXCEPTION_H_
-#define NCFRAME_NCURSES_EXCEPTION_H_
+#ifndef NCF_NCURSES_EXCEPTION_H
+#define NCF_NCURSES_EXCEPTION_H
 
 extern "C" {
 #include <eti.h>
@@ -51,4 +51,5 @@ class NCException : public std::exception {
 };
 
 } // namespace ncf
+
 #endif

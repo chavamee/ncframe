@@ -1,5 +1,5 @@
-#ifndef NCURSES_TEXTVIEW_COMPONENT
-#define NCURSES_TEXTVIEW_COMPONENT
+#ifndef NCURSES_TEXTVIEW_COMPONENT_H
+#define NCURSES_TEXTVIEW_COMPONENT_H
 
 #include "ncf/Component.hpp"
 #include "ncf/Window.hpp"

@@ -1,5 +1,5 @@
-#ifndef NCF_NCURSES_ROW_H_
-#define NCF_NCURSES_ROW_H_
+#ifndef NCF_NCURSES_ROW_H
+#define NCF_NCURSES_ROW_H
 
 #include "ncf/Widget.hpp"
 

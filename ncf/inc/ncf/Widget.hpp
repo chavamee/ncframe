@@ -1,5 +1,5 @@
-#ifndef NCURSES_WIDGETS_H_
-#define NCURSES_WIDGETS_H_
+#ifndef NCF_WIDGETS_H
+#define NCF_WIDGETS_H
 
 #include "ncf/Component.hpp"
 #include "ncf/Geometry.hpp"
@@ -102,4 +102,5 @@ class Widget : public Component {
 };
 
 }
+
 #endif

@@ -1,4 +1,5 @@
-#ifndef NCURSES_VIEW_HPP_
+#ifndef NCF_VIEW_H
+#define NCF_VIEW_H
 
 #include "ncf/Widget.hpp"
 #include "ncf/Pad.hpp"
@@ -36,4 +37,5 @@ class View : public Widget {
 };
 
 }
+
 #endif

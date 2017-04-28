@@ -1,5 +1,5 @@
-#ifndef NCF_NCURSES_WINDOWEXCEPTION_H_
-#define NCF_NCURSES_WINDOWEXCEPTION_H_
+#ifndef NCF_NCURSES_WINDOW_EXCEPTION_H
+#define NCF_NCURSES_WINDOW_EXCEPTION_H
 
 #include "ncf/Window.hpp"
 #include "ncf/NCException.hpp"

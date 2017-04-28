@@ -1,5 +1,5 @@
-#ifndef NCF_NCURSES_PANEL_EXCEPTION_H_
-#define NCF_NCURSES_PANEL_EXCEPTION_H_
+#ifndef NCF_NCURSES_PANEL_EXCEPTION_H
+#define NCF_NCURSES_PANEL_EXCEPTION_H
 
 #include "ncf/Panel.hpp"
 #include "ncf/NCWindowException.hpp"
