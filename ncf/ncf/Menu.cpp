@@ -1,5 +1,6 @@
-#include "ncf/Menu.hpp"
-#include "ncf/Application.hpp"
+#include <ncf/Panel.hpp>
+#include <ncf/Menu.hpp>
+#include <ncf/Application.hpp>
 
 #include <menu.h>
 #include <cassert>
@@ -146,7 +147,7 @@ void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 
         Menu::setWindow(*window);
 
-        subWindow = make_unique<Window>(
+        subWindow = make_unique<Panel>(
                 *window,
                 window->height()-2, window->width()-2, 1, 1,
                 false
@@ -172,6 +173,7 @@ void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 
         post();
         window->refresh();
+        subWindow->refresh();
 
         Widget::setWindow(std::move(window));
         Widget::setSubWindow(std::move(subWindow));
@@ -211,6 +213,12 @@ void Menu::setItems(vector<Item*>& items)
         item->m_menu = this;
     }
 
+    ITEM** oldItems = nullptr;
+    if (m_isDrawn) {
+        unpost();
+         oldItems = menu_items(m_menu);
+    }
+
     if (m_items.empty()) {
         set_menu_items(m_menu, nullptr);
     } else {
@@ -218,16 +226,10 @@ void Menu::setItems(vector<Item*>& items)
     }
 
     if (m_isDrawn) {
-        ITEM** oldItems = menu_items(m_menu);
-
-        if (m_isPosted) {
-            unpost();
+        post();
+        if (oldItems != nullptr) {
+            delete[] oldItems;
         }
-        if (!m_isPosted) {
-            post();
-        }
-
-        delete[] oldItems;
     }
 }
 
