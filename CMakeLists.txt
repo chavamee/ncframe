@@ -33,14 +33,28 @@ else()
     endif()
 endif()
 
-
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+
+macro(ncf_option OPTION_NAME OPTION_TEXT OPTION_DEFAULT)
+    option(${OPTION_NAME} ${OPTION_TEXT} ${OPTION_DEFAULT})
+    if(DEFINED ENV{${OPTION_NAME}})
+        # Allow setting the option through an environment variable
+        set(${OPTION_NAME} $ENV{${OPTION_NAME}})
+    endif()
+    if(${OPTION_NAME})
+        add_definitions(-D${OPTION_NAME})
+    endif()
+    message(STATUS "  ${OPTION_NAME}: ${${OPTION_NAME}}")
+endmacro()
 
 set(NCF_LIBRARIES ncf CACHE INTERNAL "")
 set(NCF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/ncf/inc CACHE INTERNAL "")
 
-include_directories(${NCF_INCLUDE_DIR})
-add_subdirectory(ncf/ncf)
+ncf_option(NCF_BUILD_TEST_SAMPLES
+    "If on, test samples will be built" OFF)
 
-add_subdirectory(tests)
+add_subdirectory(ncf/ncf)
+if(NCF_BUILD_TEST_SAMPLES)
+    add_subdirectory(tests)
+endif()
