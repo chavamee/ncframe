@@ -4,7 +4,7 @@
 namespace ncf {
 
 Panel::Panel() :
-    Window(::stdscr)
+    Window(::stdscr, false)
 {
     m_panel = ::new_panel(m_window);
     if (not m_panel) {

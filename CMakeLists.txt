@@ -42,3 +42,5 @@ set(NCF_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/ncf/inc CACHE INTERNAL "")
 
 include_directories(${NCF_INCLUDE_DIR})
 add_subdirectory(ncf/ncf)
+
+add_subdirectory(tests)

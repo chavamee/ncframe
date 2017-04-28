@@ -1,7 +1,5 @@
 -DDEBUG
 -Wall
 -Wextra
--Iinc
--Isamples/inc
+-Incf/inc
 -std=c++14
--Lbuild/lib

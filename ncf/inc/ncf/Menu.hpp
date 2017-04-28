@@ -99,7 +99,9 @@ public:
         }
 
     private:
-        ITEM* m_item = NULL;
+        void initCursesHandle();
+
+        ITEM* m_item = nullptr;
 
         /*
          * TODO: Clean up explanation
@@ -115,6 +117,8 @@ public:
 
 public:
     Menu();
+
+    Menu(const std::initializer_list<Item*>& items);
 
     Menu(std::vector<Item*>& items);
 

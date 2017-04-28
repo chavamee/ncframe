@@ -18,7 +18,7 @@ Window::Window(WINDOW*& win, bool takeOnwership) :
 {
     initialize();
     m_window = win ? win : ::stdscr;
-    if (takeOnwership) {
+    if (takeOnwership && win != ::stdscr) {
         win = nullptr;
     }
 }

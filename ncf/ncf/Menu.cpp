@@ -26,20 +26,12 @@ Menu::Item::Item(
     m_name(name),
     m_description(description)
 {
-    m_item = new_item(m_name.c_str(), m_description.c_str());
-    if (m_item == NULL) {
-        onError(E_SYSTEM_ERROR);
-    }
 }
 
 Menu::Item::Item(const Item& item) :
     m_name(item.m_name),
     m_description(item.m_description)
 {
-    m_item = new_item(m_name.c_str(), m_description.c_str());
-    if (m_item == NULL) {
-        throw std::runtime_error("menu item failed");
-    }
 }
 
 Menu::Item::~Item()
@@ -60,11 +52,32 @@ Menu::Item& Menu::Item::operator=(const Menu::Item& other)
     return *this;
 }
 
+void Menu::Item::initCursesHandle()
+{
+    m_item = new_item(m_name.c_str(), m_description.c_str());
+    if (m_item == NULL) {
+        throw std::runtime_error("menu item failed");
+    }
+}
+
 
 Menu::Menu() :
     m_menu(nullptr),
     m_itemMark(nullptr),
     m_items(),
+    m_window(),
+    m_subWindow()
+{
+    m_menu = new_menu(nullptr);
+    if (m_menu == nullptr) {
+        onError(E_SYSTEM_ERROR);
+    }
+}
+
+Menu::Menu(const initializer_list<Item*>& items) :
+    m_menu(nullptr),
+    m_itemMark(nullptr),
+    m_items(items),
     m_window(),
     m_subWindow()
 {
@@ -92,6 +105,9 @@ Menu::~Menu()
 {
     // Free all items before freeing the menu
     if (m_menu) {
+        for (auto& item : m_items) {
+            delete item;
+        }
         m_items.clear();
         ::free_menu(m_menu);
         m_menu = nullptr;
@@ -138,48 +154,57 @@ bool Menu::onEvent(int ch)
 
 void Menu::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    if (window.get() != nullptr) {
+    if (not window) {
+        window = make_unique<Panel>();
+    }
 
-        window->enableKeypad(true);
-        window->enableMeta(true);
+    for (auto& item: m_items) {
+        item->initCursesHandle();
+    }
 
-        //TODO: initializeItems()
+    if (::menu_items(m_menu) == nullptr) {
+        if (not m_items.empty()) {
+            ::set_menu_items(m_menu, _unpackItems(m_items));
+        }
+    }
 
-        Menu::setWindow(*window);
+    window->enableKeypad(true);
+    window->enableMeta(true);
 
+    Menu::setWindow(*window);
+
+    if (not subWindow) {
         subWindow = make_unique<Panel>(
                 *window,
                 window->height()-2, window->width()-2, 1, 1,
                 false
                 );
-
-        Menu::setSubWindow(*subWindow);
-
-        //TODO: These should be treated as defaults. Maybe do at construction
-        // to ensure that after construction if the user needs to change the
-        // format this will not conflict.
-        setFormat({.height = window->height() - 2, .width = 1});
-        setMark("*");
-
-        subWindow->enableKeypad(true);
-        subWindow->enableMeta(true);
-
-        Application* app = Application::getApplication();
-        if (app) {
-            setForeground(app->foregrounds());
-            setBackground(app->backgrounds());
-            setGrey(app->inactives());
-        }
-
-        post();
-        window->refresh();
-        subWindow->refresh();
-
-        Widget::setWindow(std::move(window));
-        Widget::setSubWindow(std::move(subWindow));
-    } else {
-        //TODO: Define defaults
     }
+
+    Menu::setSubWindow(*subWindow);
+
+    //TODO: These should be treated as defaults. Maybe do at construction
+    // to ensure that after construction if the user needs to change the
+    // format this will not conflict.
+    setFormat({.height = window->height() - 2, .width = 1});
+    setMark("*");
+
+    subWindow->enableKeypad(true);
+    subWindow->enableMeta(true);
+
+    Application* app = Application::getApplication();
+    if (app) {
+        setForeground(app->foregrounds());
+        setBackground(app->backgrounds());
+        setGrey(app->inactives());
+    }
+
+    post();
+    window->refresh();
+    subWindow->refresh();
+
+    Widget::setWindow(std::move(window));
+    Widget::setSubWindow(std::move(subWindow));
 
     m_isDrawn = true;
 }
@@ -198,25 +223,21 @@ bool Menu::_invokeAction(Menu::Item& item)
     return true;
 }
 
-//TODO
-// initializeItems()
-// {
-// for (auto& item : m_items)
-//  item.m_menu = new_item(...)
-//}
-
 void Menu::setItems(vector<Item*>& items)
 {
     //TODO: Implement with a swap or clone function
     m_items = items;
     for (auto& item : m_items) {
         item->m_menu = this;
+        if (item->m_item == nullptr) {
+            item->initCursesHandle();
+        }
     }
 
     ITEM** oldItems = nullptr;
     if (m_isDrawn) {
         unpost();
-         oldItems = menu_items(m_menu);
+        oldItems = menu_items(m_menu);
     }
 
     if (m_items.empty()) {
