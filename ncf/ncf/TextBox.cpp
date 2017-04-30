@@ -1,17 +1,44 @@
-#include "ncf/View.hpp"
-#include "ncf/Panel.hpp"
-#include "ncf/NCException.hpp"
+#include <ncf/TextBox.hpp>
+#include <ncf/Panel.hpp>
 
 using namespace std;
 
 namespace ncf {
 
-View::View(const Rect& rect) :
-    Widget{ rect }
+TextBox::TextBox() :
+    Widget {}
 {
 }
 
-void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
+TextBox::TextBox(const Rect& rect) :
+    Widget {rect}
+{
+}
+
+TextBox::~TextBox()
+{
+}
+
+int TextBox::onKeyEvent(int ch)
+{
+    switch (ch) {
+        case KEY_UP:break;
+    }
+    return 0;
+}
+
+void TextBox::onMouseEvent(int ch)
+{
+    (void)ch;
+}
+
+bool TextBox::onEvent(int ch)
+{
+    (void)ch;
+    return false;
+}
+
+void TextBox::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
     if (!window) {
         if (getWindow()) {
@@ -38,7 +65,15 @@ void View::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
         Widget::setWindow(std::move(window));
         Widget::setSubWindow(std::move(subWindow));
     }
-
 }
 
+void TextBox::setText(const string& text)
+{
+    m_content = text;
+    if (getSubWindow()) {
+        getSubWindow()->clear();
+        getSubWindow()->writeString(m_content);
+    }
 }
+
+} // namespace ncf

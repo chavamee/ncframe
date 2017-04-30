@@ -5,12 +5,11 @@ add_library(${NCF_LIBRARIES} SHARED
     Column.cpp
     Menu.cpp
     Row.cpp
-    TextView.cpp
-    View.cpp
     Widget.cpp
     Menu.cpp
     Panel.cpp
     Pad.cpp
+    TextBox.cpp
     Window.cpp
     )
 

@@ -12,3 +12,4 @@ include_directories(${NCF_INCLUDE_DIRS})
 
 add_ncf_test_sample(single menu)
 add_ncf_test_sample(triple_in_row menu)
+add_ncf_test_sample(single_simple textbox)
