@@ -40,40 +40,37 @@ bool TextBox::onEvent(int ch)
 
 void TextBox::draw(unique_ptr<Window> window, unique_ptr<Window> subWindow)
 {
-    if (!window) {
-        if (getWindow()) {
-            // TODO: Use this window
-        } else {
-            //TODO: Make default window
-            window = make_unique<Panel>(getGeometry());
-        }
+  if (not hasWindow()) {
+    if (not window) {
+      window = make_unique<Panel>(getGeometry());
     }
+    Widget::setWindow(std::move(window));
+  }
 
-    if (!subWindow) {
-        subWindow = make_unique<Panel>(
-                *window, window->height()-2, window->width()-2, 1, 1, false
-                );
-        m_pad = make_unique<Pad>(window->height(), window->width());
-
-        m_pad->setWindow(window.get());
-        m_pad->setSubWindow(subWindow.get());
-
-        if (!m_content.empty()) {
-            subWindow->writeString(m_content);
-        }
-
-        Widget::setWindow(std::move(window));
-        Widget::setSubWindow(std::move(subWindow));
+  if (not hasSubWindow()) {
+    if (not window) {
+      subWindow = make_unique<Panel>(getWindow(),
+          getWindow().height()-2, getWindow().width()-2, 1, 1, false
+          );
     }
+    Widget::setSubWindow(std::move(subWindow));
+  }
+
+  if (not m_pad) {
+    m_pad = make_unique<Pad>(getWindow().height(), getWindow().width());
+    m_pad->setWindow(&getWindow());
+    m_pad->setSubWindow(&getSubWindow());
+  }
+
+  if (!m_content.empty()) {
+    getSubWindow().clear();
+    getSubWindow().writeString(m_content);
+  }
 }
 
 void TextBox::setText(const string& text)
 {
     m_content = text;
-    if (getSubWindow()) {
-        getSubWindow()->clear();
-        getSubWindow()->writeString(m_content);
-    }
 }
 
 } // namespace ncf

@@ -1,1 +1,5 @@
-flags=-Iinc -DDEBUG -std=c++14 -Lbuild/lib -Isamples/inc
+flags=-DDEBUG
+flags=-Wall
+flags=-Wextra
+flags=-Incf/inc
+flags=-std=c++14

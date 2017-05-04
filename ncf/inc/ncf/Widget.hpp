@@ -76,14 +76,24 @@ class Widget : public Component {
             m_subWindow = std::move(window);
         }
 
-        Window* getWindow() const
+        Window& getWindow() const
         {
-            return m_window.get();
+            return *m_window;
         }
 
-        Window* getSubWindow() const
+        Window& getSubWindow() const
         {
-            return m_subWindow.get();
+            return *m_subWindow;
+        }
+
+        inline bool hasWindow() const
+        {
+          return m_window.get() != nullptr;
+        }
+
+        inline bool hasSubWindow() const
+        {
+          return m_subWindow.get() != nullptr;
         }
 
         void hide();
