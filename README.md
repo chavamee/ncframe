@@ -68,17 +68,17 @@ char *descriptions[] = {
 int main()
 {
   ITEM **my_items;
-	int c;
-	MENU *my_menu;
+  int c;
+  MENU *my_menu;
   WINDOW *my_menu_win;
   int n_choices, i;
 
-	initscr();
-	start_color();
+  initscr();
+  start_color();
   cbreak();
   noecho();
-	keypad(stdscr, TRUE);
-	init_pair(1, COLOR_RED, COLOR_BLACK);
+  keypad(stdscr, TRUE);
+  init_pair(1, COLOR_RED, COLOR_BLACK);
 
   n_choices = ARRAY_SIZE(choices);
   my_items = (ITEM **)calloc(n_choices, sizeof(ITEM *));
@@ -86,7 +86,7 @@ int main()
     my_items[i] = new_item(choices[i], descriptions[i]);
   }
 
-	my_menu = new_menu((ITEM **)my_items);
+  my_menu = new_menu((ITEM **)my_items);
 
   my_menu_win = newwin(10, 40, 4, 4);
   keypad(my_menu_win, TRUE);
@@ -97,30 +97,30 @@ int main()
   set_menu_mark(my_menu, " * ");
 
   box(my_menu_win, 0, 0);
-	refresh();
+  refresh();
 
-	post_menu(my_menu);
-	wrefresh(my_menu_win);
+  post_menu(my_menu);
+  wrefresh(my_menu_win);
 
-	while((c = wgetch(my_menu_win)) != 'q')
-	{
+  while((c = wgetch(my_menu_win)) != 'q')
+  {
     switch(c) {
     case KEY_DOWN:
-		  menu_driver(my_menu, REQ_DOWN_ITEM);
-			break;
+      menu_driver(my_menu, REQ_DOWN_ITEM);
+      break;
 		case KEY_UP:
-			menu_driver(my_menu, REQ_UP_ITEM);
-			break;
-		}
+      menu_driver(my_menu, REQ_UP_ITEM);
+      break;
+    }
     wrefresh(my_menu_win);
-	}
+  }
 
   unpost_menu(my_menu);
   free_menu(my_menu);
   for(i = 0; i < n_choices; ++i) {
     free_item(my_items[i]);
   }
-	endwin();
+  endwin();
 }
 ```
 
