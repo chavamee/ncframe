@@ -8,12 +8,12 @@ int main(void)
     Application app;
 
     Menu menu {
-        new ncf::Menu::Item {"Vim",    "A highly configurable text editor"},
-        new ncf::Menu::Item {"Nano",   "The GNU Nano"},
-        new ncf::Menu::Item {"Emacs",  "An extensible, customizable, free/libre text editor"},
-        new ncf::Menu::Item {"Sublime","The text editor you'll fall in love with"},
-        new ncf::Menu::Item {"Atom",   "A hackable editor for the 21st Century"},
-        new ncf::Menu::Item {"Gedit",  "The GNOME text editor"}
+        new Menu::Item {"Vim",    "A highly configurable text editor"},
+        new Menu::Item {"Nano",   "The GNU Nano"},
+        new Menu::Item {"Emacs",  "An extensible, customizable, free/libre text editor"},
+        new Menu::Item {"Sublime","The text editor you'll fall in love with"},
+        new Menu::Item {"Atom",   "A hackable editor for the 21st Century"},
+        new Menu::Item {"Gedit",  "The GNOME text editor"}
     };
 
     menu.draw();
