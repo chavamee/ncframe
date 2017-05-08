@@ -8,7 +8,8 @@ NCFframe aims to facilitate NCurses based application development by providing a
 ### Create a menu
 
 #### NCFrame
-```
+
+```cpp
 #include <ncf/Application.hpp>
 #include <ncf/Menu.hpp>
 
@@ -36,7 +37,7 @@ int main(void)
 ```
 
 #### NCurses only
-```
+```cpp
 /*
  * Example taken from http://www.tldp.org/HOWTO/NCURSES-Programming-HOWTO/menus.html#MENUWINDOWS
  */
